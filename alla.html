@@ -487,10 +487,16 @@ margin: 4px auto;
 <div class="level-sub" id="warnSub"></div>
 </div>
 
-<div class="loc-bar">
-<span class="loc-icon">📍</span>
-<span id="locLabel">Standort wird ermittelt…</span>
-<button class="btn btn-ghost" style="margin-left:auto;padding:4px 10px;font-size:11px" onclick="fetchLocation()">Aktualisieren</button>
+<div class="loc-bar" style="flex-wrap:wrap;gap:8px">
+<span class="loc-icon">&#128205;</span>
+<span id="locLabel" style="flex:1">Kein Standort gesetzt</span>
+<div style="display:flex;gap:6px;width:100%;margin-top:6px">
+<input id="cityInput" type="text" placeholder="Stadt eingeben, z.B. Wien"
+style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font-mono);font-size:13px;padding:7px 10px;outline:none"
+onkeydown="if(event.key==='Enter')searchCity()">
+<button class="btn" style="padding:7px 14px;font-size:12px" onclick="searchCity()">Suchen</button>
+</div>
+<div id="cityResults" style="width:100%"></div>
 </div>
 
 <div class="card-title">Pollen heute</div>
@@ -700,7 +706,7 @@ renderKontaktTags();
 renderTagebuch();
 renderSymptomStats();
 renderRecentSymptoms();
-fetchLocation();
+loadSavedCity();
 populateFilterMonths();
 }
 
@@ -725,43 +731,6 @@ d.toLocaleDateString('de-DE', { weekday:'long', day:'numeric', month:'long', yea
 // ═══════════════════════════════════════
 // LOCATION & POLLEN API
 // ═══════════════════════════════════════
-function fetchLocation() {
-document.getElementById('locLabel').textContent = 'Standort wird ermittelt…';
-if (!navigator.geolocation) {
-useFallbackLocation();
-return;
-}
-navigator.geolocation.getCurrentPosition(
-pos => {
-state.lat = pos.coords.latitude;
-state.lon = pos.coords.longitude;
-reverseGeocode(state.lat, state.lon);
-fetchPollenData();
-},
-() => useFallbackLocation()
-);
-}
-
-function useFallbackLocation() {
-// Fallback: Berlin
-state.lat = 52.52;
-state.lon = 13.405;
-state.locationName = 'Berlin (Fallback)';
-document.getElementById('locLabel').textContent = '📍 Berlin (kein Standortzugriff)';
-fetchPollenData();
-}
-
-async function reverseGeocode(lat, lon) {
-try {
-const r = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
-const d = await r.json();
-const name = d.address?.city || d.address?.town || d.address?.village || d.address?.county || 'Dein Standort';
-state.locationName = name;
-document.getElementById('locLabel').textContent = `📍 ${name}`;
-} catch {
-document.getElementById('locLabel').textContent = `📍 ${state.lat?.toFixed(2)}, ${state.lon?.toFixed(2)}`;
-}
-}
 
 async function fetchPollenData() {
 // Open-Meteo Air Quality API – pollen data
@@ -1228,6 +1197,61 @@ renderRecentSymptoms();
 renderSymptomStats();
 renderProfilTags();
 showToast('Alle Daten gelöscht');
+}
+
+
+// ═══════════════════════════════════════
+// STADTSUCHE
+// ═══════════════════════════════════════
+async function searchCity() {
+var query = document.getElementById('cityInput').value.trim();
+if (!query) return;
+var resultsDiv = document.getElementById('cityResults');
+resultsDiv.innerHTML = '<div style="font-size:12px;color:var(--text3);padding:4px 0">Suche\u2026</div>';
+try {
+var r = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=4&q=' + encodeURIComponent(query));
+var results = await r.json();
+if (!results.length) {
+resultsDiv.innerHTML = '<div style="font-size:12px;color:var(--text3);padding:4px 0">Keine Ergebnisse</div>';
+return;
+}
+var html = '';
+for (var i = 0; i < results.length; i++) {
+var p = results[i];
+var label = p.display_name.split(',').slice(0,3).join(', ');
+var shortName = p.display_name.split(',')[0];
+html += '<button onclick="selectCity(' + p.lat + ',' + p.lon + ',\'' + shortName.replace(/'/g,'') + '\')" '
++ 'style="display:block;width:100%;text-align:left;background:var(--surface2);border:1px solid var(--border);'
++ 'border-radius:8px;color:var(--text2);font-family:var(--font-mono);font-size:12px;padding:8px 10px;'
++ 'margin-top:4px;cursor:pointer">' + label + '</button>';
+}
+resultsDiv.innerHTML = html;
+} catch(e) {
+resultsDiv.innerHTML = '<div style="font-size:12px;color:var(--warn-3);padding:4px 0">Fehler bei der Suche</div>';
+}
+}
+
+function selectCity(lat, lon, name) {
+state.lat = parseFloat(lat);
+state.lon = parseFloat(lon);
+state.locationName = name;
+document.getElementById('locLabel').textContent = name;
+document.getElementById('cityResults').innerHTML = '';
+document.getElementById('cityInput').value = '';
+localStorage.setItem('ap_city', JSON.stringify({lat:state.lat, lon:state.lon, name:name}));
+fetchPollenData();
+}
+
+function loadSavedCity() {
+var saved = localStorage.getItem('ap_city');
+if (saved) {
+var c = JSON.parse(saved);
+state.lat = c.lat;
+state.lon = c.lon;
+state.locationName = c.name;
+document.getElementById('locLabel').textContent = c.name;
+fetchPollenData();
+}
 }
 
 // Start
