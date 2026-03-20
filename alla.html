@@ -141,37 +141,48 @@ margin-bottom: 6px;
 
 /* POLLEN CARDS */
 .pollen-grid {
-display: grid;
-grid-template-columns: 1fr 1fr;
-gap: 10px;
-margin-bottom: 20px;
+display: flex;
+flex-direction: column;
+gap: 6px;
+margin-bottom: 16px;
 }
 .pollen-card {
 background: var(–surface);
 border: 1px solid var(–border);
-border-radius: var(–card-r);
-padding: 14px 16px;
+border-radius: 8px;
+padding: 8px 12px;
+display: flex;
+align-items: center;
+gap: 10px;
 transition: border-color 0.3s;
 }
 .pollen-card .pc-name {
 font-size: 11px;
 color: var(–text3);
 text-transform: uppercase;
-letter-spacing: 0.08em;
-margin-bottom: 6px;
+letter-spacing: 0.06em;
+width: 60px;
+flex-shrink: 0;
 }
 .pollen-card .pc-val {
 font-family: var(–font-serif);
-font-size: 22px;
+font-size: 18px;
 line-height: 1;
-margin-bottom: 4px;
+width: 36px;
+flex-shrink: 0;
+}
+.pollen-card .pc-label {
+font-size: 11px;
+color: var(–text3);
+width: 50px;
+flex-shrink: 0;
 }
 .pollen-card .pc-bar {
+flex: 1;
 height: 4px;
 background: var(–border);
 border-radius: 2px;
 overflow: hidden;
-margin-top: 8px;
 }
 .pollen-card .pc-fill {
 height: 100%;
@@ -800,7 +811,7 @@ card.style.borderColor = lvl > 0 ? col : '';
 card.innerHTML = `
 <div class="pc-name">${POLLEN_NAMES[key]}</div>
 <div class="pc-val" style="color:${col}">${val ? Math.round(val) : '—'}</div>
-<div style="font-size:10px;color:var(--text3)">${['Keine','Gering','Mäßig','Hoch','Sehr hoch'][lvl]}</div>
+<div class="pc-label" style="color:${col}">${['Keine','Gering','Mäßig','Hoch','Sehr hoch'][lvl]}</div>
 <div class="pc-bar"><div class="pc-fill" style="width:${pct}%;background:${col}"></div></div>
 `;
 grid.appendChild(card);
