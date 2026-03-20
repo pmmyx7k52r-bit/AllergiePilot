@@ -140,54 +140,47 @@ margin-bottom: 6px;
 .wl-4 { background: #200000; border: 1px solid var(–warn-4); color: #e05050; }
 
 /* POLLEN CARDS */
-.pollen-grid {
+/* 5-TAGE AMPEL */
+.ampel-row {
 display: flex;
-flex-direction: column;
-gap: 6px;
-margin-bottom: 16px;
+gap: 8px;
+margin-bottom: 20px;
 }
-.pollen-card {
-background: var(–surface);
+.ampel-tag {
+flex: 1;
+border-radius: 12px;
 border: 1px solid var(–border);
-border-radius: 8px;
-padding: 8px 12px;
-display: flex;
-align-items: center;
-gap: 10px;
+background: var(–surface);
+padding: 12px 6px 10px;
+text-align: center;
 transition: border-color 0.3s;
 }
-.pollen-card .pc-name {
-font-size: 11px;
+.ampel-tag.heute {
+border-width: 2px;
+}
+.ampel-tag .amp-wday {
+font-size: 10px;
 color: var(–text3);
 text-transform: uppercase;
 letter-spacing: 0.06em;
-width: 60px;
-flex-shrink: 0;
+margin-bottom: 2px;
 }
-.pollen-card .pc-val {
+.ampel-tag .amp-day {
 font-family: var(–font-serif);
-font-size: 18px;
-line-height: 1;
-width: 36px;
-flex-shrink: 0;
+font-size: 17px;
+line-height: 1.1;
+margin-bottom: 8px;
 }
-.pollen-card .pc-label {
-font-size: 11px;
+.ampel-tag .amp-circle {
+width: 28px;
+height: 28px;
+border-radius: 50%;
+margin: 0 auto 6px;
+}
+.ampel-tag .amp-lbl {
+font-size: 9px;
 color: var(–text3);
-width: 50px;
-flex-shrink: 0;
-}
-.pollen-card .pc-bar {
-flex: 1;
-height: 4px;
-background: var(–border);
-border-radius: 2px;
-overflow: hidden;
-}
-.pollen-card .pc-fill {
-height: 100%;
-border-radius: 2px;
-transition: width 0.8s ease;
+letter-spacing: 0.04em;
 }
 
 /* SECTIONS & CARDS */
@@ -206,47 +199,39 @@ color: var(–text3);
 margin-bottom: 14px;
 }
 
-/* SYMPTOM ENTRY */
-.symptom-row {
-display: flex;
-align-items: center;
+/* SYMPTOM ENTRY – Toggle Buttons */
+.sym-grid {
+display: grid;
+grid-template-columns: 1fr 1fr;
 gap: 10px;
-margin-bottom: 14px;
+margin-bottom: 16px;
 }
-.symptom-row label {
-width: 90px;
-font-size: 13px;
-color: var(–text2);
-flex-shrink: 0;
-}
-.tap-row {
+.sym-btn {
 display: flex;
-gap: 5px;
-flex: 1;
-}
-.tap-btn {
-flex: 1;
-height: 38px;
-border-radius: 8px;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+gap: 6px;
+padding: 16px 10px;
+border-radius: 12px;
 border: 1.5px solid var(–border);
 background: var(–surface2);
 color: var(–text3);
 font-family: var(–font-mono);
-font-size: 13px;
-font-weight: 500;
+font-size: 12px;
 cursor: pointer;
-transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.1s;
+transition: background 0.18s, border-color 0.18s, color 0.18s, transform 0.12s;
 -webkit-tap-highlight-color: transparent;
 user-select: none;
-padding: 0;
+letter-spacing: 0.04em;
 }
-.tap-btn:active { transform: scale(0.88); }
-.tap-btn.aktiv-0 { background: var(–surface); border-color: var(–text3); color: var(–text); }
-.tap-btn.aktiv-1 { background: #1e3020; border-color: var(–warn-0); color: #8de880; }
-.tap-btn.aktiv-2 { background: #2a2800; border-color: var(–warn-1); color: #e8e070; }
-.tap-btn.aktiv-3 { background: #2a1e00; border-color: var(–warn-2); color: #f0b060; }
-.tap-btn.aktiv-4 { background: #2a0a0a; border-color: var(–warn-3); color: #f08080; }
-.tap-btn.aktiv-5 { background: #1e0000; border-color: var(–warn-4); color: #e05050; }
+.sym-btn .sym-icon { font-size: 26px; line-height: 1; }
+.sym-btn:active { transform: scale(0.94); }
+.sym-btn.an {
+background: #1e3a18;
+border-color: var(–accent);
+color: #a0e896;
+}
 
 /* TEXTAREA */
 textarea {
@@ -438,36 +423,7 @@ letter-spacing: 0.1em;
 margin-bottom: 8px;
 }
 
-/* FORECAST ROW */
-.forecast-row {
-display: flex;
-gap: 8px;
-overflow-x: auto;
-padding-bottom: 8px;
-scrollbar-width: none;
-margin-bottom: 16px;
-}
-.forecast-row::-webkit-scrollbar { display: none; }
-.fc-day {
-min-width: 60px;
-background: var(–surface2);
-border: 1px solid var(–border);
-border-radius: 10px;
-padding: 10px 8px;
-text-align: center;
-font-size: 11px;
-flex-shrink: 0;
-transition: border-color 0.3s;
-}
-.fc-day .fc-date { color: var(–text3); margin-bottom: 4px; }
-.fc-day .fc-dot {
-width: 20px; height: 20px;
-border-radius: 50%;
-margin: 4px auto;
-}
-.fc-day .fc-lbl { font-size: 10px; color: var(–text2); }
 </style>
-
 </head>
 <body>
 
@@ -510,15 +466,11 @@ onkeydown="if(event.key==='Enter')searchCity()">
 <div id="cityResults" style="width:100%"></div>
 </div>
 
-<div class="card-title">Pollen heute</div>
-<div class="pollen-grid" id="pollenGrid">
-<div class="loading"><div class="spinner"></div> Lade Pollendaten…</div>
+<div class="card-title" style="margin-bottom:10px">5-Tage-Belastung</div>
+<div class="ampel-row" id="ampelRow">
+<div style="color:var(--text3);font-size:12px;padding:8px 0"><span class="spinner" style="display:inline-block"></span></div>
 </div>
-
-<div class="card-title">7-Tage-Vorschau</div>
-<div class="forecast-row" id="forecastRow">
-<div class="loading"><div class="spinner"></div></div>
-</div>
+<div id="aktivePollen"></div>
 
 <div class="card">
 <div class="card-title">Letzte Einträge – Symptomtrend</div>
@@ -532,66 +484,30 @@ onkeydown="if(event.key==='Enter')searchCity()">
 
 <div class="section" id="tab-eintrag">
 <div class="card">
-<div class="card-title">Symptome heute eintragen</div>
-<div style="font-size:11px;color:var(--text3);margin-bottom:16px">Tippe auf eine Zahl (0 = keine, 5 = sehr stark)</div>
+<div class="card-title">Wo hast du heute Beschwerden?</div>
+<div style="font-size:11px;color:var(--text3);margin-bottom:14px">Antippen was gerade zwickt &mdash; kein Eintrag n&ouml;tig wenn alles okay ist</div>
+<div class="sym-grid">
+<button class="sym-btn" id="sb-nase" onclick="toggleSymptom('nase')">
+<span class="sym-icon">&#128067;</span>Nase
+</button>
+<button class="sym-btn" id="sb-augen" onclick="toggleSymptom('augen')">
+<span class="sym-icon">&#128064;</span>Augen
+</button>
+<button class="sym-btn" id="sb-haut" onclick="toggleSymptom('haut')">
+<span class="sym-icon">&#129304;</span>Haut
+</button>
+<button class="sym-btn" id="sb-atem" onclick="toggleSymptom('atem')">
+<span class="sym-icon">&#129755;</span>Atem
+</button>
+<button class="sym-btn" id="sb-muede" onclick="toggleSymptom('muede')">
+<span class="sym-icon">&#128564;</span>M&#252;digkeit
+</button>
+<button class="sym-btn" id="sb-kopf" onclick="toggleSymptom('kopf')">
+<span class="sym-icon">&#129354;</span>Kopf
+</button>
+</div>
 
 ```
-<div class="symptom-row">
-<label>Nase 👃</label>
-<div class="tap-row">
-<button class="tap-btn aktiv-0" data-key="nase" data-val="0" onclick="setSymptom('nase',0)">0</button>
-<button class="tap-btn" data-key="nase" data-val="1" onclick="setSymptom('nase',1)">1</button>
-<button class="tap-btn" data-key="nase" data-val="2" onclick="setSymptom('nase',2)">2</button>
-<button class="tap-btn" data-key="nase" data-val="3" onclick="setSymptom('nase',3)">3</button>
-<button class="tap-btn" data-key="nase" data-val="4" onclick="setSymptom('nase',4)">4</button>
-<button class="tap-btn" data-key="nase" data-val="5" onclick="setSymptom('nase',5)">5</button>
-</div>
-</div>
-<div class="symptom-row">
-<label>Augen 👁️</label>
-<div class="tap-row">
-<button class="tap-btn aktiv-0" data-key="augen" data-val="0" onclick="setSymptom('augen',0)">0</button>
-<button class="tap-btn" data-key="augen" data-val="1" onclick="setSymptom('augen',1)">1</button>
-<button class="tap-btn" data-key="augen" data-val="2" onclick="setSymptom('augen',2)">2</button>
-<button class="tap-btn" data-key="augen" data-val="3" onclick="setSymptom('augen',3)">3</button>
-<button class="tap-btn" data-key="augen" data-val="4" onclick="setSymptom('augen',4)">4</button>
-<button class="tap-btn" data-key="augen" data-val="5" onclick="setSymptom('augen',5)">5</button>
-</div>
-</div>
-<div class="symptom-row">
-<label>Haut 🖐️</label>
-<div class="tap-row">
-<button class="tap-btn aktiv-0" data-key="haut" data-val="0" onclick="setSymptom('haut',0)">0</button>
-<button class="tap-btn" data-key="haut" data-val="1" onclick="setSymptom('haut',1)">1</button>
-<button class="tap-btn" data-key="haut" data-val="2" onclick="setSymptom('haut',2)">2</button>
-<button class="tap-btn" data-key="haut" data-val="3" onclick="setSymptom('haut',3)">3</button>
-<button class="tap-btn" data-key="haut" data-val="4" onclick="setSymptom('haut',4)">4</button>
-<button class="tap-btn" data-key="haut" data-val="5" onclick="setSymptom('haut',5)">5</button>
-</div>
-</div>
-<div class="symptom-row">
-<label>Atem 🫁</label>
-<div class="tap-row">
-<button class="tap-btn aktiv-0" data-key="atem" data-val="0" onclick="setSymptom('atem',0)">0</button>
-<button class="tap-btn" data-key="atem" data-val="1" onclick="setSymptom('atem',1)">1</button>
-<button class="tap-btn" data-key="atem" data-val="2" onclick="setSymptom('atem',2)">2</button>
-<button class="tap-btn" data-key="atem" data-val="3" onclick="setSymptom('atem',3)">3</button>
-<button class="tap-btn" data-key="atem" data-val="4" onclick="setSymptom('atem',4)">4</button>
-<button class="tap-btn" data-key="atem" data-val="5" onclick="setSymptom('atem',5)">5</button>
-</div>
-</div>
-<div class="symptom-row">
-<label>Müdigkeit 😴</label>
-<div class="tap-row">
-<button class="tap-btn aktiv-0" data-key="muede" data-val="0" onclick="setSymptom('muede',0)">0</button>
-<button class="tap-btn" data-key="muede" data-val="1" onclick="setSymptom('muede',1)">1</button>
-<button class="tap-btn" data-key="muede" data-val="2" onclick="setSymptom('muede',2)">2</button>
-<button class="tap-btn" data-key="muede" data-val="3" onclick="setSymptom('muede',3)">3</button>
-<button class="tap-btn" data-key="muede" data-val="4" onclick="setSymptom('muede',4)">4</button>
-<button class="tap-btn" data-key="muede" data-val="5" onclick="setSymptom('muede',5)">5</button>
-</div>
-</div>
-
 <div style="margin: 14px 0 10px">
 <div class="card-title" style="margin-bottom:8px">Umgebung / Kontakt</div>
 <div id="kontaktTags">
@@ -604,7 +520,7 @@ onkeydown="if(event.key==='Enter')searchCity()">
 <textarea id="entryNote" placeholder="Was hast du heute gemacht? Wo warst du? Welche Medikamente?"></textarea>
 </div>
 
-<button class="btn" onclick="saveEntry()">✓ Eintrag speichern</button>
+<button class="btn" style="width:100%;padding:14px;font-size:15px;justify-content:center" onclick="saveEntry()">&#10003; Beschwerden speichern</button>
 </div>
 ```
 
@@ -697,7 +613,7 @@ tiere: ['Katze','Hund','Pferd','Meerschweinchen','Vogel','Hausstaubmilben'],
 sonstiges: ['Schimmel','Latex','Insektengift','Nickel','Parfüm']
 };
 
-const SYMPTOM_LABELS = { 'nase':'Nase','augen':'Augen','haut':'Haut','atem':'Atem','muede':'Müdigkeit' };
+const SYMPTOM_LABELS = { 'nase':'Nase 🂃','augen':'Augen 👀','haut':'Haut 🤚','atem':'Atem 🫁','muede':'Müdigkeit 😴','kopf':'Kopf 🦠' };
 const WARN_LEVELS = [
 { label: 'Keine Belastung', sub: 'Alles entspannt 🌿', cls: 'wl-0', col: '#3a8c35' },
 { label: 'Gering', sub: 'Leicht erhöhte Werte ⚠️', cls: 'wl-1', col: '#b8b800' },
@@ -752,8 +668,8 @@ try {
 const r = await fetch(url);
 const d = await r.json();
 state.pollenData = d;
-renderPollenCards(d);
-renderForecast(d);
+renderAmpel(d);
+renderAktivePollen(d);
 renderWarnBanner(d);
 } catch(e) {
 document.getElementById('pollenGrid').innerHTML = '<div style="color:var(--text3);font-size:12px">Pollendaten konnten nicht geladen werden.</div>';
@@ -792,30 +708,92 @@ olive_pollen: 'Olive',
 ragweed_pollen: 'Ragweed'
 };
 
-function renderPollenCards(data) {
-const idx = getCurrentHourIndex(data);
-const grid = document.getElementById('pollenGrid');
-grid.innerHTML = '';
+function renderAmpel(data) {
+var row = document.getElementById('ampelRow');
+row.innerHTML = '';
+var keys = Object.keys(POLLEN_NAMES);
+var times = data.hourly.time;
+var dailyMap = {};
+var selected = state.profil.pollen.map(function(a){ return a.toLowerCase(); });
 
-const keys = Object.keys(POLLEN_NAMES);
-keys.forEach(key => {
-const arr = data.hourly[key];
+times.forEach(function(t, i) {
+var day = t.slice(0, 10);
+if (!dailyMap[day]) dailyMap[day] = {};
+keys.forEach(function(k) {
+var arr = data.hourly[k];
 if (!arr) return;
-const val = arr[idx] || 0;
-const lvl = getPollenLevel(val);
-const pct = Math.min(100, (val / 600) * 100);
-const col = pollenColor(lvl);
-const card = document.createElement('div');
-card.className = 'pollen-card';
-card.style.borderColor = lvl > 0 ? col : '';
-card.innerHTML = `
-<div class="pc-name">${POLLEN_NAMES[key]}</div>
-<div class="pc-val" style="color:${col}">${val ? Math.round(val) : '—'}</div>
-<div class="pc-label" style="color:${col}">${['Keine','Gering','Mäßig','Hoch','Sehr hoch'][lvl]}</div>
-<div class="pc-bar"><div class="pc-fill" style="width:${pct}%;background:${col}"></div></div>
-`;
-grid.appendChild(card);
+var v = arr[i] || 0;
+if (!dailyMap[day][k] || v > dailyMap[day][k]) dailyMap[day][k] = v;
 });
+});
+
+var today = new Date().toISOString().slice(0,10);
+var days = Object.keys(dailyMap).slice(0, 5);
+
+days.forEach(function(day) {
+var vals = dailyMap[day];
+var maxLvl = 0;
+var maxName = '';
+keys.forEach(function(k) {
+var lvl = getPollenLevel(vals[k]||0);
+var name = POLLEN_NAMES[k];
+var boost = selected.some(function(s){ return name.toLowerCase().includes(s) || s.includes(name.toLowerCase()); }) ? 1 : 0;
+var eff = Math.min(4, lvl + boost);
+if (eff > maxLvl) { maxLvl = eff; maxName = name; }
+});
+
+var col = ['#3a8c35','#b8b800','#d97c00','#c83232','#8b0000'][maxLvl];
+var d = new Date(day + 'T12:00:00');
+var wday = d.toLocaleDateString('de-DE', { weekday:'short' });
+var dayNum = d.toLocaleDateString('de-DE', { day:'numeric', month:'numeric' });
+var isToday = day === today;
+var lbls = ['Keine','Gering','Mäßig','Hoch','Sehr hoch'];
+
+var el = document.createElement('div');
+el.className = 'ampel-tag' + (isToday ? ' heute' : '');
+el.style.borderColor = maxLvl > 0 ? col : '';
+if (isToday) el.style.background = 'var(--surface2)';
+el.innerHTML = '<div class="amp-wday">' + wday + '</div>'
++ '<div class="amp-day">' + dayNum + '</div>'
++ '<div class="amp-circle" style="background:' + col + '"></div>'
++ '<div class="amp-lbl">' + (maxLvl > 0 ? maxName : 'Okay') + '</div>';
+row.appendChild(el);
+});
+}
+
+function renderAktivePollen(data) {
+var wrap = document.getElementById('aktivePollen');
+if (!wrap) return;
+var idx = getCurrentHourIndex(data);
+var keys = Object.keys(POLLEN_NAMES);
+var aktiv = [];
+keys.forEach(function(k) {
+var arr = data.hourly[k];
+if (!arr) return;
+var val = arr[idx] || 0;
+var lvl = getPollenLevel(val);
+if (lvl > 0) aktiv.push({ name: POLLEN_NAMES[k], val: Math.round(val), lvl: lvl });
+});
+aktiv.sort(function(a,b){ return b.lvl - a.lvl; });
+
+if (!aktiv.length) {
+wrap.innerHTML = '';
+return;
+}
+
+var cols = ['','#3a8c35','#b8b800','#d97c00','#c83232','#8b0000'];
+var lbls = ['','Gering','Mäßig','Hoch','Sehr hoch'];
+var html = '<div style="margin-bottom:16px">'
++ '<div class="card-title" style="margin-bottom:8px">Aktuelle Pollen</div>';
+aktiv.forEach(function(p) {
+html += '<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)">'
++ '<div style="width:8px;height:8px;border-radius:50%;background:' + cols[p.lvl] + ';flex-shrink:0"></div>'
++ '<div style="flex:1;font-size:13px;color:var(--text2)">' + p.name + '</div>'
++ '<div style="font-size:12px;color:' + cols[p.lvl] + '">' + lbls[p.lvl] + '</div>'
++ '</div>';
+});
+html += '</div>';
+wrap.innerHTML = html;
 }
 
 function renderWarnBanner(data) {
@@ -846,58 +824,28 @@ document.getElementById('warnLevel').textContent = wl.label;
 document.getElementById('warnSub').textContent = maxLvl > 0 ? `${maxName} aktuell am stärksten · ${wl.sub}` : wl.sub;
 }
 
-function renderForecast(data) {
-const row = document.getElementById('forecastRow');
-row.innerHTML = '';
-const keys = Object.keys(POLLEN_NAMES);
-
-// Get daily max (one per day from hourly)
-const times = data.hourly.time;
-const dailyMap = {};
-
-times.forEach((t, i) => {
-const day = t.slice(0, 10);
-if (!dailyMap[day]) dailyMap[day] = {};
-keys.forEach(k => {
-const arr = data.hourly[k];
-if (!arr) return;
-const v = arr[i] || 0;
-if (!dailyMap[day][k] || v > dailyMap[day][k]) dailyMap[day][k] = v;
-});
-});
-
-Object.entries(dailyMap).slice(0, 7).forEach(([day, vals]) => {
-let maxLvl = 0;
-keys.forEach(k => { const lvl = getPollenLevel(vals[k]||0); if(lvl>maxLvl) maxLvl=lvl; });
-const col = pollenColor(maxLvl);
-const d = new Date(day + 'T12:00:00');
-const label = d.toLocaleDateString('de-DE', { weekday:'short', day:'numeric' });
-const el = document.createElement('div');
-el.className = 'fc-day';
-el.style.borderColor = maxLvl > 0 ? col : '';
-el.innerHTML = `
-<div class="fc-date">${label}</div>
-<div class="fc-dot" style="background:${col}"></div>
-<div class="fc-lbl">${['—','↑','↑↑','↑↑↑','!!!'][maxLvl]}</div>
-`;
-row.appendChild(el);
-});
-}
 
 // ═══════════════════════════════════════
 // SYMPTOME – TAP BUTTONS
 // ═══════════════════════════════════════
-const symptomValues = { nase:0, augen:0, haut:0, atem:0, muede:0 };
+const symptomValues = { nase:false, augen:false, haut:false, atem:false, muede:false, kopf:false };
 
-function setSymptom(key, val) {
-symptomValues[key] = val;
-var btns = document.querySelectorAll('.tap-btn[data-key="' + key + '"]');
-for (var i = 0; i < btns.length; i++) {
-var b = btns[i];
-for (var v = 0; v <= 5; v++) b.classList.remove('aktiv-' + v);
-if (parseInt(b.getAttribute('data-val')) === val) {
-b.classList.add('aktiv-' + val);
+function toggleSymptom(key) {
+symptomValues[key] = !symptomValues[key];
+var btn = document.getElementById('sb-' + key);
+if (symptomValues[key]) {
+btn.classList.add('an');
+} else {
+btn.classList.remove('an');
 }
+}
+
+function resetSymptoms() {
+var keys = ['nase','augen','haut','atem','muede','kopf'];
+for (var i = 0; i < keys.length; i++) {
+symptomValues[keys[i]] = false;
+var btn = document.getElementById('sb-' + keys[i]);
+if (btn) btn.classList.remove('an');
 }
 }
 
@@ -924,7 +872,16 @@ el.classList.add('selected');
 }
 
 function saveEntry() {
-const symps = { ...symptomValues };
+var skeys = ['nase','augen','haut','atem','muede','kopf'];
+var anyActive = skeys.some(function(k) { return symptomValues[k]; });
+if (!anyActive) {
+showToast('Keine Beschwerden markiert – nichts gespeichert');
+return;
+}
+var symps = {};
+for (var si = 0; si < skeys.length; si++) {
+symps[skeys[si]] = symptomValues[skeys[si]] ? 1 : 0;
+}
 const note = document.getElementById('entryNote').value.trim();
 
 const entry = {
@@ -941,7 +898,7 @@ state.entries.unshift(entry);
 saveStorage();
 
 // Reset
-['nase','augen','haut','atem','muede'].forEach(k => { setSymptom(k, 0); });
+resetSymptoms();
 document.getElementById('entryNote').value = '';
 activeKontakte = [];
 document.querySelectorAll('#kontaktTags .allergen-tag').forEach(el => el.classList.remove('selected'));
@@ -988,9 +945,8 @@ list.innerHTML = entries.map(e => {
 const total = Object.values(e.symptoms).reduce((a,b)=>a+b,0);
 const pills = Object.entries(e.symptoms)
 .filter(([,v]) => v > 0)
-.map(([k,v]) => {
-const cls = v >= 4 ? 's-high' : v >= 2 ? 's-mid' : 's-low';
-return `<span class="symptom-pill ${cls}">${SYMPTOM_LABELS[k]} ${v}/5</span>`;
+.map(([k]) => {
+return '<span class="symptom-pill s-mid">' + (SYMPTOM_LABELS[k] || k) + '</span>';
 }).join('');
 
 const kontaktPills = e.kontakte?.map(k =>
@@ -1054,11 +1010,11 @@ wrap.innerHTML = '<div class="empty"><div class="emj">📊</div>Zu wenig Daten</
 return;
 }
 
-const totals = { nase:0, augen:0, haut:0, atem:0, muede:0 };
-state.entries.forEach(e => {
-Object.keys(totals).forEach(k => { totals[k] += e.symptoms[k] || 0; });
+const totals = { nase:0, augen:0, haut:0, atem:0, muede:0, kopf:0 };
+state.entries.forEach(function(e) {
+Object.keys(totals).forEach(function(k) { totals[k] += e.symptoms[k] ? 1 : 0; });
 });
-const max = Math.max(...Object.values(totals)) || 1;
+const max = Math.max.apply(null, Object.values(totals)) || 1;
 
 wrap.innerHTML = Object.entries(totals).map(([k,v]) => {
 const pct = Math.round((v/max)*100);
