@@ -470,7 +470,7 @@ onkeydown="if(event.key==='Enter')searchCity()">
 <div class="ampel-row" id="ampelRow">
 <div style="color:var(--text3);font-size:12px;padding:8px 0">Bitte zuerst Standort eingeben</div>
 </div>
-<div id="aktivePollen"></div>
+<div id="pollenFliegt"></div>
 ```
 
 </div>
@@ -663,8 +663,7 @@ const r = await fetch(url);
 const d = await r.json();
 state.pollenData = d;
 renderAmpel(d);
-renderPollenUebersicht(d);
-renderAktivePollen(d);
+renderPollenFliegt(d);
 renderWarnBanner(d);
 } catch(e) {
 document.getElementById('pollenGrid').innerHTML = '<div style="color:var(--text3);font-size:12px">Pollendaten konnten nicht geladen werden.</div>';
@@ -756,39 +755,54 @@ row.appendChild(el);
 });
 }
 
-function renderAktivePollen(data) {
-var wrap = document.getElementById('aktivePollen');
+
+function renderPollenFliegt(data) {
+var wrap = document.getElementById('pollenFliegt');
 if (!wrap) return;
 var idx = getCurrentHourIndex(data);
 var keys = Object.keys(POLLEN_NAMES);
+var selected = state.profil.pollen.map(function(a){ return a.toLowerCase(); });
+var lvlCols = ['','#3a8c35','#b8b800','#d97c00','#c83232','#8b0000'];
+var lvlLbls = ['','Gering','Mäßig','Hoch','Sehr hoch'];
+
 var aktiv = [];
 keys.forEach(function(k) {
 var arr = data.hourly[k];
 if (!arr) return;
 var val = arr[idx] || 0;
 var lvl = getPollenLevel(val);
-if (lvl > 0) aktiv.push({ name: POLLEN_NAMES[k], val: Math.round(val), lvl: lvl });
+if (lvl === 0) return;
+var name = POLLEN_NAMES[k];
+var isAllerg = selected.some(function(s){
+return name.toLowerCase().includes(s) || s.includes(name.toLowerCase());
 });
-aktiv.sort(function(a,b){ return b.lvl - a.lvl; });
+aktiv.push({ name:name, val:val, lvl:lvl, isAllerg:isAllerg });
+});
 
-if (!aktiv.length) {
-wrap.innerHTML = '';
-return;
-}
+if (!aktiv.length) { wrap.innerHTML = ''; return; }
+aktiv.sort(function(a,b){ return b.lvl - a.lvl || b.val - a.val; });
+var maxVal = Math.max.apply(null, aktiv.map(function(a){ return a.val; })) || 1;
 
-var cols = ['','#3a8c35','#b8b800','#d97c00','#c83232','#8b0000'];
-var lbls = ['','Gering','Mäßig','Hoch','Sehr hoch'];
-var html = '<div style="margin-bottom:16px">'
-+ '<div class="card-title" style="margin-bottom:8px">Aktuelle Pollen</div>';
+var html = '<div class="card-title" style="margin-bottom:10px">Pollen im Flug</div>';
 aktiv.forEach(function(p) {
-html += '<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)">'
-+ '<div style="width:8px;height:8px;border-radius:50%;background:' + cols[p.lvl] + ';flex-shrink:0"></div>'
-+ '<div style="flex:1;font-size:13px;color:var(--text2)">' + p.name + '</div>'
-+ '<div style="font-size:12px;color:' + cols[p.lvl] + '">' + lbls[p.lvl] + '</div>'
+var col = lvlCols[p.lvl];
+var pct = Math.round(p.val / maxVal * 100);
+var allergieBadge = p.isAllerg
+? ' <span style="font-size:10px;padding:1px 7px;border-radius:10px;background:#1e3a18;border:1px solid var(--accent);color:var(--accent);vertical-align:middle">Meine Allergie</span>'
+: '';
+html += '<div style="margin-bottom:12px">'
++ '<div style="display:flex;align-items:center;margin-bottom:5px">'
++ '<span style="font-size:14px;color:' + (p.isAllerg ? 'var(--text)' : 'var(--text2)') + ';font-weight:' + (p.isAllerg ? '600' : '400') + '">' + p.name + '</span>'
++ allergieBadge
++ '<span style="margin-left:auto;font-size:12px;color:' + col + ';font-weight:500">' + lvlLbls[p.lvl] + '</span>'
++ '</div>'
++ '<div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden">'
++ '<div style="width:' + pct + '%;height:100%;background:' + col + ';border-radius:3px;transition:width 0.8s ease"></div>'
++ '</div>'
 + '</div>';
 });
-html += '</div>';
-wrap.innerHTML = html;
+
+wrap.innerHTML = '<div style="margin-bottom:20px">' + html + '</div>';
 }
 
 function renderWarnBanner(data) {
@@ -973,54 +987,7 @@ return `<option value="${m}" ${m===cur?'selected':''}>${label}</option>`;
 // ═══════════════════════════════════════
 // POLLEN UEBERSICHT (Heute-Tab)
 // ═══════════════════════════════════════
-function renderPollenUebersicht(data) {
-var wrap = document.getElementById('pollenUebersicht');
-if (!wrap) return;
-var idx = getCurrentHourIndex(data);
-var keys = Object.keys(POLLEN_NAMES);
-var selected = state.profil.pollen.map(function(a){ return a.toLowerCase(); });
-var cols = ['var(--border)','#3a8c35','#b8b800','#d97c00','#c83232','#8b0000'];
-var lbls = ['','Gering','Mäßig','Hoch','Sehr hoch'];
 
-var aktiv = [];
-keys.forEach(function(k) {
-var arr = data.hourly[k]; if (!arr) return;
-var val = arr[idx] || 0;
-var lvl = getPollenLevel(val);
-if (lvl === 0) return;
-var name = POLLEN_NAMES[k];
-var isAllergen = selected.some(function(s){ return name.toLowerCase().includes(s) || s.includes(name.toLowerCase()); });
-aktiv.push({ name:name, val:val, lvl:lvl, isAllergen:isAllergen });
-});
-
-if (!aktiv.length) { wrap.innerHTML = ''; return; }
-aktiv.sort(function(a,b){ return b.lvl - a.lvl; });
-var maxVal = Math.max.apply(null, aktiv.map(function(a){ return a.val; })) || 1;
-
-var html = '<div class="card" style="margin-bottom:14px"><div class="card-title" style="margin-bottom:10px">Pollen im Flug</div>';
-aktiv.forEach(function(p) {
-var pct = Math.round(p.val / maxVal * 100);
-var col = cols[p.lvl];
-var allergenBadge = p.isAllergen
-? '<span style="font-size:10px;background:#1e3a18;border:1px solid var(--accent);color:var(--accent);padding:1px 6px;border-radius:10px;margin-left:6px">deine Allergie</span>'
-: '';
-html += '<div style="margin-bottom:10px">'
-+ '<div style="display:flex;align-items:center;margin-bottom:4px">'
-+ '<span style="font-size:13px;color:' + (p.isAllergen ? 'var(--text)' : 'var(--text2)') + ';font-weight:' + (p.isAllergen ? '600' : '400') + '">' + p.name + '</span>'
-+ allergenBadge
-+ '<span style="margin-left:auto;font-size:11px;color:' + col + '">' + lbls[p.lvl] + '</span>'
-+ '</div>'
-+ '<div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden">'
-+ '<div style="width:' + pct + '%;height:100%;background:' + col + ';border-radius:3px;transition:width 0.8s"></div>'
-+ '</div></div>';
-});
-html += '</div>';
-wrap.innerHTML = html;
-}
-
-// ═══════════════════════════════════════
-// RECENT SYMPTOMS (Heute-Tab)
-// ═══════════════════════════════════════
 function renderRecentSymptoms() {
 var wrap = document.getElementById('recentSymptoms');
 var recent = state.entries.slice(0, 5);
