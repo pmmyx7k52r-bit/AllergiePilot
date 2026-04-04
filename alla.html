@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>AllergiePilot Mobile (v1.9.1.7)</title>
+<title>AllergiePilot Pro (v1.9.1.9)</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -12,122 +12,123 @@
 --warn-0: #3a8c35; --warn-2: #d97c00; --warn-4: #c83232;
 --font-serif: 'DM Serif Display', serif; --font-mono: 'DM Mono', monospace;
 }
-/* Mobile Reset */
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body {
 background: var(--bg); color: var(--text); font-family: var(--font-mono);
-font-size: 16px; line-height: 1.4; overflow-x: hidden;
+font-size: 16px; line-height: 1.4; overflow-x: hidden; min-height: 100vh;
 }
 
-header { padding: 25px 20px 15px; background: #000; border-bottom: 1px solid var(--border); }
-.logo { font-family: var(--font-serif); font-size: 26px; color: var(--accent); }
+header { padding: 20px; background: #000; border-bottom: 1px solid var(--border); text-align: center; }
+.logo { font-family: var(--font-serif); font-size: 24px; color: var(--accent); }
 
-/* Tab-Navigation für Daumen-Bedienung */
 nav {
 display: flex; position: sticky; top: 0; background: var(--bg);
-z-index: 100; border-bottom: 1px solid var(--border); padding: 0 10px;
+z-index: 100; border-bottom: 1px solid var(--border);
 justify-content: space-around;
 }
 nav button {
 background: none; border: none; color: var(--text2); font-family: var(--font-mono);
-font-size: 11px; text-transform: uppercase; padding: 15px 5px; cursor: pointer;
-border-bottom: 3px solid transparent; opacity: 0.6;
+font-size: 10px; text-transform: uppercase; padding: 15px 5px; cursor: pointer;
+border-bottom: 3px solid transparent; flex: 1;
 }
-nav button.active { color: var(--accent); border-bottom-color: var(--accent); opacity: 1; }
+nav button.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: bold; }
 
-main { padding: 15px; max-width: 500px; margin: 0 auto; }
-.section { display: none; animation: fadeIn 0.3s ease; }
+main { padding: 15px; max-width: 500px; margin: 0 auto; padding-bottom: 100px; }
+.section { display: none; }
 .section.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-/* Mobile-Optimierte Karten */
 .card {
 background: var(--surface); border: 1px solid var(--border);
-border-radius: 16px; padding: 20px; margin-bottom: 15px;
+border-radius: 16px; padding: 18px; margin-bottom: 15px;
 }
-.card-title { font-size: 11px; text-transform: uppercase; color: var(--text2); margin-bottom: 15px; letter-spacing: 1px; }
+.card-title { font-size: 10px; text-transform: uppercase; color: var(--text2); margin-bottom: 12px; letter-spacing: 1px; }
 
-.warn-banner { border-radius: 16px; padding: 25px 20px; margin-bottom: 15px; text-align: center; }
-.wl-0 { background: #1a2e18; border: 1px solid var(--warn-0); }
-.wl-2 { background: #2a1b00; border: 1px solid var(--warn-2); }
-.wl-4 { background: #2a0a0a; border: 1px solid var(--warn-4); }
+.warn-banner { border-radius: 16px; padding: 20px; margin-bottom: 15px; text-align: center; border: 1px solid transparent; }
+.wl-0 { background: #1a2e18; border-color: var(--warn-0); }
+.wl-2 { background: #2a1b00; border-color: var(--warn-2); }
+.wl-4 { background: #2a0a0a; border-color: var(--warn-4); }
 
-/* Standort-Eingabe */
-.loc-bar { background: var(--surface2); border-radius: 12px; padding: 15px; margin-bottom: 20px; }
-input[type="text"], textarea {
-width: 100%; padding: 14px; background: var(--bg); border: 1px solid var(--border);
-color: var(--text); border-radius: 10px; font-size: 16px; outline: none; appearance: none;
+.loc-box { background: var(--surface2); border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid var(--border); }
+.input-row { display: flex; gap: 8px; margin-top: 10px; }
+input[type="text"] {
+flex: 1; padding: 12px; background: var(--bg); border: 1px solid var(--border);
+color: var(--text); border-radius: 8px; font-size: 16px; outline: none;
 }
+.search-btn { background: var(--surface); border: 1px solid var(--border); color: #fff; padding: 0 15px; border-radius: 8px; }
 
-/* Große Symptom-Buttons */
 .sym-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .sym-btn {
-padding: 18px 15px; border-radius: 12px; border: 1px solid var(--border);
-background: var(--surface2); color: var(--text2); cursor: pointer; font-size: 15px;
-display: flex; align-items: center; gap: 10px;
+padding: 16px; border-radius: 12px; border: 1px solid var(--border);
+background: var(--surface2); color: var(--text2); cursor: pointer; font-size: 14px;
+display: flex; align-items: center; justify-content: center; gap: 8px;
 }
-.sym-btn.an { background: #1e3a18; border-color: var(--accent); color: var(--text); font-weight: bold; }
+.sym-btn.an { background: #1e3a18; border-color: var(--accent); color: #fff; font-weight: bold; }
 
-.btn {
+.btn-save {
 background: var(--accent); color: #000; border: none; border-radius: 12px;
-padding: 18px; font-weight: bold; cursor: pointer; width: 100%; font-size: 16px;
-margin-top: 10px;
+padding: 18px; font-weight: bold; cursor: pointer; width: 100%; font-size: 16px; margin-top: 15px;
 }
 
-.pollen-row { margin-bottom: 15px; }
-.pollen-bar { height: 6px; background: var(--border); border-radius: 3px; margin-top: 6px; overflow: hidden; }
-.pollen-fill { height: 100%; background: var(--accent); transition: width 0.8s ease-out; }
+.pollen-row { margin-bottom: 12px; }
+.pollen-bar { height: 6px; background: var(--border); border-radius: 3px; margin-top: 4px; }
+.pollen-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 1s ease; }
 
-.entry-item { border-bottom: 1px solid var(--border); padding: 15px 0; }
-.pill { display: inline-block; font-size: 11px; padding: 4px 10px; border-radius: 20px; background: var(--surface2); margin: 3px 5px 0 0; border: 1px solid var(--border); }
-.search-res { padding: 15px; border-bottom: 1px solid var(--border); background: var(--surface); cursor: pointer; }
+.result-item {
+padding: 14px; border-bottom: 1px solid var(--border); background: var(--surface);
+margin-top: 5px; border-radius: 8px; cursor: pointer; font-size: 14px;
+}
+.entry-card { border-bottom: 1px solid var(--border); padding: 12px 0; }
+.pill { display: inline-block; font-size: 10px; padding: 3px 8px; border-radius: 8px; background: var(--surface2); border: 1px solid var(--border); margin: 2px 4px 0 0; }
 </style>
 </head>
 <body>
 
-<header><div class="logo">Allergie<span>Pilot</span></div></header>
+<header><div class="logo">AllergiePilot</div></header>
 
 <nav>
-<button id="btn-heute" class="active" onclick="showTab('heute')">Heute</button>
-<button id="btn-eintrag" onclick="showTab('eintrag')">Eintrag</button>
-<button id="btn-tagebuch" onclick="showTab('tagebuch')">Tagebuch</button>
-<button id="btn-muster" onclick="showTab('muster')">Analyse</button>
+<button id="nav-heute" class="active" onclick="showTab('heute')">Heute</button>
+<button id="nav-eintrag" onclick="showTab('eintrag')">Eintrag</button>
+<button id="nav-tagebuch" onclick="showTab('tagebuch')">Tagebuch</button>
+<button id="nav-muster" onclick="showTab('muster')">Analyse</button>
 </nav>
 
 <main>
 <div class="section active" id="tab-heute">
 <div id="warnBanner" class="warn-banner wl-0">
-<div id="warnLevel" style="font-family:var(--font-serif); font-size:32px">...</div>
-<div id="warnSub" style="font-size:13px; opacity:0.8">Suche einen Ort</div>
+<div id="warnLevel" style="font-family:var(--font-serif); font-size:28px">Bereit</div>
+<div id="warnSub" style="font-size:12px">Wähle einen Ort aus der Liste</div>
 </div>
-<div class="loc-bar">
-<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
-<span id="locLabel" style="font-weight:bold; color:var(--accent)">📍 Kein Ort gesetzt</span>
-<button onclick="getLocation()" style="background:var(--surface); border:1px solid var(--border); padding:8px 12px; border-radius:8px; color:#fff">🎯 GPS</button>
+<div class="loc-box">
+<div style="display:flex; justify-content:space-between; align-items:center">
+<span id="locLabel" style="font-weight:bold; color:var(--accent)">📍 Ort wählen</span>
+<button onclick="getLocation()" style="background:var(--surface); border:1px solid var(--border); padding:6px 12px; border-radius:6px; color:#fff; font-size:12px">🎯 GPS</button>
 </div>
-<input id="cityInput" type="text" placeholder="PLZ oder Ort..." oninput="searchCityDebounced()">
-<div id="cityResults" style="margin-top:10px"></div>
+<div class="input-row">
+<input id="cityInput" type="text" placeholder="Ort oder PLZ..." onkeydown="if(event.key==='Enter') executeSearch()">
+<button class="search-btn" onclick="executeSearch()">Suchen</button>
+</div>
+<div id="cityResults"></div>
 </div>
 <div id="pollenListe"></div>
 </div>
 
 <div class="section" id="tab-eintrag">
 <div class="card">
-<div class="card-title">Aktuelle Symptome</div>
+<div class="card-title">Symptome wählen</div>
 <div class="sym-grid">
 <button class="sym-btn" id="sb-nase" onclick="toggleSym('nase')">👃 Nase</button>
 <button class="sym-btn" id="sb-augen" onclick="toggleSym('augen')">👁️ Augen</button>
 <button class="sym-btn" id="sb-atem" onclick="toggleSym('atem')">🫁 Atem</button>
 <button class="sym-btn" id="sb-haut" onclick="toggleSym('haut')">🖐️ Haut</button>
 </div>
-<textarea id="note" style="margin-top:15px; height:100px" placeholder="Was ist dir aufgefallen? (Essen, Ort, etc.)"></textarea>
-<button class="btn" onclick="saveEntry()">Eintrag Speichern</button>
+<textarea id="note" style="width:100%; margin-top:15px; height:80px; background:var(--bg); border:1px solid var(--border); color:#fff; padding:10px; border-radius:10px; font-family:inherit" placeholder="Notizen..."></textarea>
+<button class="btn-save" onclick="saveEntry()">Eintrag Speichern</button>
 </div>
 </div>
 
 <div class="section" id="tab-tagebuch">
 <div class="card">
-<div class="card-title">Letzte 30 Tage</div>
+<div class="card-title">Deine Einträge</div>
 <div id="diaryList"></div>
 </div>
 </div>
@@ -146,20 +147,23 @@ const lastLoc = JSON.parse(localStorage.getItem('ap_city'));
 if (lastLoc) selectCity(lastLoc.lat, lastLoc.lon, lastLoc.name, lastLoc.pc);
 }
 
-// SUCHE & STANDORT
-let sTimeout;
-function searchCityDebounced() {
-clearTimeout(sTimeout);
-sTimeout = setTimeout(async () => {
+// SUCHE & API
+async function executeSearch() {
 const q = document.getElementById('cityInput').value;
 if (q.length < 2) return;
-const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&addressdetails=1&limit=3`);
+const resDiv = document.getElementById('cityResults');
+resDiv.innerHTML = '<div class="result-item">Suche...</div>';
+try {
+const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&addressdetails=1&limit=4`);
 const d = await r.json();
-document.getElementById('cityResults').innerHTML = d.map(i => {
-const city = i.address.city || i.address.town || i.address.village || i.display_name.split(',')[0];
-return `<div class="search-res" onclick="selectCity(${i.lat}, ${i.lon}, '${city}', '${i.address.postcode||''}')">📍 ${i.address.postcode||''} ${city}</div>`;
+if (d.length === 0) { resDiv.innerHTML = '<div class="result-item">Kein Ort gefunden.</div>'; return; }
+resDiv.innerHTML = d.map(i => {
+const name = i.address.city || i.address.town || i.address.village || i.display_name.split(',')[0];
+return `<div class="result-item" onclick="selectCity(${i.lat}, ${i.lon}, '${name}', '${i.address.postcode||''}')">
+<b>${i.address.postcode||''} ${name}</b><br><small>${i.address.state || ''}</small>
+</div>`;
 }).join('');
-}, 500);
+} catch(e) { resDiv.innerHTML = '<div class="result-item">Netzwerkfehler.</div>'; }
 }
 
 async function selectCity(lat, lon, name, pc) {
@@ -174,6 +178,7 @@ renderToday();
 }
 
 function renderToday() {
+if(!state.pollen) return;
 const h = new Date().getHours();
 let html = '', max = 0;
 Object.keys(POLLEN_MAP).forEach(k => {
@@ -187,8 +192,8 @@ html += `<div class="pollen-row">
 document.getElementById('pollenListe').innerHTML = html;
 const b = document.getElementById('warnBanner');
 b.className = `warn-banner wl-${max < 15 ? 0 : max < 80 ? 2 : 4}`;
-document.getElementById('warnLevel').innerText = max < 15 ? 'Entspannt' : max < 80 ? 'Achtung' : 'Kritisch';
-document.getElementById('warnSub').innerText = `Max: ${Math.round(max)} (Ort: ${state.loc})`;
+document.getElementById('warnLevel').innerText = max < 15 ? 'Gering' : max < 80 ? 'Mäßig' : 'Hoch';
+document.getElementById('warnSub').innerText = `Spitzenwert: ${Math.round(max)} in ${state.loc}`;
 }
 
 // TAGEBUCH & MUSTER
@@ -200,7 +205,7 @@ if (state.pollen) Object.keys(POLLEN_MAP).forEach(k => curP[POLLEN_MAP[k]] = Mat
 const entries = JSON.parse(localStorage.getItem('ap_entries') || '[]');
 entries.unshift({ t:new Date().toISOString(), loc:state.pc+' '+state.loc, syms:{...state.activeSyms}, pollen:curP, note:document.getElementById('note').value });
 localStorage.setItem('ap_entries', JSON.stringify(entries));
-// UI Reset
+// Reset & Redirect
 state.activeSyms = {nase:false, augen:false, atem:false, haut:false};
 document.querySelectorAll('.sym-btn').forEach(b => b.classList.remove('an'));
 document.getElementById('note').value = '';
@@ -209,11 +214,14 @@ showTab('tagebuch');
 
 function renderDiary() {
 const e = JSON.parse(localStorage.getItem('ap_entries') || '[]');
-document.getElementById('diaryList').innerHTML = e.length === 0 ? "Keine Einträge." : e.map(i => `
-<div class="entry-item">
-<div style="font-size:11px; color:var(--text2); margin-bottom:5px">${new Date(i.t).toLocaleDateString('de-DE')} • ${i.loc}</div>
-<div>${Object.entries(i.syms).filter(s=>s[1]).map(s=>`<span class="pill">${s[0].toUpperCase()}</span>`).join('')}</div>
-<div style="font-size:12px; margin-top:5px; opacity:0.8">${Object.entries(i.pollen||{}).filter(p=>p[1]>5).map(p=>p[0]+':'+p[1]).join(' · ')}</div>
+document.getElementById('diaryList').innerHTML = e.length === 0 ? "Noch keine Einträge." : e.map(i => `
+<div class="entry-card">
+<div style="font-size:10px; color:var(--text2); display:flex; justify-content:space-between">
+<span>${new Date(i.t).toLocaleDateString()}</span><span>${i.loc}</span>
+</div>
+<div style="margin:5px 0">${Object.entries(i.syms).filter(s=>s[1]).map(s=>`<span class="pill">${s[0].toUpperCase()}</span>`).join('')}</div>
+<div style="font-size:11px; opacity:0.7">${Object.entries(i.pollen||{}).filter(p=>p[1]>5).map(p=>p[0]+':'+p[1]).join(' · ')}</div>
+${i.note ? `<div style="font-size:11px; font-style:italic; margin-top:3px">"${i.note}"</div>` : ''}
 </div>`).join('');
 }
 
@@ -221,14 +229,14 @@ function renderMuster() {
 const e = JSON.parse(localStorage.getItem('ap_entries') || '[]');
 const symps = e.filter(i => Object.values(i.syms).some(v => v));
 const res = document.getElementById('patternResults');
-if (symps.length < 2) { res.innerHTML = "<div class='card-title'>Analyse</div>Noch zu wenig Daten mit Beschwerden." return; }
+if (symps.length < 2) { res.innerHTML = "Sammle mehr Daten für die Trigger-Analyse." return; }
 
 let counts = {};
 symps.forEach(i => Object.entries(i.pollen||{}).forEach(([n,v]) => { if(v > 20) counts[n] = (counts[n]||0)+1; }));
-let html = '<div class="card-title">Mögliche Trigger</div>';
+let html = '<div class="card-title">Mögliche Auslöser</div>';
 Object.entries(counts).sort((a,b)=>b[1]-a[1]).forEach(([n,c]) => {
 const p = Math.round((c/symps.length)*100);
-html += `<div style="margin-bottom:15px"><span>${n}</span> (${p}%)<div class="pollen-bar"><div class="pollen-fill" style="width:${p}%"></div></div></div>`;
+html += `<div style="margin-bottom:12px"><span>${n}</span> (${p}%)<div class="pollen-bar"><div class="pollen-fill" style="width:${p}%"></div></div></div>`;
 });
 res.innerHTML = html;
 }
@@ -237,7 +245,7 @@ function showTab(id) {
 document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
 document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
 document.getElementById('tab-'+id).classList.add('active');
-document.getElementById('btn-'+id).classList.add('active');
+document.getElementById('nav-'+id).classList.add('active');
 if(id === 'tagebuch') renderDiary();
 if(id === 'muster') renderMuster();
 }
@@ -247,8 +255,8 @@ function getLocation() {
 navigator.geolocation.getCurrentPosition(async p => {
 const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${p.coords.latitude}&lon=${p.coords.longitude}`);
 const d = await r.json();
-selectCity(p.coords.latitude, p.coords.longitude, d.address.city || d.address.town || 'GPS Ort', d.address.postcode || '');
-}, () => alert("Bitte GPS aktivieren"));
+selectCity(p.coords.latitude, p.coords.longitude, d.address.city || d.address.town || 'Mein Ort', d.address.postcode || '');
+});
 }
 
 init();
