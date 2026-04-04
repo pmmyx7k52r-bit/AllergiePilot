@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>AllergiePilot Fixed (v1.9.2.0)</title>
+<title>AllergiePilot Pro (v1.9.3.0)</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -13,110 +13,98 @@
 --font-serif: 'DM Serif Display', serif; --font-mono: 'DM Mono', monospace;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body { background: var(--bg); color: var(--text); font-family: var(--font-mono); font-size: 16px; line-height: 1.4; overflow-x: hidden; min-height: 100vh; }
+body { background: var(--bg); color: var(--text); font-family: var(--font-mono); font-size: 16px; line-height: 1.4; min-height: 100vh; }
 header { padding: 20px; background: #000; border-bottom: 1px solid var(--border); text-align: center; }
 .logo { font-family: var(--font-serif); font-size: 24px; color: var(--accent); }
-nav { display: flex; position: sticky; top: 0; background: var(--bg); z-index: 100; border-bottom: 1px solid var(--border); justify-content: space-around; }
-nav button { background: none; border: none; color: var(--text2); font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; padding: 15px 5px; cursor: pointer; border-bottom: 3px solid transparent; flex: 1; }
-nav button.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: bold; }
-main { padding: 15px; max-width: 500px; margin: 0 auto; padding-bottom: 100px; }
+nav { display: flex; position: sticky; top: 0; background: var(--bg); z-index: 100; border-bottom: 1px solid var(--border); }
+nav button { background: none; border: none; color: var(--text2); font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; padding: 15px; flex: 1; cursor: pointer; }
+nav button.active { color: var(--accent); border-bottom: 3px solid var(--accent); font-weight: bold; }
+main { padding: 15px; max-width: 500px; margin: 0 auto; padding-bottom: 50px; }
 .section { display: none; } .section.active { display: block; }
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 15px; }
 .card-title { font-size: 10px; text-transform: uppercase; color: var(--text2); margin-bottom: 12px; letter-spacing: 1px; }
-.warn-banner { border-radius: 16px; padding: 20px; margin-bottom: 15px; text-align: center; border: 1px solid transparent; }
+
+.warn-banner { border-radius: 16px; padding: 25px; margin-bottom: 15px; text-align: center; border: 1px solid transparent; }
 .wl-0 { background: #1a2e18; border-color: var(--warn-0); }
 .wl-2 { background: #2a1b00; border-color: var(--warn-2); }
 .wl-4 { background: #2a0a0a; border-color: var(--warn-4); }
-.loc-box { background: var(--surface2); border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid var(--border); }
-.input-row { display: flex; gap: 8px; margin-top: 10px; }
-input[type="text"] { flex: 1; padding: 12px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 8px; font-size: 16px; outline: none; }
-.search-btn { background: var(--surface); border: 1px solid var(--border); color: #fff; padding: 0 15px; border-radius: 8px; font-size: 12px; }
+
 .pollen-row { margin-bottom: 12px; }
-.pollen-bar { height: 6px; background: var(--border); border-radius: 3px; margin-top: 4px; }
-.pollen-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 1s ease; }
-.result-item { padding: 14px; border-bottom: 1px solid var(--border); background: var(--surface); margin-top: 5px; border-radius: 8px; cursor: pointer; font-size: 14px; color: var(--accent); border: 1px solid var(--accent); }
+.pollen-bar { height: 8px; background: var(--border); border-radius: 4px; margin-top: 4px; overflow: hidden; }
+.pollen-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width 1s ease; }
+
+.sym-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+.sym-btn { padding: 16px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface2); color: var(--text2); cursor: pointer; font-size: 14px; text-align: center; }
+.sym-btn.an { background: #1e3a18; border-color: var(--accent); color: #fff; font-weight: bold; }
+
+textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 10px; font-family: inherit; margin-bottom: 15px; height: 80px; outline: none; }
+.btn-action { background: var(--accent); color: #000; border: none; border-radius: 12px; padding: 18px; font-weight: bold; cursor: pointer; width: 100%; font-size: 16px; }
+
+.entry-item { border-bottom: 1px solid var(--border); padding: 12px 0; }
+.pill { display: inline-block; font-size: 10px; padding: 3px 8px; border-radius: 8px; background: var(--surface2); border: 1px solid var(--border); margin: 2px 4px 0 0; }
 </style>
 </head>
 <body>
 
 <header><div class="logo">AllergiePilot</div></header>
+
 <nav>
-<button id="nav-heute" class="active" onclick="showTab('heute')">Heute</button>
-<button id="nav-eintrag" onclick="showTab('eintrag')">Eintrag</button>
-<button id="nav-tagebuch" onclick="showTab('tagebuch')">Tagebuch</button>
+<button id="nav-heute" class="active" onclick="showTab('heute')">Pollen</button>
+<button id="nav-eintrag" onclick="showTab('eintrag')">Check</button>
+<button id="nav-tagebuch" onclick="showTab('tagebuch')">Daten</button>
 </nav>
 
 <main>
 <div class="section active" id="tab-heute">
 <div id="warnBanner" class="warn-banner wl-0">
-<div id="warnLevel" style="font-family:var(--font-serif); font-size:28px">Bereit</div>
-<div id="warnSub">Kein Ort aktiv</div>
+<div id="warnLevel" style="font-family:var(--font-serif); font-size:32px">Lade...</div>
+<div id="warnSub">Region Frechen</div>
 </div>
-<div class="loc-box">
-<div style="display:flex; justify-content:space-between; align-items:center">
-<span id="locLabel" style="font-weight:bold; color:var(--accent)">📍 Ort fixieren</span>
-<button onclick="getLocation()" style="background:var(--surface); border:1px solid var(--border); padding:6px 12px; border-radius:6px; color:#fff; font-size:10px">GPS</button>
-</div>
-<div class="input-row">
-<input id="cityInput" type="text" placeholder="Stadt eingeben...">
-<button class="search-btn" onclick="forceFix()">FIXIEREN</button>
-</div>
-<div id="cityResults"></div>
-<p style="font-size: 10px; color: var(--text2); margin-top: 10px; opacity: 0.7;">
-Tipp: Wenn 'Suchen' nicht geht, gib 'Frechen' ein und klicke auf **FIXIEREN**.
-</p>
-</div>
-<div id="pollenListe"></div>
+<div id="pollenListe" class="card">Abruf läuft...</div>
+<div id="statusLabel" style="font-size:10px; text-align:center; opacity:0.6;">Standort fixiert: 50226 Frechen</div>
 </div>
 
 <div class="section" id="tab-eintrag">
 <div class="card">
-<div class="card-title">Symptome</div>
-<div id="diaryList">Hier werden deine Daten geladen...</div>
+<div class="card-title">Was spürst du gerade?</div>
+<div class="sym-grid">
+<button class="sym-btn" id="sb-nase" onclick="toggleSym('nase')">👃 Nase</button>
+<button class="sym-btn" id="sb-augen" onclick="toggleSym('augen')">👁️ Augen</button>
+<button class="sym-btn" id="sb-atem" onclick="toggleSym('atem')">🫁 Atem</button>
+<button class="sym-btn" id="sb-haut" onclick="toggleSym('haut')">🖐️ Haut</button>
 </div>
+<textarea id="note" placeholder="Notizen (z.B. Sport gemacht, anderes Essen...)"></textarea>
+<button class="btn-action" onclick="saveEntry()">Eintrag Speichern</button>
+</div>
+</div>
+
+<div class="section" id="tab-tagebuch">
+<div class="card" id="patternResults" style="border-color: var(--accent); display:none;"></div>
+<div class="card">
+<div class="card-title">Historie</div>
+<div id="diaryList">Keine Einträge vorhanden.</div>
+</div>
+<button onclick="clearData()" style="background:none; border:none; color:var(--warn-4); font-size:10px; width:100%; margin-top:20px;">Alle Daten löschen</button>
 </div>
 </main>
 
 <script>
-let state = { lat: 50.91, lon: 6.81, loc: 'Frechen', pc: '50226', pollen: null };
-const POLLEN_MAP = { alder_pollen:'Erle', birch_pollen:'Birke', grass_pollen:'Gräser', mugwort_pollen:'Beifuß', ragweed_pollen:'Ragweed' };
+const FRECHEN = { lat: 50.9108, lon: 6.8126, name: 'Frechen' };
+const POLLEN_MAP = { alder_pollen:'Erle', birch_pollen:'Birke', grass_pollen:'Gräser', mugwort_pollen:'Beifuß', ragweed_pollen:'Ambrosia' };
+let state = { pollen: null, activeSyms: {nase:false, augen:false, atem:false, haut:false} };
 
-function init() {
-const saved = localStorage.getItem('ap_city');
-if (saved) {
-const loc = JSON.parse(saved);
-selectCity(loc.lat, loc.lon, loc.name, loc.pc);
-} else {
-// Standardmäßig Frechen laden, falls nichts da ist
-selectCity(50.91, 6.81, 'Frechen', '50226');
-}
-}
-
-// DER NEUE FIXIER-MODUS
-function forceFix() {
-const name = document.getElementById('cityInput').value || 'Frechen';
-// Wir nutzen die Koordinaten von Frechen als Anker, wenn die Suche klemmt
-const lat = 50.9108;
-const lon = 6.8126;
-selectCity(lat, lon, name, '');
-alert("Ort " + name + " wurde fixiert!");
-}
-
-async function selectCity(lat, lon, name, pc) {
-state.lat = lat; state.lon = lon; state.loc = name; state.pc = pc;
-document.getElementById('locLabel').innerText = `📍 ${name}`;
-localStorage.setItem('ap_city', JSON.stringify({lat, lon, name, pc}));
+// 1. Daten laden
+async function updateData() {
 try {
-const r = await fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&hourly=alder_pollen,birch_pollen,grass_pollen,mugwort_pollen,ragweed_pollen&timezone=auto`);
+const r = await fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${FRECHEN.lat}&longitude=${FRECHEN.lon}&hourly=alder_pollen,birch_pollen,grass_pollen,mugwort_pollen,ragweed_pollen&timezone=auto`);
 state.pollen = await r.json();
 renderToday();
 } catch(e) {
-document.getElementById('warnSub').innerText = "Fehler: Keine Internetverbindung."
+document.getElementById('warnLevel').innerText = "Offline"
 }
 }
 
 function renderToday() {
-if(!state.pollen) return;
 const h = new Date().getHours();
 let html = '', max = 0;
 Object.keys(POLLEN_MAP).forEach(k => {
@@ -131,7 +119,88 @@ document.getElementById('pollenListe').innerHTML = html;
 const b = document.getElementById('warnBanner');
 b.className = `warn-banner wl-${max < 15 ? 0 : max < 80 ? 2 : 4}`;
 document.getElementById('warnLevel').innerText = max < 15 ? 'Gering' : max < 80 ? 'Mäßig' : 'Hoch';
-document.getElementById('warnSub').innerText = `${state.loc} (Aktuell)`;
+document.getElementById('warnSub').innerText = `Frechen • ${h}:00 Uhr`;
+}
+
+// 2. Speichern
+function toggleSym(k) {
+state.activeSyms[k] = !state.activeSyms[k];
+document.getElementById('sb-'+k).classList.toggle('an');
+}
+
+function saveEntry() {
+const h = new Date().getHours();
+const curP = {};
+if (state.pollen) {
+Object.keys(POLLEN_MAP).forEach(k => curP[POLLEN_MAP[k]] = Math.round(state.pollen.hourly[k][h] || 0));
+}
+
+const entries = JSON.parse(localStorage.getItem('ap_entries') || '[]');
+entries.unshift({
+t: new Date().toISOString(),
+loc: 'Frechen',
+syms: {...state.activeSyms},
+pollen: curP,
+note: document.getElementById('note').value
+});
+localStorage.setItem('ap_entries', JSON.stringify(entries));
+// Reset UI
+state.activeSyms = {nase:false, augen:false, atem:false, haut:false};
+document.querySelectorAll('.sym-btn').forEach(b => b.classList.remove('an'));
+document.getElementById('note').value = '';
+showTab('tagebuch');
+}
+
+// 3. Anzeigen & Analyse
+function renderDiary() {
+const entries = JSON.parse(localStorage.getItem('ap_entries') || '[]');
+const list = document.getElementById('diaryList');
+if (entries.length === 0) {
+list.innerHTML = "Noch keine Einträge."
+return;
+}
+
+list.innerHTML = entries.map(e => `
+<div class="entry-item">
+<div style="font-size:10px; color:var(--text2); display:flex; justify-content:space-between">
+<span>${new Date(e.t).toLocaleDateString()} ${new Date(e.t).getHours()}:00</span>
+<span>📍 Frechen</span>
+</div>
+<div style="margin:5px 0">${Object.entries(e.syms).filter(s=>s[1]).map(s=>`<span class="pill">${s[0].toUpperCase()}</span>`).join('')}</div>
+<div style="font-size:11px; opacity:0.7">${Object.entries(e.pollen||{}).filter(p=>p[1]>5).map(p=>p[0]+':'+p[1]).join(' · ')}</div>
+${e.note ? `<div style="font-size:11px; font-style:italic; margin-top:3px; color:var(--accent)">"${e.note}"</div>` : ''}
+</div>
+`).join('');
+renderMuster(entries);
+}
+
+function renderMuster(entries) {
+const symps = entries.filter(e => Object.values(e.syms).some(v => v));
+const resDiv = document.getElementById('patternResults');
+if (symps.length < 2) {
+resDiv.style.display = 'none';
+return;
+}
+
+resDiv.style.display = 'block';
+let triggers = {};
+symps.forEach(e => {
+Object.entries(e.pollen||{}).forEach(([name, val]) => {
+if (val > 20) triggers[name] = (triggers[name] || 0) + 1;
+});
+});
+
+let html = '<div class="card-title">Trigger-Analyse</div>';
+const sorted = Object.entries(triggers).sort((a,b) => b[1] - a[1]);
+if (sorted.length === 0) {
+html += "<div style='font-size:12px'>Symptome traten bei geringer Belastung auf.</div>"
+} else {
+sorted.forEach(([n, c]) => {
+const p = Math.round((c / symps.length) * 100);
+html += `<div style="margin-bottom:8px; font-size:13px;"><b>${n}</b>: Bei ${p}% deiner Probleme aktiv</div>`;
+});
+}
+resDiv.innerHTML = html;
 }
 
 function showTab(id) {
@@ -139,15 +208,17 @@ document.querySelectorAll('.section').forEach(s => s.classList.remove('active'))
 document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
 document.getElementById('tab-'+id).classList.add('active');
 document.getElementById('nav-'+id).classList.add('active');
+if (id === 'tagebuch') renderDiary();
 }
 
-function getLocation() {
-navigator.geolocation.getCurrentPosition(p => {
-selectCity(p.coords.latitude, p.coords.longitude, 'Standort', '');
-}, () => alert("GPS blockiert. Nutze den FIXIEREN Button."));
+function clearData() {
+if (confirm("Wirklich alle Einträge löschen?")) {
+localStorage.removeItem('ap_entries');
+renderDiary();
+}
 }
 
-init();
+updateData();
 </script>
 </body>
 </html>
