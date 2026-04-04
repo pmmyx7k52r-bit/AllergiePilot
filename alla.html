@@ -2,88 +2,132 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AllergiePilot 1.1 (v1.9.1.6)</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>AllergiePilot Mobile (v1.9.1.7)</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
---bg: #0f1a0f; --surface: #172317; --surface2: #1e2e1e; --border: #2a3d2a;
---text: #d4e8d0; --text2: #7fa87a; --text3: #4a6b46; --accent: #5dba52;
---warn-0: #3a8c35; --warn-1: #b8b800; --warn-2: #d97c00; --warn-3: #c83232; --warn-4: #8b0000;
---card-r: 14px; --font-serif: 'DM Serif Display', serif; --font-mono: 'DM Mono', monospace;
+--bg: #0a0f0a; --surface: #141c14; --surface2: #1b261b; --border: #2d3d2d;
+--text: #d4e8d0; --text2: #8eb38a; --accent: #5dba52;
+--warn-0: #3a8c35; --warn-2: #d97c00; --warn-4: #c83232;
+--font-serif: 'DM Serif Display', serif; --font-mono: 'DM Mono', monospace;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg); color: var(--text); font-family: var(--font-mono); font-size: 14px; line-height: 1.5; }
-header { padding: 20px; border-bottom: 1px solid var(--border); background: #0a120a; }
-.logo { font-family: var(--font-serif); font-size: 24px; color: var(--accent); }
-nav { display: flex; gap: 5px; padding: 10px 15px; border-bottom: 1px solid var(--border); overflow-x: auto; background: var(--bg); sticky; top: 0; z-index: 100; }
-nav button { background: none; border: none; color: var(--text3); font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; padding: 10px; cursor: pointer; border-bottom: 2px solid transparent; }
-nav button.active { color: var(--accent); border-bottom-color: var(--accent); }
-main { padding: 20px 16px; max-width: 600px; margin: 0 auto; }
-.section { display: none; } .section.active { display: block; }
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--card-r); padding: 18px; margin-bottom: 15px; }
-.card-title { font-size: 10px; text-transform: uppercase; color: var(--text3); margin-bottom: 12px; letter-spacing: 1px; }
-.warn-banner { border-radius: var(--card-r); padding: 20px; margin-bottom: 20px; border: 1px solid transparent; }
-.wl-0 { background: #1a2e18; border-color: var(--warn-0); }
-.wl-2 { background: #2a1800; border-color: var(--warn-2); }
-.wl-4 { background: #200000; border-color: var(--warn-4); }
-.loc-bar { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 20px; }
-.sym-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.sym-btn { padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); color: var(--text3); cursor: pointer; text-align: left; transition: 0.2s; }
-.sym-btn.an { background: #1e3a18; border-color: var(--accent); color: #a0e896; }
-.btn { background: var(--accent); color: #0a1a0a; border: none; border-radius: 8px; padding: 14px; font-weight: 600; cursor: pointer; width: 100%; font-family: var(--font-mono); }
+/* Mobile Reset */
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+background: var(--bg); color: var(--text); font-family: var(--font-mono);
+font-size: 16px; line-height: 1.4; overflow-x: hidden;
+}
+
+header { padding: 25px 20px 15px; background: #000; border-bottom: 1px solid var(--border); }
+.logo { font-family: var(--font-serif); font-size: 26px; color: var(--accent); }
+
+/* Tab-Navigation für Daumen-Bedienung */
+nav {
+display: flex; position: sticky; top: 0; background: var(--bg);
+z-index: 100; border-bottom: 1px solid var(--border); padding: 0 10px;
+justify-content: space-around;
+}
+nav button {
+background: none; border: none; color: var(--text2); font-family: var(--font-mono);
+font-size: 11px; text-transform: uppercase; padding: 15px 5px; cursor: pointer;
+border-bottom: 3px solid transparent; opacity: 0.6;
+}
+nav button.active { color: var(--accent); border-bottom-color: var(--accent); opacity: 1; }
+
+main { padding: 15px; max-width: 500px; margin: 0 auto; }
+.section { display: none; animation: fadeIn 0.3s ease; }
+.section.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* Mobile-Optimierte Karten */
+.card {
+background: var(--surface); border: 1px solid var(--border);
+border-radius: 16px; padding: 20px; margin-bottom: 15px;
+}
+.card-title { font-size: 11px; text-transform: uppercase; color: var(--text2); margin-bottom: 15px; letter-spacing: 1px; }
+
+.warn-banner { border-radius: 16px; padding: 25px 20px; margin-bottom: 15px; text-align: center; }
+.wl-0 { background: #1a2e18; border: 1px solid var(--warn-0); }
+.wl-2 { background: #2a1b00; border: 1px solid var(--warn-2); }
+.wl-4 { background: #2a0a0a; border: 1px solid var(--warn-4); }
+
+/* Standort-Eingabe */
+.loc-bar { background: var(--surface2); border-radius: 12px; padding: 15px; margin-bottom: 20px; }
+input[type="text"], textarea {
+width: 100%; padding: 14px; background: var(--bg); border: 1px solid var(--border);
+color: var(--text); border-radius: 10px; font-size: 16px; outline: none; appearance: none;
+}
+
+/* Große Symptom-Buttons */
+.sym-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.sym-btn {
+padding: 18px 15px; border-radius: 12px; border: 1px solid var(--border);
+background: var(--surface2); color: var(--text2); cursor: pointer; font-size: 15px;
+display: flex; align-items: center; gap: 10px;
+}
+.sym-btn.an { background: #1e3a18; border-color: var(--accent); color: var(--text); font-weight: bold; }
+
+.btn {
+background: var(--accent); color: #000; border: none; border-radius: 12px;
+padding: 18px; font-weight: bold; cursor: pointer; width: 100%; font-size: 16px;
+margin-top: 10px;
+}
+
+.pollen-row { margin-bottom: 15px; }
+.pollen-bar { height: 6px; background: var(--border); border-radius: 3px; margin-top: 6px; overflow: hidden; }
+.pollen-fill { height: 100%; background: var(--accent); transition: width 0.8s ease-out; }
+
 .entry-item { border-bottom: 1px solid var(--border); padding: 15px 0; }
-.pill { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 10px; background: var(--surface2); border: 1px solid var(--border); margin: 2px 4px 2px 0; color: var(--text2); }
-.pollen-bar { height: 4px; background: var(--border); border-radius: 2px; margin-top: 4px; overflow: hidden; }
-.pollen-fill { height: 100%; background: var(--accent); }
-.search-res { padding: 12px; border-bottom: 1px solid var(--border); cursor: pointer; font-size: 13px; background: var(--surface); }
+.pill { display: inline-block; font-size: 11px; padding: 4px 10px; border-radius: 20px; background: var(--surface2); margin: 3px 5px 0 0; border: 1px solid var(--border); }
+.search-res { padding: 15px; border-bottom: 1px solid var(--border); background: var(--surface); cursor: pointer; }
 </style>
 </head>
 <body>
 
-<header><div class="logo">Allergie<span>Pilot</span> 1.9.1.6</div></header>
+<header><div class="logo">Allergie<span>Pilot</span></div></header>
 
 <nav>
 <button id="btn-heute" class="active" onclick="showTab('heute')">Heute</button>
-<button id="btn-eintrag" onclick="showTab('eintrag')">Symptome</button>
+<button id="btn-eintrag" onclick="showTab('eintrag')">Eintrag</button>
 <button id="btn-tagebuch" onclick="showTab('tagebuch')">Tagebuch</button>
-<button id="btn-muster" onclick="showTab('muster')">Muster</button>
+<button id="btn-muster" onclick="showTab('muster')">Analyse</button>
 </nav>
 
 <main>
 <div class="section active" id="tab-heute">
 <div id="warnBanner" class="warn-banner wl-0">
-<div id="warnLevel" style="font-family:var(--font-serif); font-size:28px">Bereit</div>
-<div id="warnSub" style="font-size:12px">Wähle einen Ort.</div>
+<div id="warnLevel" style="font-family:var(--font-serif); font-size:32px">...</div>
+<div id="warnSub" style="font-size:13px; opacity:0.8">Suche einen Ort</div>
 </div>
 <div class="loc-bar">
-<div style="display:flex; justify-content:space-between; margin-bottom:8px">
-<span id="locLabel">📍 Ort suchen</span>
-<button onclick="getLocation()" style="background:none; border:none; cursor:pointer; font-size:18px">🎯</button>
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
+<span id="locLabel" style="font-weight:bold; color:var(--accent)">📍 Kein Ort gesetzt</span>
+<button onclick="getLocation()" style="background:var(--surface); border:1px solid var(--border); padding:8px 12px; border-radius:8px; color:#fff">🎯 GPS</button>
 </div>
-<input id="cityInput" type="text" placeholder="PLZ oder Stadt..." oninput="searchCityDebounced()" style="width:100%; padding:12px; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:8px; outline:none">
-<div id="cityResults"></div>
+<input id="cityInput" type="text" placeholder="PLZ oder Ort..." oninput="searchCityDebounced()">
+<div id="cityResults" style="margin-top:10px"></div>
 </div>
 <div id="pollenListe"></div>
 </div>
 
 <div class="section" id="tab-eintrag">
 <div class="card">
-<div class="card-title">Status erfassen</div>
+<div class="card-title">Aktuelle Symptome</div>
 <div class="sym-grid">
 <button class="sym-btn" id="sb-nase" onclick="toggleSym('nase')">👃 Nase</button>
 <button class="sym-btn" id="sb-augen" onclick="toggleSym('augen')">👁️ Augen</button>
 <button class="sym-btn" id="sb-atem" onclick="toggleSym('atem')">🫁 Atem</button>
 <button class="sym-btn" id="sb-haut" onclick="toggleSym('haut')">🖐️ Haut</button>
 </div>
-<textarea id="note" style="width:100%; margin-top:15px; background:var(--surface2); border:1px solid var(--border); color:var(--text); padding:10px; border-radius:8px; height:80px" placeholder="Notizen..."></textarea>
-<button class="btn" style="margin-top:15px" onclick="saveEntry()">Speichern</button>
+<textarea id="note" style="margin-top:15px; height:100px" placeholder="Was ist dir aufgefallen? (Essen, Ort, etc.)"></textarea>
+<button class="btn" onclick="saveEntry()">Eintrag Speichern</button>
 </div>
 </div>
 
 <div class="section" id="tab-tagebuch">
 <div class="card">
-<div class="card-title">Deine Historie</div>
+<div class="card-title">Letzte 30 Tage</div>
 <div id="diaryList"></div>
 </div>
 </div>
@@ -94,26 +138,15 @@ main { padding: 20px 16px; max-width: 600px; margin: 0 auto; }
 </main>
 
 <script>
-let state = {
-lat: null, lon: null, loc: 'Unbekannt', pc: '',
-pollen: null,
-activeSyms: { nase:false, augen:false, atem:false, haut:false }
-};
-
-const POLLEN_MAP = { alder_pollen:'Erle', birch_pollen:'Birke', grass_pollen:'Gräser', mugwort_pollen:'Beifuß', olive_pollen:'Olive', ragweed_pollen:'Ragweed' };
-
-// Speicher-Zugriff
-function getEntries() {
-return JSON.parse(localStorage.getItem('ap_entries') || '[]');
-}
+let state = { lat:null, lon:null, loc:'Unbekannt', pc:'', pollen:null, activeSyms:{nase:false, augen:false, atem:false, haut:false}};
+const POLLEN_MAP = { alder_pollen:'Erle', birch_pollen:'Birke', grass_pollen:'Gräser', mugwort_pollen:'Beifuß', ragweed_pollen:'Ragweed' };
 
 function init() {
 const lastLoc = JSON.parse(localStorage.getItem('ap_city'));
 if (lastLoc) selectCity(lastLoc.lat, lastLoc.lon, lastLoc.name, lastLoc.pc);
-renderDiary();
 }
 
-// Suche
+// SUCHE & STANDORT
 let sTimeout;
 function searchCityDebounced() {
 clearTimeout(sTimeout);
@@ -122,10 +155,10 @@ const q = document.getElementById('cityInput').value;
 if (q.length < 2) return;
 const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&addressdetails=1&limit=3`);
 const d = await r.json();
-document.getElementById('cityResults').innerHTML = d.map(i => `
-<div class="search-res" onclick="selectCity(${i.lat}, ${i.lon}, '${i.address.city||i.address.town||i.display_name.split(',')[0]}', '${i.address.postcode||''}')">
-${i.address.postcode||''} ${i.address.city||i.address.town||i.display_name.split(',')[0]}
-</div>`).join('');
+document.getElementById('cityResults').innerHTML = d.map(i => {
+const city = i.address.city || i.address.town || i.address.village || i.display_name.split(',')[0];
+return `<div class="search-res" onclick="selectCity(${i.lat}, ${i.lon}, '${city}', '${i.address.postcode||''}')">📍 ${i.address.postcode||''} ${city}</div>`;
+}).join('');
 }, 500);
 }
 
@@ -133,83 +166,69 @@ async function selectCity(lat, lon, name, pc) {
 state.lat = lat; state.lon = lon; state.loc = name; state.pc = pc;
 document.getElementById('locLabel').innerText = `📍 ${pc} ${name}`;
 document.getElementById('cityResults').innerHTML = '';
+document.getElementById('cityInput').value = '';
 localStorage.setItem('ap_city', JSON.stringify({lat, lon, name, pc}));
-const r = await fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&hourly=alder_pollen,birch_pollen,grass_pollen,mugwort_pollen,olive_pollen,ragweed_pollen&timezone=auto`);
+const r = await fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&hourly=alder_pollen,birch_pollen,grass_pollen,mugwort_pollen,ragweed_pollen&timezone=auto`);
 state.pollen = await r.json();
 renderToday();
 }
 
 function renderToday() {
-const idx = new Date().getHours();
-let html = '<div class="card-title">Pollenflug aktuell</div>';
-let max = 0;
+const h = new Date().getHours();
+let html = '', max = 0;
 Object.keys(POLLEN_MAP).forEach(k => {
-const val = state.pollen.hourly[k][idx] || 0;
-max = Math.max(max, val);
-html += `<div style="margin-bottom:12px">
-<div style="display:flex; justify-content:space-between; font-size:12px"><span>${POLLEN_MAP[k]}</span><span>${Math.round(val)}</span></div>
-<div class="pollen-bar"><div class="pollen-fill" style="width:${Math.min(100, val/2)}%"></div></div>
+const v = state.pollen.hourly[k][h] || 0;
+max = Math.max(max, v);
+html += `<div class="pollen-row">
+<div style="display:flex; justify-content:space-between; font-size:13px"><span>${POLLEN_MAP[k]}</span><b>${Math.round(v)}</b></div>
+<div class="pollen-bar"><div class="pollen-fill" style="width:${Math.min(100, v/1.5)}%"></div></div>
 </div>`;
 });
 document.getElementById('pollenListe').innerHTML = html;
-const banner = document.getElementById('warnBanner');
-banner.className = `warn-banner wl-${max < 10 ? 0 : max < 100 ? 2 : 4}`;
-document.getElementById('warnLevel').innerText = max < 10 ? 'Gering' : max < 100 ? 'Mäßig' : 'Hoch';
+const b = document.getElementById('warnBanner');
+b.className = `warn-banner wl-${max < 15 ? 0 : max < 80 ? 2 : 4}`;
+document.getElementById('warnLevel').innerText = max < 15 ? 'Entspannt' : max < 80 ? 'Achtung' : 'Kritisch';
+document.getElementById('warnSub').innerText = `Max: ${Math.round(max)} (Ort: ${state.loc})`;
 }
 
+// TAGEBUCH & MUSTER
 function saveEntry() {
-const idx = new Date().getHours();
-const currentPollen = {};
-if (state.pollen) {
-Object.keys(POLLEN_MAP).forEach(k => { currentPollen[POLLEN_MAP[k]] = Math.round(state.pollen.hourly[k][idx] || 0); });
-}
+const h = new Date().getHours();
+const curP = {};
+if (state.pollen) Object.keys(POLLEN_MAP).forEach(k => curP[POLLEN_MAP[k]] = Math.round(state.pollen.hourly[k][h] || 0));
 
-const entries = getEntries();
-entries.unshift({
-t: new Date().toISOString(),
-loc: `${state.pc} ${state.loc}`,
-syms: {...state.activeSyms},
-pollen: currentPollen,
-note: document.getElementById('note').value
-});
+const entries = JSON.parse(localStorage.getItem('ap_entries') || '[]');
+entries.unshift({ t:new Date().toISOString(), loc:state.pc+' '+state.loc, syms:{...state.activeSyms}, pollen:curP, note:document.getElementById('note').value });
 localStorage.setItem('ap_entries', JSON.stringify(entries));
-// Reset
-state.activeSyms = { nase:false, augen:false, atem:false, haut:false };
+// UI Reset
+state.activeSyms = {nase:false, augen:false, atem:false, haut:false};
 document.querySelectorAll('.sym-btn').forEach(b => b.classList.remove('an'));
 document.getElementById('note').value = '';
 showTab('tagebuch');
 }
 
 function renderDiary() {
-const entries = getEntries();
-const list = document.getElementById('diaryList');
-if (entries.length === 0) { list.innerHTML = "Keine Einträge." return; }
-list.innerHTML = entries.map(e => `
+const e = JSON.parse(localStorage.getItem('ap_entries') || '[]');
+document.getElementById('diaryList').innerHTML = e.length === 0 ? "Keine Einträge." : e.map(i => `
 <div class="entry-item">
-<div style="font-size:10px; color:var(--text3); display:flex; justify-content:space-between">
-<span>${new Date(e.t).toLocaleDateString()}</span><span>${e.loc}</span>
-</div>
-<div style="margin:5px 0">${Object.entries(e.syms).filter(s=>s[1]).map(s=>`<span class="pill">${s[0].toUpperCase()}</span>`).join('')}</div>
-<div style="font-size:11px; opacity:0.7">${Object.entries(e.pollen||{}).filter(p=>p[1]>5).map(p=>p[0]+': '+p[1]).join(' · ')}</div>
-</div>
-`).join('');
+<div style="font-size:11px; color:var(--text2); margin-bottom:5px">${new Date(i.t).toLocaleDateString('de-DE')} • ${i.loc}</div>
+<div>${Object.entries(i.syms).filter(s=>s[1]).map(s=>`<span class="pill">${s[0].toUpperCase()}</span>`).join('')}</div>
+<div style="font-size:12px; margin-top:5px; opacity:0.8">${Object.entries(i.pollen||{}).filter(p=>p[1]>5).map(p=>p[0]+':'+p[1]).join(' · ')}</div>
+</div>`).join('');
 }
 
 function renderMuster() {
-const entries = getEntries();
-const sympEntries = entries.filter(e => Object.values(e.syms).some(v => v));
+const e = JSON.parse(localStorage.getItem('ap_entries') || '[]');
+const symps = e.filter(i => Object.values(i.syms).some(v => v));
 const res = document.getElementById('patternResults');
-if (sympEntries.length < 2) { res.innerHTML = "Sammle mehr Daten mit Symptomen." return; }
+if (symps.length < 2) { res.innerHTML = "<div class='card-title'>Analyse</div>Noch zu wenig Daten mit Beschwerden." return; }
 
 let counts = {};
-sympEntries.forEach(e => {
-Object.entries(e.pollen||{}).forEach(([n, v]) => { if(v > 20) counts[n] = (counts[n]||0) + 1; });
-});
-
-let html = '<div class="card-title">Trigger Analyse</div>';
-Object.entries(counts).sort((a,b)=>b[1]-a[1]).forEach(([n, c]) => {
-const p = Math.round((c/sympEntries.length)*100);
-html += `<div style="margin-bottom:10px"><b>${n}</b>: ${p}% der Beschwerden</div>`;
+symps.forEach(i => Object.entries(i.pollen||{}).forEach(([n,v]) => { if(v > 20) counts[n] = (counts[n]||0)+1; }));
+let html = '<div class="card-title">Mögliche Trigger</div>';
+Object.entries(counts).sort((a,b)=>b[1]-a[1]).forEach(([n,c]) => {
+const p = Math.round((c/symps.length)*100);
+html += `<div style="margin-bottom:15px"><span>${n}</span> (${p}%)<div class="pollen-bar"><div class="pollen-fill" style="width:${p}%"></div></div></div>`;
 });
 res.innerHTML = html;
 }
@@ -224,7 +243,13 @@ if(id === 'muster') renderMuster();
 }
 
 function toggleSym(k) { state.activeSyms[k] = !state.activeSyms[k]; document.getElementById('sb-'+k).classList.toggle('an'); }
-function getLocation() { navigator.geolocation.getCurrentPosition(p => selectCity(p.coords.latitude, p.coords.longitude, 'Standort', '')); }
+function getLocation() {
+navigator.geolocation.getCurrentPosition(async p => {
+const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${p.coords.latitude}&lon=${p.coords.longitude}`);
+const d = await r.json();
+selectCity(p.coords.latitude, p.coords.longitude, d.address.city || d.address.town || 'GPS Ort', d.address.postcode || '');
+}, () => alert("Bitte GPS aktivieren"));
+}
 
 init();
 </script>
