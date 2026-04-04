@@ -3,330 +3,278 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#1a2e1a">
-<title>AllergiePilot 1.1 (v1.9.1.3)</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<title>AllergiePilot 1.1 (v1.9.1.5)</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
---bg: #0f1a0f;
---surface: #172317;
---surface2: #1e2e1e;
---border: #2a3d2a;
---text: #d4e8d0;
---text2: #7fa87a;
---text3: #4a6b46;
---accent: #5dba52;
---warn-0: #3a8c35;
---warn-1: #b8b800;
---warn-2: #d97c00;
---warn-3: #c83232;
---warn-4: #8b0000;
---card-r: 14px;
---font-serif: 'DM Serif Display', serif;
---font-mono: 'DM Mono', monospace;
+--bg: #0f1a0f; --surface: #172317; --surface2: #1e2e1e; --border: #2a3d2a;
+--text: #d4e8d0; --text2: #7fa87a; --text3: #4a6b46; --accent: #5dba52;
+--warn-0: #3a8c35; --warn-1: #b8b800; --warn-2: #d97c00; --warn-3: #c83232; --warn-4: #8b0000;
+--card-r: 14px; --font-serif: 'DM Serif Display', serif; --font-mono: 'DM Mono', monospace;
 }
-
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg); color: var(--text); font-family: var(--font-mono); font-size: 14px; min-height: 100vh; }
-
-header { padding: 24px 20px 16px; border-bottom: 1px solid var(--border); background: linear-gradient(180deg, #0a120a 0%, var(--bg) 100%); }
-.logo { font-family: var(--font-serif); font-size: 28px; color: var(--accent); }
-.logo span { color: var(--text2); font-style: italic; }
-
-nav { display: flex; gap: 2px; padding: 12px 16px 0; border-bottom: 1px solid var(--border); overflow-x: auto; scrollbar-width: none; }
-nav button { background: none; border: none; color: var(--text3); font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; padding: 8px 14px 10px; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; }
+body { background: var(--bg); color: var(--text); font-family: var(--font-mono); font-size: 14px; line-height: 1.5; }
+header { padding: 20px; border-bottom: 1px solid var(--border); background: linear-gradient(180deg, #0a120a 0%, var(--bg) 100%); }
+.logo { font-family: var(--font-serif); font-size: 24px; color: var(--accent); }
+nav { display: flex; gap: 5px; padding: 10px 15px; border-bottom: 1px solid var(--border); overflow-x: auto; background: var(--bg); position: sticky; top: 0; z-index: 10; }
+nav button { background: none; border: none; color: var(--text3); font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; padding: 8px 12px; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; }
 nav button.active { color: var(--accent); border-bottom-color: var(--accent); }
-
-main { padding: 20px 16px 80px; max-width: 600px; margin: 0 auto; }
-.section { display: none; }
-.section.active { display: block; }
-
-.warn-banner { border-radius: var(--card-r); padding: 18px 20px; margin-bottom: 20px; border: 1px solid transparent; transition: all 0.5s; }
-.wl-0 { background: #1a2e18; border-color: var(--warn-0); color: #a8e8a0; }
-.wl-1 { background: #2a2800; border-color: var(--warn-1); color: #e8e070; }
-.wl-2 { background: #2a1800; border-color: var(--warn-2); color: #f0b060; }
-.wl-3 { background: #2a0808; border-color: var(--warn-3); color: #f08080; }
-.wl-4 { background: #200000; border-color: var(--warn-4); color: #e05050; }
-
+main { padding: 20px 16px; max-width: 600px; margin: 0 auto; }
+.section { display: none; } .section.active { display: block; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--card-r); padding: 18px; margin-bottom: 15px; }
+.card-title { font-size: 10px; text-transform: uppercase; color: var(--text3); margin-bottom: 12px; letter-spacing: 1px; }
+.warn-banner { border-radius: var(--card-r); padding: 20px; margin-bottom: 20px; border: 1px solid transparent; transition: 0.3s; }
+.wl-0 { background: #1a2e18; border-color: var(--warn-0); }
+.wl-2 { background: #2a1800; border-color: var(--warn-2); }
+.wl-4 { background: #200000; border-color: var(--warn-4); }
 .loc-bar { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 20px; }
-.search-res { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; margin-top: 5px; cursor: pointer; font-size: 12px; color: var(--text2); }
-
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--card-r); padding: 18px; margin-bottom: 14px; }
-.card-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text3); margin-bottom: 12px; }
-
 .sym-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.sym-btn { display: flex; flex-direction: column; align-items: center; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface2); color: var(--text3); cursor: pointer; transition: 0.2s; }
+.sym-btn { padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); color: var(--text3); cursor: pointer; text-align: left; }
 .sym-btn.an { background: #1e3a18; border-color: var(--accent); color: #a0e896; }
-
-.btn { background: var(--accent); color: #0a1a0a; border: none; border-radius: 8px; padding: 12px 20px; font-family: var(--font-mono); font-weight: 600; cursor: pointer; width: 100%; }
-.btn-ghost { background: none; color: var(--text3); border: 1px solid var(--border); width: auto; font-size: 11px; }
-
-.entry-item { border-bottom: 1px solid var(--border); padding: 15px 0; position: relative; }
-.entry-loc { position: absolute; right: 0; top: 15px; font-size: 10px; color: var(--text3); }
-.symptom-pill { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 12px; background: var(--surface2); border: 1px solid var(--border); margin: 2px 4px 2px 0; }
-.pollen-pill { border-color: var(--text3); opacity: 0.8; }
+.btn { background: var(--accent); color: #0a1a0a; border: none; border-radius: 8px; padding: 12px; font-weight: 600; cursor: pointer; width: 100%; font-family: var(--font-mono); }
+.entry-item { border-bottom: 1px solid var(--border); padding: 15px 0; }
+.pill { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 10px; background: var(--surface2); border: 1px solid var(--border); margin: 2px 4px 2px 0; }
+.pollen-bar { height: 4px; background: var(--border); border-radius: 2px; margin-top: 4px; overflow: hidden; }
+.pollen-fill { height: 100%; background: var(--accent); transition: width 0.5s; }
+.search-res { padding: 10px; border-bottom: 1px solid var(--border); cursor: pointer; font-size: 12px; background: var(--surface); }
 </style>
 </head>
 <body>
 
-<header>
-<div class="logo">Allergie<span>Pilot</span></div>
-</header>
+<header><div class="logo">Allergie<span>Pilot</span> 1.9.1.5</div></header>
 
-<nav>
+<nav id="mainNav">
 <button class="active" onclick="showTab('heute')">Heute</button>
 <button onclick="showTab('eintrag')">Symptome</button>
 <button onclick="showTab('tagebuch')">Tagebuch</button>
 <button onclick="showTab('muster')">Muster</button>
-<button onclick="showTab('profil')">Profil</button>
 </nav>
 
 <main>
 <div class="section active" id="tab-heute">
 <div id="warnBanner" class="warn-banner wl-0">
-<div style="font-size:10px; opacity:0.7">AKTUELL</div>
-<div id="warnLevel" style="font-family:var(--font-serif); font-size:30px">Lädt...</div>
-<div id="warnSub" style="font-size:12px; margin-top:5px">Ort wählen um Daten zu sehen</div>
+<div id="warnLevel" style="font-family:var(--font-serif); font-size:28px">Bereit</div>
+<div id="warnSub" style="font-size:12px">Wähle einen Ort für die Prognose.</div>
 </div>
-
 <div class="loc-bar">
-<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px">
-<span id="locLabel" style="font-weight:600; color:var(--accent)">📍 Kein Standort</span>
+<div style="display:flex; justify-content:space-between; margin-bottom:8px">
+<span id="locLabel">📍 Ort suchen</span>
 <button onclick="getLocation()" style="background:none; border:none; cursor:pointer; font-size:16px">🎯</button>
 </div>
-<input id="cityInput" type="text" placeholder="Stadt oder PLZ..." oninput="searchCityDebounced()" style="width:100%; background:var(--surface); border:1px solid var(--border); border-radius:8px; color:var(--text); padding:10px; outline:none">
+<input id="cityInput" type="text" placeholder="PLZ oder Stadt..." oninput="searchCityDebounced()" style="width:100%; padding:10px; background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:8px; outline:none">
 <div id="cityResults"></div>
 </div>
-
-<div id="pollenFliegt"></div>
+<div id="pollenListe"></div>
 </div>
 
 <div class="section" id="tab-eintrag">
 <div class="card">
-<div class="card-title">Was spürst du gerade?</div>
+<div class="card-title">Wie geht es dir?</div>
 <div class="sym-grid">
-<button class="sym-btn" id="sb-nase" onclick="toggleSymptom('nase')">👃 Nase</button>
-<button class="sym-btn" id="sb-augen" onclick="toggleSymptom('augen')">👁️ Augen</button>
-<button class="sym-btn" id="sb-haut" onclick="toggleSymptom('haut')">🖐️ Haut</button>
-<button class="sym-btn" id="sb-atem" onclick="toggleSymptom('atem')">🫁 Atem</button>
-<button class="sym-btn" id="sb-muede" onclick="toggleSymptom('muede')">😴 Müdigkeit</button>
-<button class="sym-btn" id="sb-kopf" onclick="toggleSymptom('kopf')">🧠 Kopf</button>
+<button class="sym-btn" id="sb-nase" onclick="toggleSym('nase')">👃 Nase</button>
+<button class="sym-btn" id="sb-augen" onclick="toggleSym('augen')">👁️ Augen</button>
+<button class="sym-btn" id="sb-atem" onclick="toggleSym('atem')">🫁 Atem</button>
+<button class="sym-btn" id="sb-haut" onclick="toggleSym('haut')">🖐️ Haut</button>
 </div>
-<div class="card-title" style="margin-top:20px">Notiz</div>
-<textarea id="entryNote" placeholder="Was hast du gegessen? Besondere Umgebung?" style="height:80px; width:100%; background:var(--surface2); border:1px solid var(--border); color:var(--text); padding:10px; border-radius:8px"></textarea>
+<textarea id="note" style="width:100%; margin-top:15px; background:var(--surface2); border:1px solid var(--border); color:var(--text); padding:10px; border-radius:8px; font-family:inherit" placeholder="Optionale Notiz..."></textarea>
 <button class="btn" style="margin-top:15px" onclick="saveEntry()">Eintrag speichern</button>
 </div>
 </div>
 
 <div class="section" id="tab-tagebuch">
-<div class="card" id="tagebuchList"></div>
+<div class="card" id="diaryList"></div>
 </div>
 
 <div class="section" id="tab-muster">
-<div class="card" id="musterContent"></div>
-</div>
-
-<div class="section" id="tab-profil">
-<div class="card">
-<div class="card-title">Meine Pollen-Trigger</div>
-<div id="pollenAllergens"></div>
-<button class="btn" style="margin-top:20px" onclick="saveProfil()">Profil speichern</button>
-</div>
-<div style="text-align:center">
-<button class="btn-ghost" onclick="clearData()">Alle Daten löschen</button>
-</div>
+<div class="card" id="patternResults"></div>
 </div>
 </main>
 
 <script>
 let state = {
-lat: null, lon: null, locationName: '', postcode: '',
-pollenData: null, entries: [],
-profil: { pollen: [] },
-activeSymptoms: { nase:false, augen:false, haut:false, atem:false, muede:false, kopf:false }
+lat: null, lon: null, loc: 'Unbekannt', pc: '',
+pollen: null, entries: [],
+activeSyms: { nase:false, augen:false, atem:false, haut:false }
 };
 
-const POLLEN_NAMES = { alder_pollen:'Erle', birch_pollen:'Birke', grass_pollen:'Gräser', mugwort_pollen:'Beifuß', olive_pollen:'Olive', ragweed_pollen:'Ragweed' };
+const POLLEN_MAP = {
+alder_pollen:'Erle', birch_pollen:'Birke', grass_pollen:'Gräser',
+mugwort_pollen:'Beifuß', olive_pollen:'Olive', ragweed_pollen:'Ragweed'
+};
 
 function init() {
-state.entries = JSON.parse(localStorage.getItem('ap_entries') || '[]');
-state.profil = JSON.parse(localStorage.getItem('ap_profil') || '{"pollen":[]}');
-renderProfilTags();
-loadSavedCity();
+// RETTUNGS-LOGIK: Versuche verschiedene Keys zu laden
+const legacyData = localStorage.getItem('ap_entries') || localStorage.getItem('entries') || '[]';
+state.entries = JSON.parse(legacyData);
+const lastLoc = JSON.parse(localStorage.getItem('ap_city'));
+if (lastLoc) {
+selectCity(lastLoc.lat, lastLoc.lon, lastLoc.name, lastLoc.pc);
+}
+renderDiary();
 }
 
-// LOCATION LOGIC
-let searchTimeout;
+// LOCATION
+let sTimeout;
 function searchCityDebounced() {
-clearTimeout(searchTimeout);
-searchTimeout = setTimeout(async () => {
+clearTimeout(sTimeout);
+sTimeout = setTimeout(async () => {
 const q = document.getElementById('cityInput').value;
-if (q.length < 3) return;
-const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=3&addressdetails=1&q=${encodeURIComponent(q)}`);
+if (q.length < 2) return;
+try {
+const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&addressdetails=1&limit=3`);
 const d = await r.json();
 document.getElementById('cityResults').innerHTML = d.map(i => {
-const name = i.address.city || i.address.town || i.address.village || i.display_name.split(',')[0];
-const pc = i.address.postcode || '';
-return `<div class="search-res" onclick="selectCity(${i.lat}, ${i.lon}, '${name}', '${pc}')">${pc} ${name} (${i.address.state || ''})</div>`;
+const city = i.address.city || i.address.town || i.address.village || i.display_name.split(',')[0];
+return `<div class="search-res" onclick="selectCity(${i.lat}, ${i.lon}, '${city}', '${i.address.postcode||''}')">
+${i.address.postcode||''} ${city}
+</div>`;
 }).join('');
+} catch(e) { console.error(e); }
 }, 500);
 }
 
-function selectCity(lat, lon, name, pc) {
-state.lat = lat; state.lon = lon; state.locationName = name; state.postcode = pc;
-document.getElementById('locLabel').textContent = `📍 ${pc} ${name}`;
+async function selectCity(lat, lon, name, pc) {
+state.lat = lat; state.lon = lon; state.loc = name; state.pc = pc;
+document.getElementById('locLabel').innerText = `📍 ${pc} ${name}`;
 document.getElementById('cityResults').innerHTML = '';
 document.getElementById('cityInput').value = '';
 localStorage.setItem('ap_city', JSON.stringify({lat, lon, name, pc}));
-fetchPollenData();
+try {
+const r = await fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&hourly=alder_pollen,birch_pollen,grass_pollen,mugwort_pollen,olive_pollen,ragweed_pollen&timezone=auto`);
+state.pollen = await r.json();
+renderToday();
+} catch(e) { console.error(e); }
 }
 
-function getLocation() {
-if (navigator.geolocation) {
-navigator.geolocation.getCurrentPosition(async (pos) => {
-const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`);
-const d = await r.json();
-selectCity(pos.coords.latitude, pos.coords.longitude, d.address.city || d.address.town, d.address.postcode || '');
+function renderToday() {
+if (!state.pollen) return;
+const idx = new Date().getHours();
+let html = '<div class="card-title">Alle aktuellen Pollen</div>';
+let max = 0;
+
+Object.keys(POLLEN_MAP).forEach(k => {
+const val = state.pollen.hourly[k][idx] || 0;
+max = Math.max(max, val);
+html += `
+<div style="margin-bottom:12px">
+<div style="display:flex; justify-content:space-between; font-size:12px">
+<span>${POLLEN_MAP[k]}</span><span style="color:var(--text2)">${Math.round(val)}</span>
+</div>
+<div class="pollen-bar"><div class="pollen-fill" style="width:${Math.min(100, val/2)}%; background:${val > 50 ? 'var(--warn-2)' : 'var(--accent)'}"></div></div>
+</div>`;
 });
-}
-}
-
-async function fetchPollenData() {
-const url = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${state.lat}&longitude=${state.lon}&hourly=alder_pollen,birch_pollen,grass_pollen,mugwort_pollen,olive_pollen,ragweed_pollen&timezone=auto`;
-const r = await fetch(url);
-const d = await r.json();
-state.pollenData = d;
-renderWarnBanner(d);
-renderPollenFliegt(d);
+document.getElementById('pollenListe').innerHTML = html;
+const banner = document.getElementById('warnBanner');
+if (max < 10) { banner.className='warn-banner wl-0'; document.getElementById('warnLevel').innerText='Gering'; }
+else if (max < 100) { banner.className='warn-banner wl-2'; document.getElementById('warnLevel').innerText='Mäßig'; }
+else { banner.className='warn-banner wl-4'; document.getElementById('warnLevel').innerText='Hoch'; }
+document.getElementById('warnSub').innerText = `Spitzenwert: ${Math.round(max)} (Stunde: ${idx}:00)`;
 }
 
-// TAGEBUCH LOGIC
+// DIARY & LOGIC
 function saveEntry() {
-const idx = getCurrentHourIndex(state.pollenData);
+const idx = new Date().getHours();
 const currentPollen = {};
-if (state.pollenData) {
-Object.keys(POLLEN_NAMES).forEach(k => {
-const val = state.pollenData.hourly[k][idx];
-if (val > 10) currentPollen[POLLEN_NAMES[k]] = Math.round(val);
+if (state.pollen) {
+Object.keys(POLLEN_MAP).forEach(k => {
+currentPollen[POLLEN_MAP[k]] = Math.round(state.pollen.hourly[k][idx] || 0);
 });
 }
 
-const entry = {
-date: new Date().toISOString(),
-location: state.locationName,
-pc: state.postcode,
-symptoms: {...state.activeSymptoms},
+const newEntry = {
+t: new Date().toISOString(),
+loc: `${state.pc} ${state.loc}`.trim() || 'Unbekannt',
+syms: {...state.activeSyms},
 pollen: currentPollen,
-note: document.getElementById('entryNote').value
+note: document.getElementById('note').value
 };
 
-state.entries.unshift(entry);
+state.entries.unshift(newEntry);
 localStorage.setItem('ap_entries', JSON.stringify(state.entries));
-showTab('tagebuch');
-// Reset UI
-state.activeSymptoms = { nase:false, augen:false, haut:false, atem:false, muede:false, kopf:false };
+// UI Reset
+state.activeSyms = { nase:false, augen:false, atem:false, haut:false };
 document.querySelectorAll('.sym-btn').forEach(b => b.classList.remove('an'));
-document.getElementById('entryNote').value = '';
+document.getElementById('note').value = '';
+alert("Eintrag erfolgreich gespeichert!");
+showTab('tagebuch');
 }
 
-function renderTagebuch() {
-const list = document.getElementById('tagebuchList');
-if (!state.entries.length) { list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text3)">Noch keine Einträge</div>'; return; }
-list.innerHTML = state.entries.map(e => {
-const date = new Date(e.date).toLocaleDateString('de-DE', {weekday:'short', day:'numeric', month:'short'});
-const symps = Object.entries(e.symptoms).filter(s => s[1]).map(s => `<span class="symptom-pill">${s[0].toUpperCase()}</span>`).join('');
-const poll = Object.entries(e.pollen).map(p => `<span class="symptom-pill pollen-pill">🌿 ${p[0]}: ${p[1]}</span>`).join('');
-return `
+function renderDiary() {
+const container = document.getElementById('diaryList');
+if (state.entries.length === 0) {
+container.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text3)">Noch keine Einträge vorhanden.</div>';
+return;
+}
+
+container.innerHTML = state.entries.map(e => `
 <div class="entry-item">
-<div class="entry-loc">📍 ${e.pc} ${e.location}</div>
-<div style="font-weight:600; font-size:12px; margin-bottom:5px">${date}</div>
-<div>${symps}</div>
-<div style="margin-top:5px">${poll}</div>
-${e.note ? `<div style="font-size:11px; font-style:italic; color:var(--text2); margin-top:5px">"${e.note}"</div>` : ''}
+<div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text3); margin-bottom:5px">
+<span>${new Date(e.t).toLocaleDateString('de-DE', {weekday:'short', day:'2-digit', month:'2-digit', year:'2-digit'})}</span>
+<span>📍 ${e.loc}</span>
 </div>
-`;
-}).join('');
+<div style="margin-bottom:8px">${Object.entries(e.syms).filter(s=>s[1]).map(s=>`<span class="pill">${s[0].toUpperCase()}</span>`).join('')}</div>
+<div style="font-size:11px; opacity:0.8">
+${Object.entries(e.pollen || {}).filter(p=>p[1]>5).map(p=>`<b>${p[0]}</b>: ${p[1]}`).join(' · ') || 'Keine Belastung'}
+</div>
+${e.note ? `<div style="font-size:11px; font-style:italic; margin-top:5px; color:var(--text2)">"${e.note}"</div>` : ''}
+</div>
+`).join('');
 }
 
-// UI HELPERS
-function toggleSymptom(k) {
-state.activeSymptoms[k] = !state.activeSymptoms[k];
-document.getElementById('sb-'+k).classList.toggle('an');
+function renderMuster() {
+const container = document.getElementById('patternResults');
+const sympEntries = state.entries.filter(e => Object.values(e.syms).some(v => v));
+if (sympEntries.length < 2) {
+container.innerHTML = '<div class="card-title">Analyse</div>Sammle mindestens 2 Einträge mit Symptomen für eine Auswertung.';
+return;
+}
+
+let triggers = {};
+sympEntries.forEach(e => {
+Object.entries(e.pollen || {}).forEach(([pName, pVal]) => {
+if (pVal > 20) triggers[pName] = (triggers[pName] || 0) + 1;
+});
+});
+
+let html = '<div class="card-title">Mögliche Trigger</div>';
+const sorted = Object.entries(triggers).sort((a,b) => b[1] - a[1]);
+if (sorted.length === 0) {
+html += "Keine eindeutigen Zusammenhänge gefunden."
+} else {
+sorted.forEach(([name, count]) => {
+const perc = Math.round((count / sympEntries.length) * 100);
+html += `<div style="margin-bottom:12px">
+<div style="display:flex; justify-content:space-between"><span>${name}</span> <span>${perc}%</span></div>
+<div class="pollen-bar"><div class="pollen-fill" style="width:${perc}%"></div></div>
+</div>`;
+});
+}
+container.innerHTML = html;
 }
 
 function showTab(id) {
 document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
 document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
 document.getElementById('tab-'+id).classList.add('active');
-const btnIdx = {heute:0, eintrag:1, tagebuch:2, muster:3, profil:4}[id];
-document.querySelectorAll('nav button')[btnIdx].classList.add('active');
-if (id === 'tagebuch') renderTagebuch();
+const btns = document.querySelectorAll('nav button');
+if(id==='heute') btns[0].classList.add('active');
+if(id==='eintrag') btns[1].classList.add('active');
+if(id==='tagebuch') { btns[2].classList.add('active'); renderDiary(); }
+if(id==='muster') { btns[3].classList.add('active'); renderMuster(); }
 }
 
-function getCurrentHourIndex(d) {
-if (!d) return 0;
-const now = new Date();
-const times = d.hourly.time;
-for(let i=0; i<times.length; i++) if(new Date(times[i]) >= now) return Math.max(0, i-1);
-return 0;
+function toggleSym(k) {
+state.activeSyms[k] = !state.activeSyms[k];
+document.getElementById('sb-'+k).classList.toggle('an');
 }
 
-function renderPollenFliegt(data) {
-const idx = getCurrentHourIndex(data);
-let aktiv = [];
-Object.keys(POLLEN_NAMES).forEach(k => {
-const val = data.hourly[k][idx];
-if (val > 5) aktiv.push({name: POLLEN_NAMES[k], val});
+function getLocation() {
+navigator.geolocation.getCurrentPosition(async (p) => {
+const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${p.coords.latitude}&lon=${p.coords.longitude}`);
+const d = await r.json();
+selectCity(p.coords.latitude, p.coords.longitude, d.address.city || d.address.town || 'Mein Standort', d.address.postcode || '');
 });
-aktiv.sort((a,b) => b.val - a.val);
-document.getElementById('pollenFliegt').innerHTML = `
-<div class="card-title" style="margin-top:20px">Top Belastungen vor Ort</div>
-${aktiv.slice(0,5).map(p => `
-<div style="margin-bottom:10px">
-<div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:3px">
-<span>${p.name}</span><span>${Math.round(p.val)}</span>
-</div>
-<div style="height:4px; background:var(--border); border-radius:2px">
-<div style="width:${Math.min(100, p.val/5)}%; height:100%; background:var(--accent); border-radius:2px"></div>
-</div>
-</div>
-`).join('')}
-`;
 }
-
-function renderWarnBanner(data) {
-const idx = getCurrentHourIndex(data);
-let maxVal = 0;
-Object.keys(POLLEN_NAMES).forEach(k => { maxVal = Math.max(maxVal, data.hourly[k][idx]); });
-const lvl = maxVal < 10 ? 0 : maxVal < 50 ? 1 : maxVal < 150 ? 2 : maxVal < 300 ? 3 : 4;
-const banner = document.getElementById('warnBanner');
-banner.className = `warn-banner wl-${lvl}`;
-document.getElementById('warnLevel').textContent = ['Sehr gering', 'Gering', 'Mäßig', 'Hoch', 'Sehr hoch'][lvl];
-document.getElementById('warnSub').textContent = `Max. Wert: ${Math.round(maxVal)} an deinem Standort.`;
-}
-
-function renderProfilTags() {
-const tags = ['Birke','Erle','Esche','Gräser','Roggen','Beifuß','Ragweed','Hasel'];
-document.getElementById('pollenAllergens').innerHTML = tags.map(t =>
-`<span class="allergen-tag ${state.profil.pollen.includes(t)?'selected':''}" onclick="toggleAllergen('${t}')">${t}</span>`
-).join('');
-}
-
-function toggleAllergen(t) {
-const idx = state.profil.pollen.indexOf(t);
-if (idx > -1) state.profil.pollen.splice(idx, 1); else state.profil.pollen.push(t);
-renderProfilTags();
-}
-
-function saveProfil() { localStorage.setItem('ap_profil', JSON.stringify(state.profil)); fetchPollenData(); }
-
-function loadSavedCity() {
-const s = JSON.parse(localStorage.getItem('ap_city'));
-if (s) selectCity(s.lat, s.lon, s.name, s.pc);
-}
-
-function clearData() { if(confirm('Alle Daten löschen?')) { localStorage.clear(); location.reload(); } }
 
 init();
 </script>
