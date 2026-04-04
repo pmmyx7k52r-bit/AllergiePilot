@@ -5,533 +5,164 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#1a2e1a">
-<title>AllergiePilot 1.1</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<title>AllergiePilot 1.2</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
---bg: #0f1a0f;
---surface: #172317;
---surface2: #1e2e1e;
---border: #2a3d2a;
---text: #d4e8d0;
---text2: #7fa87a;
---text3: #4a6b46;
---accent: #5dba52;
---warn-0: #3a8c35;
---warn-1: #b8b800;
---warn-2: #d97c00;
---warn-3: #c83232;
---warn-4: #8b0000;
---card-r: 14px;
---font-serif: 'DM Serif Display', serif;
---font-mono: 'DM Mono', monospace;
+--bg:#0f1a0f; --surface:#172317; --surface2:#1e2e1e; --border:#2a3d2a;
+--text:#d4e8d0; --text2:#7fa87a; --text3:#4a6b46; --accent:#5dba52;
+--w0:#3a8c35; --w1:#b8b800; --w2:#d97c00; --w3:#c83232; --w4:#8b0000;
+--r:12px; --serif:'DM Serif Display',serif; --mono:'DM Mono',monospace;
 }
-
-- { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-background: var(–bg);
-color: var(–text);
-font-family: var(–font-mono);
-font-size: 14px;
-min-height: 100vh;
-overflow-x: hidden;
-}
-
-/* HEADER */
-header {
-padding: 24px 20px 16px;
-display: flex;
-align-items: flex-end;
-gap: 12px;
-border-bottom: 1px solid var(–border);
-background: linear-gradient(180deg, #0a120a 0%, var(–bg) 100%);
-}
-header .logo {
-font-family: var(–font-serif);
-font-size: 28px;
-color: var(–accent);
-letter-spacing: -0.5px;
-line-height: 1;
-}
-header .logo span { color: var(–text2); font-style: italic; }
-header .subtitle {
-font-size: 11px;
-color: var(–text3);
-letter-spacing: 0.08em;
-text-transform: uppercase;
-padding-bottom: 3px;
-}
-
-/* NAVIGATION */
-nav {
-display: flex;
-gap: 2px;
-padding: 12px 16px 0;
-border-bottom: 1px solid var(–border);
-overflow-x: auto;
-scrollbar-width: none;
-}
-nav::-webkit-scrollbar { display: none; }
-nav button {
-background: none;
-border: none;
-color: var(–text3);
-font-family: var(–font-mono);
-font-size: 12px;
-letter-spacing: 0.06em;
-text-transform: uppercase;
-padding: 8px 14px 10px;
-cursor: pointer;
-border-bottom: 2px solid transparent;
-white-space: nowrap;
-transition: color 0.2s, border-color 0.2s;
-}
-nav button.active {
-color: var(–accent);
-border-bottom-color: var(–accent);
-}
-nav button:hover { color: var(–text); }
-
-/* MAIN */
-main { padding: 20px 16px 80px; max-width: 600px; margin: 0 auto; }
-
-/* SECTIONS */
-.section { display: none; }
-.section.active { display: block; }
-
-/* WARN BANNER */
-.warn-banner {
-border-radius: var(–card-r);
-padding: 18px 20px;
-margin-bottom: 20px;
-position: relative;
-overflow: hidden;
-transition: background 0.5s, border-color 0.5s;
-}
-.warn-banner::before {
-content: ‘’;
-position: absolute;
-inset: 0;
-opacity: 0.08;
-background: radial-gradient(ellipse at top right, #fff 0%, transparent 70%);
-}
-.warn-banner .level-label {
-font-size: 10px;
-letter-spacing: 0.12em;
-text-transform: uppercase;
-opacity: 0.7;
-margin-bottom: 4px;
-}
-.warn-banner .level-val {
-font-family: var(–font-serif);
-font-size: 32px;
-line-height: 1;
-margin-bottom: 6px;
-}
-.warn-banner .level-sub { font-size: 12px; opacity: 0.75; }
-
-/* WARN COLORS */
-.wl-0 { background: #1a2e18; border: 1px solid var(–warn-0); color: #a8e8a0; }
-.wl-1 { background: #2a2800; border: 1px solid var(–warn-1); color: #e8e070; }
-.wl-2 { background: #2a1800; border: 1px solid var(–warn-2); color: #f0b060; }
-.wl-3 { background: #2a0808; border: 1px solid var(–warn-3); color: #f08080; }
-.wl-4 { background: #200000; border: 1px solid var(–warn-4); color: #e05050; }
-
-/* POLLEN CARDS */
-/* 5-TAGE AMPEL */
-.ampel-row {
-display: flex;
-gap: 8px;
-margin-bottom: 20px;
-}
-.ampel-tag {
-flex: 1;
-border-radius: 12px;
-border: 1px solid var(–border);
-background: var(–surface);
-padding: 12px 6px 10px;
-text-align: center;
-transition: border-color 0.3s;
-}
-.ampel-tag.heute {
-border-width: 2px;
-}
-.ampel-tag .amp-wday {
-font-size: 10px;
-color: var(–text3);
-text-transform: uppercase;
-letter-spacing: 0.06em;
-margin-bottom: 2px;
-}
-.ampel-tag .amp-day {
-font-family: var(–font-serif);
-font-size: 17px;
-line-height: 1.1;
-margin-bottom: 8px;
-}
-.ampel-tag .amp-circle {
-width: 28px;
-height: 28px;
-border-radius: 50%;
-margin: 0 auto 6px;
-}
-.ampel-tag .amp-lbl {
-font-size: 9px;
-color: var(–text3);
-letter-spacing: 0.04em;
-}
-
-/* SECTIONS & CARDS */
-.card {
-background: var(–surface);
-border: 1px solid var(–border);
-border-radius: var(–card-r);
-padding: 18px;
-margin-bottom: 14px;
-}
-.card-title {
-font-size: 11px;
-text-transform: uppercase;
-letter-spacing: 0.1em;
-color: var(–text3);
-margin-bottom: 14px;
-}
-
-/* SYMPTOM ENTRY – Toggle Buttons */
-.sym-grid {
-display: grid;
-grid-template-columns: 1fr 1fr;
-gap: 10px;
-margin-bottom: 16px;
-}
-.sym-btn {
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-gap: 6px;
-padding: 16px 10px;
-border-radius: 12px;
-border: 1.5px solid var(–border);
-background: var(–surface2);
-color: var(–text3);
-font-family: var(–font-mono);
-font-size: 12px;
-cursor: pointer;
-transition: background 0.18s, border-color 0.18s, color 0.18s, transform 0.12s;
--webkit-tap-highlight-color: transparent;
-user-select: none;
-letter-spacing: 0.04em;
-}
-.sym-btn .sym-icon { font-size: 26px; line-height: 1; }
-.sym-btn:active { transform: scale(0.94); }
-.sym-btn.an {
-background: #1e3a18;
-border-color: var(–accent);
-color: #a0e896;
-}
-
-/* TEXTAREA */
-textarea {
-width: 100%;
-background: var(–surface2);
-border: 1px solid var(–border);
-border-radius: 8px;
-color: var(–text);
-font-family: var(–font-mono);
-font-size: 13px;
-padding: 12px;
-resize: vertical;
-min-height: 72px;
-outline: none;
-transition: border-color 0.2s;
-}
-textarea:focus { border-color: var(–accent); }
-
-/* BUTTONS */
-.btn {
-display: inline-flex;
-align-items: center;
-gap: 6px;
-background: var(–accent);
-color: #0a1a0a;
-border: none;
-border-radius: 8px;
-padding: 10px 20px;
-font-family: var(–font-mono);
-font-size: 13px;
-font-weight: 500;
-cursor: pointer;
-transition: opacity 0.2s, transform 0.15s;
-letter-spacing: 0.04em;
-}
-.btn:active { transform: scale(0.97); opacity: 0.85; }
-.btn-ghost {
-background: none;
-color: var(–text2);
-border: 1px solid var(–border);
-}
-
-/* TAGEBUCH */
-.entry-item {
-border-bottom: 1px solid var(–border);
-padding: 14px 0;
-animation: slideIn 0.3s ease;
-}
-.entry-item:last-child { border-bottom: none; }
-@keyframes slideIn {
-from { opacity: 0; transform: translateY(-8px); }
-to { opacity: 1; transform: translateY(0); }
-}
-.entry-date {
-font-size: 10px;
-color: var(–text3);
-text-transform: uppercase;
-letter-spacing: 0.08em;
-margin-bottom: 6px;
-}
-.entry-symptoms {
-display: flex;
-flex-wrap: wrap;
-gap: 6px;
-margin-bottom: 6px;
-}
-.symptom-pill {
-font-size: 11px;
-padding: 3px 8px;
-border-radius: 20px;
-background: var(–surface2);
-border: 1px solid var(–border);
-}
-.symptom-pill.s-high { border-color: var(–warn-3); color: #f08080; }
-.symptom-pill.s-mid { border-color: var(–warn-2); color: #f0b060; }
-.symptom-pill.s-low { border-color: var(–warn-1); color: #d4e8d0; }
-.entry-note { font-size: 12px; color: var(–text2); font-style: italic; }
-
-/* MUSTER / ANALYSE */
-.muster-bar-wrap { margin-bottom: 12px; }
-.muster-label {
-display: flex;
-justify-content: space-between;
-font-size: 12px;
-color: var(–text2);
-margin-bottom: 4px;
-}
-.muster-bar {
-height: 8px;
-background: var(–border);
-border-radius: 4px;
-overflow: hidden;
-}
-.muster-fill {
-height: 100%;
-border-radius: 4px;
-background: linear-gradient(90deg, var(–warn-1), var(–warn-3));
-transition: width 1s ease;
-}
-
-/* ALLERGEN PROFILE */
-.allergen-tag {
-display: inline-flex;
-align-items: center;
-gap: 6px;
-background: var(–surface2);
-border: 1px solid var(–border);
-border-radius: 20px;
-padding: 5px 12px;
-font-size: 12px;
-margin: 4px;
-cursor: pointer;
-transition: border-color 0.2s, background 0.2s;
-}
-.allergen-tag.selected {
-background: #1e3a1a;
-border-color: var(–accent);
-color: var(–accent);
-}
-.allergen-tag .dot {
-width: 6px; height: 6px;
-border-radius: 50%;
-background: var(–text3);
-}
-.allergen-tag.selected .dot { background: var(–accent); }
-
-/* LOADING */
-.loading {
-display: flex;
-align-items: center;
-gap: 8px;
-color: var(–text3);
-font-size: 12px;
-padding: 12px 0;
-}
-.spinner {
-width: 14px; height: 14px;
-border: 2px solid var(–border);
-border-top-color: var(–accent);
-border-radius: 50%;
-animation: spin 0.8s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* LOCATION */
-.loc-bar {
-display: flex;
-align-items: center;
-gap: 8px;
-background: var(–surface2);
-border: 1px solid var(–border);
-border-radius: 8px;
-padding: 10px 14px;
-margin-bottom: 16px;
-font-size: 12px;
-color: var(–text2);
-}
-.loc-bar .loc-icon { font-size: 16px; }
-
-/* SELECT */
-select {
-background: var(–surface2);
-border: 1px solid var(–border);
-border-radius: 8px;
-color: var(–text);
-font-family: var(–font-mono);
-font-size: 13px;
-padding: 8px 12px;
-outline: none;
-cursor: pointer;
-}
-select:focus { border-color: var(–accent); }
-
-/* EMPTY STATE */
-.empty {
-text-align: center;
-padding: 40px 20px;
-color: var(–text3);
-font-size: 13px;
-}
-.empty .emj { font-size: 36px; margin-bottom: 10px; }
-
-/* DATE DISPLAY */
-.today-label {
-font-size: 11px;
-color: var(–text3);
-text-transform: uppercase;
-letter-spacing: 0.1em;
-margin-bottom: 8px;
-}
-
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:14px;min-height:100vh;overflow-x:hidden;}
+header{padding:20px 16px 14px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,#0a120a 0%,var(--bg) 100%);display:flex;align-items:flex-end;gap:10px;}
+.logo{font-family:var(--serif);font-size:26px;color:var(--accent);}
+.logo span{color:var(--text2);font-style:italic;}
+.ver{font-size:10px;color:var(--text3);padding-bottom:4px;letter-spacing:.1em;}
+nav{display:flex;gap:2px;padding:10px 14px 0;border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;}
+nav::-webkit-scrollbar{display:none;}
+nav button{background:none;border:none;color:var(--text3);font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:7px 12px 9px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color .2s,border-color .2s;}
+nav button.active{color:var(--accent);border-bottom-color:var(--accent);}
+nav button:hover{color:var(--text);}
+main{padding:16px 14px 80px;max-width:600px;margin:0 auto;}
+.section{display:none;} .section.active{display:block;}
+.wb{border-radius:var(--r);padding:16px 18px;margin-bottom:14px;position:relative;overflow:hidden;}
+.wb::before{content:'';position:absolute;inset:0;opacity:.07;background:radial-gradient(ellipse at top right,#fff 0%,transparent 70%);}
+.wb-lbl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.7;margin-bottom:3px;}
+.wb-val{font-family:var(--serif);font-size:28px;line-height:1;margin-bottom:4px;}
+.wb-sub{font-size:11px;opacity:.75;}
+.wl0{background:#1a2e18;border:1px solid var(--w0);color:#a0e090;}
+.wl1{background:#2a2800;border:1px solid var(--w1);color:#e8e070;}
+.wl2{background:#2a1800;border:1px solid var(--w2);color:#f0b060;}
+.wl3{background:#2a0808;border:1px solid var(--w3);color:#f08080;}
+.wl4{background:#200000;border:1px solid var(--w4);color:#e05050;}
+.loc-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:14px;}
+.loc-top{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:12px;color:var(--text2);}
+.loc-row{display:flex;gap:6px;}
+.loc-row input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:13px;padding:8px 10px;outline:none;}
+.loc-row input:focus{border-color:var(--accent);}
+#cityResults button{display:block;width:100%;text-align:left;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text2);font-family:var(--mono);font-size:12px;padding:8px 10px;margin-top:4px;cursor:pointer;}
+.sec-title{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;}
+.ampel-row{display:flex;gap:6px;margin-bottom:16px;}
+.amp-day{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 4px 8px;text-align:center;}
+.amp-day.heute{background:var(--surface2);border-width:2px;}
+.amp-wday{font-size:10px;color:var(--text3);text-transform:uppercase;margin-bottom:2px;}
+.amp-date{font-family:var(--serif);font-size:15px;margin-bottom:6px;}
+.amp-dot{width:24px;height:24px;border-radius:50%;margin:0 auto 4px;}
+.amp-lbl{font-size:9px;color:var(--text3);}
+.pollen-item{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.pollen-name{font-size:13px;width:68px;flex-shrink:0;}
+.pollen-bw{flex:1;}
+.pollen-head{display:flex;align-items:center;margin-bottom:3px;}
+.pollen-bar{height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.pollen-fill{height:100%;border-radius:3px;transition:width .8s ease;}
+.allerg-badge{font-size:10px;padding:1px 7px;border-radius:10px;background:#1e3a18;border:1px solid var(--accent);color:var(--accent);margin-right:6px;white-space:nowrap;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:14px;}
+.card-title{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:12px;}
+.sym-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.sym-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:18px 10px;border-radius:12px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text3);font-family:var(--mono);font-size:12px;cursor:pointer;transition:background .18s,border-color .18s,color .18s,transform .12s;-webkit-tap-highlight-color:transparent;user-select:none;}
+.sym-btn .ico{font-size:28px;line-height:1;}
+.sym-btn:active{transform:scale(.93);}
+.sym-btn.an{background:#1e3a18;border-color:var(--accent);color:#a0e896;}
+textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:13px;padding:10px;resize:vertical;min-height:64px;outline:none;transition:border-color .2s;}
+textarea:focus{border-color:var(--accent);}
+.btn{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:#0a1a0a;border:none;border-radius:8px;padding:10px 18px;font-family:var(--mono);font-size:13px;font-weight:500;cursor:pointer;transition:opacity .2s,transform .15s;letter-spacing:.03em;}
+.btn:active{transform:scale(.96);opacity:.85;}
+.btn-full{width:100%;justify-content:center;padding:14px;font-size:15px;}
+.btn-ghost{background:none;color:var(--text2);border:1px solid var(--border);}
+.entry-item{border-bottom:1px solid var(--border);padding:12px 0;}
+.entry-item:last-child{border-bottom:none;}
+.entry-date{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
+.entry-syms{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:4px;}
+.sym-pill{font-size:11px;padding:2px 8px;border-radius:12px;background:var(--surface2);border:1px solid var(--accent);color:var(--accent);}
+.pollen-pills{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;}
+.pollen-pill{font-size:11px;padding:2px 8px;border-radius:12px;background:var(--surface2);}
+.entry-note{font-size:12px;color:var(--text2);font-style:italic;margin-top:5px;}
+.allergen-tag{display:inline-flex;align-items:center;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:12px;margin:3px;cursor:pointer;transition:border-color .2s,background .2s;}
+.allergen-tag.selected{background:#1e3a1a;border-color:var(--accent);color:var(--accent);}
+.allerg-result{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+.allerg-result:last-child{border-bottom:none;}
+.allerg-icon{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.allerg-pct{width:42px;height:42px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:16px;font-weight:700;color:#0a1a0a;flex-shrink:0;}
+select{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:13px;padding:7px 10px;outline:none;cursor:pointer;}
+.empty{text-align:center;padding:36px 20px;color:var(--text3);font-size:13px;}
+.empty .emj{font-size:34px;margin-bottom:10px;}
+.today-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;}
 </style>
 </head>
 <body>
-
 <header>
 <div class="logo">Allergie<span>Pilot</span></div>
-<div class="subtitle">Dein persönlicher Warnhelfer</div>
+<div class="ver">v1.2</div>
 </header>
-
 <nav>
 <button class="active" onclick="showTab('heute')">Heute</button>
-<button onclick="showTab('eintrag')">Symptome</button>
+<button onclick="showTab('symptome')">Symptome</button>
 <button onclick="showTab('tagebuch')">Tagebuch</button>
 <button onclick="showTab('muster')">Muster</button>
 <button onclick="showTab('profil')">Profil</button>
 </nav>
-
 <main>
 
 <!-- HEUTE -->
 
 <div class="section active" id="tab-heute">
-<div class="today-label" id="todayLabel"></div>
-
-```
-<div id="warnBanner" class="warn-banner wl-0">
-<div class="level-label">Aktuelle Belastung</div>
-<div class="level-val" id="warnLevel">Wird geladen…</div>
-<div class="level-sub" id="warnSub"></div>
+<div class="today-lbl" id="todayLbl"></div>
+<div id="warnBanner" class="wb wl0">
+<div class="wb-lbl">Aktuelle Belastung</div>
+<div class="wb-val" id="warnVal">Kein Standort</div>
+<div class="wb-sub" id="warnSub">Bitte Stadt eingeben</div>
 </div>
-
-<div class="loc-bar" style="flex-wrap:wrap;gap:8px">
-<span class="loc-icon">&#128205;</span>
-<span id="locLabel" style="flex:1">Kein Standort gesetzt</span>
-<div style="display:flex;gap:6px;width:100%;margin-top:6px">
-<input id="cityInput" type="text" placeholder="Stadt eingeben, z.B. Wien"
-style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font-mono);font-size:13px;padding:7px 10px;outline:none"
-onkeydown="if(event.key==='Enter')searchCity()">
-<button class="btn" style="padding:7px 14px;font-size:12px" onclick="searchCity()">Suchen</button>
+<div class="loc-bar">
+<div class="loc-top">&#128205; <span id="locLabel">Kein Standort gesetzt</span></div>
+<div class="loc-row">
+<input id="cityInput" type="text" placeholder="Stadt eingeben, z.B. Frechen" onkeydown="if(event.key==='Enter')searchCity()">
+<button class="btn" style="padding:8px 14px;font-size:12px" onclick="searchCity()">Suchen</button>
 </div>
-<div id="cityResults" style="width:100%"></div>
+<div id="cityResults"></div>
 </div>
-
-<div class="card-title" style="margin-bottom:10px">5-Tage-Belastung</div>
+<div class="sec-title">5-Tage-Belastung</div>
 <div class="ampel-row" id="ampelRow">
-<div style="color:var(--text3);font-size:12px;padding:8px 0">Bitte zuerst Standort eingeben</div>
+<div style="color:var(--text3);font-size:12px">Bitte Standort eingeben</div>
 </div>
-<div id="pollenFliegt"></div>
-```
-
+<div class="sec-title">Pollenflug heute &ndash; Top 5</div>
+<div id="pollenListe" style="margin-bottom:16px">
+<div style="font-size:12px;color:var(--text3)">Warte auf Standort&hellip;</div>
+</div>
 </div>
 
 <!-- SYMPTOME -->
 
-<div class="section" id="tab-eintrag">
+<div class="section" id="tab-symptome">
 <div class="card">
-<div class="card-title">Wo hast du heute Beschwerden?</div>
-<div style="font-size:11px;color:var(--text3);margin-bottom:14px">Antippen was gerade zwickt &mdash; kein Eintrag n&ouml;tig wenn alles okay ist</div>
+<div class="card-title">Wo hast du Beschwerden?</div>
+<div style="font-size:11px;color:var(--text3);margin-bottom:14px">Antippen = betroffen &mdash; nochmal antippen = aufheben</div>
 <div class="sym-grid">
-<button class="sym-btn" id="sb-nase" onclick="toggleSymptom('nase')">
-<span class="sym-icon">&#128067;</span>Nase
-</button>
-<button class="sym-btn" id="sb-augen" onclick="toggleSymptom('augen')">
-<span class="sym-icon">&#128064;</span>Augen
-</button>
-<button class="sym-btn" id="sb-haut" onclick="toggleSymptom('haut')">
-<span class="sym-icon">&#129304;</span>Haut
-</button>
-<button class="sym-btn" id="sb-atem" onclick="toggleSymptom('atem')">
-<span class="sym-icon">&#129755;</span>Atem
-</button>
-<button class="sym-btn" id="sb-muede" onclick="toggleSymptom('muede')">
-<span class="sym-icon">&#128564;</span>M&#252;digkeit
-</button>
-<button class="sym-btn" id="sb-kopf" onclick="toggleSymptom('kopf')">
-<span class="sym-icon">&#129354;</span>Kopf
-</button>
+<button class="sym-btn" id="sb-nase" onclick="toggleSym('nase')"><span class="ico">&#128067;</span>Nase</button>
+<button class="sym-btn" id="sb-augen" onclick="toggleSym('augen')"><span class="ico">&#128064;</span>Augen</button>
+<button class="sym-btn" id="sb-haut" onclick="toggleSym('haut')"><span class="ico">&#129304;</span>Haut</button>
+<button class="sym-btn" id="sb-atem" onclick="toggleSym('atem')"><span class="ico">&#129755;</span>Atem</button>
+<button class="sym-btn" id="sb-muede" onclick="toggleSym('muede')"><span class="ico">&#128564;</span>M&uuml;digkeit</button>
+<button class="sym-btn" id="sb-kopf" onclick="toggleSym('kopf')"><span class="ico">&#129354;</span>Kopf</button>
 </div>
-
-```
-<div style="margin: 14px 0 10px">
-<div class="card-title" style="margin-bottom:8px">Umgebung / Kontakt</div>
-<div id="kontaktTags">
-<!-- Filled dynamically based on profile -->
+<div style="margin-bottom:12px">
+<div class="card-title">Notiz (optional)</div>
+<textarea id="entryNote" placeholder="Z.B. war draussen, Katze besucht&hellip;"></textarea>
 </div>
+<button class="btn btn-full" onclick="saveEntry()">&#10003; Beschwerden speichern</button>
 </div>
-
-<div style="margin-bottom:14px">
-<div class="card-title" style="margin-bottom:8px">Notiz</div>
-<textarea id="entryNote" placeholder="Was hast du heute gemacht? Wo warst du? Welche Medikamente?"></textarea>
-</div>
-
-<button class="btn" style="width:100%;padding:14px;font-size:15px;justify-content:center" onclick="saveEntry()">&#10003; Beschwerden speichern</button>
-</div>
-```
-
 </div>
 
 <!-- TAGEBUCH -->
 
 <div class="section" id="tab-tagebuch">
-<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-<div class="card-title" style="margin:0">Alle Einträge</div>
-<select id="filterMonth" onchange="renderTagebuch()">
-<option value="">Alle Monate</option>
-</select>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+<div class="sec-title" style="margin:0">Alle Eintr&auml;ge</div>
+<select id="filterMonth" onchange="renderTagebuch()"><option value="">Alle Monate</option></select>
 </div>
 <div class="card" id="tagebuchList">
-<div class="empty"><div class="emj">📓</div>Noch keine Einträge</div>
+<div class="empty"><div class="emj">&#128211;</div>Noch keine Eintr&auml;ge</div>
 </div>
 </div>
 
@@ -539,715 +170,424 @@ onkeydown="if(event.key==='Enter')searchCity()">
 
 <div class="section" id="tab-muster">
 <div class="card">
-<div class="card-title">KI-Analyse: Was löst was aus?</div>
-<div id="musterContent">
-<div class="empty"><div class="emj">🔍</div>Mindestens 3 Einträge nötig für Muster-Erkennung</div>
+<div class="card-title">Deine wahrscheinlichen Allergien</div>
+<div id="musterContent"><div class="empty"><div class="emj">&#128269;</div>Mindestens 3 Eintr&auml;ge n&ouml;tig</div></div>
+<button class="btn btn-full" style="margin-top:14px" onclick="analyseMuster()">&#128202; Jetzt berechnen</button>
 </div>
-<button class="btn" style="margin-top:14px" onclick="analyseMuster()">🤖 Jetzt analysieren</button>
-</div>
-
-```
-<div class="card">
-<div class="card-title">Häufigste Symptome</div>
-<div id="symptomStats"></div>
-</div>
-```
-
 </div>
 
 <!-- PROFIL -->
 
 <div class="section" id="tab-profil">
 <div class="card">
-<div class="card-title">Meine bekannten Allergene</div>
-<div style="margin-bottom:14px">Wähle an, worauf du reagierst (hilft bei der Analyse):</div>
-
-```
-<div style="margin-bottom:8px;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em">Pollen</div>
-<div id="pollenAllergens"></div>
-
-<div style="margin: 14px 0 8px;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em">Tiere</div>
-<div id="tierAllergens"></div>
-
-<div style="margin: 14px 0 8px;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em">Sonstiges</div>
-<div id="sonstigesAllergens"></div>
-
-<button class="btn" style="margin-top:16px" onclick="saveProfil()">✓ Profil speichern</button>
+<div class="card-title">Bekannte Allergene</div>
+<div style="font-size:12px;color:var(--text2);margin-bottom:12px">Ausw&auml;hlen was du weisst oder vermutest</div>
+<div class="sec-title">Pollen</div><div id="profil-pollen"></div>
+<div class="sec-title" style="margin-top:12px">Tiere</div><div id="profil-tiere"></div>
+<div class="sec-title" style="margin-top:12px">Sonstiges</div><div id="profil-sonstiges"></div>
+<button class="btn" style="margin-top:16px" onclick="saveProfil()">&#10003; Profil speichern</button>
 </div>
-
 <div class="card">
 <div class="card-title">Daten</div>
-<button class="btn btn-ghost" onclick="exportData()" style="margin-right:8px;margin-bottom:8px">📤 Exportieren</button>
-<button class="btn btn-ghost" onclick="clearData()" style="color:#f08080;border-color:#5a2020">🗑️ Alle Daten löschen</button>
+<button class="btn btn-ghost" onclick="exportData()" style="margin-right:8px;margin-bottom:8px">&#128228; Exportieren</button>
+<button class="btn btn-ghost" onclick="clearData()" style="color:#f08080;border-color:#5a2020">&#128465; Alles l&ouml;schen</button>
 </div>
-```
-
 </div>
 
 </main>
-
 <script>
-// ═══════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════
-let state = {
-lat: null, lon: null,
-locationName: '',
-pollenData: null,
-entries: [],
-profil: {
-pollen: [],
-tiere: [],
-sonstiges: []
-}
+var POLLEN_API_KEYS = ['alder_pollen','birch_pollen','grass_pollen','mugwort_pollen','olive_pollen','ragweed_pollen'];
+var POLLEN_NAMES = {alder_pollen:'Erle',birch_pollen:'Birke',grass_pollen:'Graeser',mugwort_pollen:'Beifuss',olive_pollen:'Olive',ragweed_pollen:'Ragweed'};
+var ALLERGENS = {
+pollen:['Birke','Erle','Esche','Graeser','Roggen','Beifuss','Ragweed','Hasel'],
+tiere:['Katze','Hund','Pferd','Meerschweinchen','Vogel','Hausstaubmilben'],
+sonstiges:['Schimmel','Latex','Insektengift','Nickel','Parfuem']
 };
-
-const ALLERGENS = {
-pollen: ['Birke','Erle','Esche','Gräser','Roggen','Beifuß','Ragweed','Hasel'],
-tiere: ['Katze','Hund','Pferd','Meerschweinchen','Vogel','Hausstaubmilben'],
-sonstiges: ['Schimmel','Latex','Insektengift','Nickel','Parfüm']
-};
-
-const SYMPTOM_LABELS = { 'nase':'Nase 🂃','augen':'Augen 👀','haut':'Haut 🤚','atem':'Atem 🫁','muede':'Müdigkeit 😴','kopf':'Kopf 🦠' };
-const WARN_LEVELS = [
-{ label: 'Keine Belastung', sub: 'Alles entspannt 🌿', cls: 'wl-0', col: '#3a8c35' },
-{ label: 'Gering', sub: 'Leicht erhöhte Werte ⚠️', cls: 'wl-1', col: '#b8b800' },
-{ label: 'Mäßig', sub: 'Vorsicht empfohlen 🟠', cls: 'wl-2', col: '#d97c00' },
-{ label: 'Hoch', sub: 'Starke Belastung – Maßnahmen ergreifen 🔴', cls: 'wl-3', col: '#c83232' },
-{ label: 'Sehr hoch', sub: 'Draußen bleiben, Fenster schließen 🚨', cls: 'wl-4', col: '#8b0000' }
+var SYM_LABELS = {nase:'Nase',augen:'Augen',haut:'Haut',atem:'Atem',muede:'Muedigkeit',kopf:'Kopf'};
+var LVL_COLS = ['var(--text3)','#3a8c35','#b8b800','#d97c00','#c83232','#8b0000'];
+var LVL_LBLS = ['Keine','Gering','Maessig','Hoch','Sehr hoch'];
+var WARN_DATA = [
+{lbl:'Keine Belastung',sub:'Alles entspannt',cls:'wl0'},
+{lbl:'Gering',sub:'Leicht erhoehte Werte',cls:'wl1'},
+{lbl:'Maessig',sub:'Vorsicht empfohlen',cls:'wl2'},
+{lbl:'Hoch',sub:'Massnahmen ergreifen',cls:'wl3'},
+{lbl:'Sehr hoch',sub:'Fenster schliessen',cls:'wl4'}
 ];
 
-// ═══════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════
+var S = {lat:null,lon:null,locationName:’’,pollenData:null,entries:[],profil:{pollen:[],tiere:[],sonstiges:[]}};
+var symVals = {nase:false,augen:false,haut:false,atem:false,muede:false,kopf:false};
+
 function init() {
 loadStorage();
-renderTodayLabel();
-renderProfilTags();
-renderKontaktTags();
+document.getElementById(‘todayLbl’).textContent =
+new Date().toLocaleDateString(‘de-DE’,{weekday:‘long’,day:‘numeric’,month:‘long’,year:‘numeric’}).toUpperCase();
+renderProfil();
 renderTagebuch();
-renderSymptomStats();
+populateMonths();
 loadSavedCity();
-populateFilterMonths();
 }
 
 function loadStorage() {
-const e = localStorage.getItem('ap_entries');
-const p = localStorage.getItem('ap_profil');
-if (e) state.entries = JSON.parse(e);
-if (p) state.profil = JSON.parse(p);
+try { var e=localStorage.getItem(‘ap_entries’); if(e) S.entries=JSON.parse(e); } catch(x){}
+try { var p=localStorage.getItem(‘ap_profil’); if(p) S.profil=JSON.parse(p); } catch(x){}
 }
-
 function saveStorage() {
-localStorage.setItem('ap_entries', JSON.stringify(state.entries));
-localStorage.setItem('ap_profil', JSON.stringify(state.profil));
+localStorage.setItem(‘ap_entries’,JSON.stringify(S.entries));
+localStorage.setItem(‘ap_profil’,JSON.stringify(S.profil));
 }
 
-function renderTodayLabel() {
-const d = new Date();
-document.getElementById('todayLabel').textContent =
-d.toLocaleDateString('de-DE', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+function showTab(id) {
+document.querySelectorAll(’.section’).forEach(function(s){s.classList.remove(‘active’);});
+document.querySelectorAll(‘nav button’).forEach(function(b){b.classList.remove(‘active’);});
+document.getElementById(‘tab-’+id).classList.add(‘active’);
+var tabs=[‘heute’,‘symptome’,‘tagebuch’,‘muster’,‘profil’];
+var idx=tabs.indexOf(id);
+if(idx>=0) document.querySelectorAll(‘nav button’)[idx].classList.add(‘active’);
+if(id===‘tagebuch’){renderTagebuch();populateMonths();}
+if(id===‘muster’) analyseMuster();
 }
 
-// ═══════════════════════════════════════
-// LOCATION & POLLEN API
-// ═══════════════════════════════════════
-
-async function fetchPollenData() {
-// Open-Meteo Air Quality API – pollen data
-const fields = 'alder_pollen,birch_pollen,grass_pollen,mugwort_pollen,olive_pollen,ragweed_pollen';
-const url = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${state.lat}&longitude=${state.lon}&hourly=${fields}&forecast_days=7&timezone=auto`;
-
+function loadSavedCity() {
 try {
-const r = await fetch(url);
-const d = await r.json();
-state.pollenData = d;
-renderAmpel(d);
-renderPollenFliegt(d);
-renderWarnBanner(d);
-} catch(e) {
-document.getElementById('pollenGrid').innerHTML = '<div style="color:var(--text3);font-size:12px">Pollendaten konnten nicht geladen werden.</div>';
-}
+var c=JSON.parse(localStorage.getItem(‘ap_city’)||‘null’);
+if(c){S.lat=c.lat;S.lon=c.lon;S.locationName=c.name;document.getElementById(‘locLabel’).textContent=c.name;fetchPollen();}
+} catch(x){}
 }
 
-function getCurrentHourIndex(data) {
-const now = new Date();
-const times = data.hourly.time;
-// find index closest to now
-for (let i = 0; i < times.length; i++) {
-const t = new Date(times[i]);
-if (t >= now) return Math.max(0, i - 1);
+async function searchCity() {
+var q=document.getElementById(‘cityInput’).value.trim();
+if(!q) return;
+var div=document.getElementById(‘cityResults’);
+div.innerHTML=’<div style="font-size:12px;color:var(--text3);padding:6px 0">Suche…</div>’;
+try {
+var r=await fetch(‘https://nominatim.openstreetmap.org/search?format=json&limit=4&q=’+encodeURIComponent(q));
+var res=await r.json();
+if(!res.length){div.innerHTML=’<div style="font-size:12px;color:var(--text3);padding:6px 0">Keine Ergebnisse</div>’;return;}
+var html=’’;
+for(var i=0;i<res.length;i++){
+var p=res[i];
+var name=p.display_name.split(’,’)[0].replace(/’/g,’’);
+var label=p.display_name.split(’,’).slice(0,3).join(’, ‘);
+html+=’<button onclick="selectCity('+p.lat+','+p.lon+',\''+name+'\')">’+label+’</button>’;
 }
-return times.length - 1;
+div.innerHTML=html;
+} catch(e){div.innerHTML=’<div style="font-size:12px;color:var(--w3);padding:6px 0">Suchfehler</div>’;}
 }
 
-function getPollenLevel(val) {
-if (!val || val < 5) return 0;
-if (val < 50) return 1;
-if (val < 200) return 2;
-if (val < 500) return 3;
+function selectCity(lat,lon,name) {
+S.lat=parseFloat(lat);S.lon=parseFloat(lon);S.locationName=name;
+document.getElementById(‘locLabel’).textContent=name;
+document.getElementById(‘cityResults’).innerHTML=’’;
+document.getElementById(‘cityInput’).value=’’;
+localStorage.setItem(‘ap_city’,JSON.stringify({lat:S.lat,lon:S.lon,name:name}));
+fetchPollen();
+}
+
+async function fetchPollen() {
+var fields=POLLEN_API_KEYS.join(’,’);
+var url=‘https://air-quality-api.open-meteo.com/v1/air-quality?latitude=’+S.lat+’&longitude=’+S.lon+’&hourly=’+fields+’&forecast_days=7&timezone=auto’;
+try {
+var r=await fetch(url);
+S.pollenData=await r.json();
+renderWarnBanner();renderAmpel();renderPollenListe();
+} catch(e){document.getElementById(‘warnVal’).textContent=‘Ladefehler’;}
+}
+
+function getCurrentHourIdx() {
+if(!S.pollenData) return 0;
+var now=new Date(),times=S.pollenData.hourly.time;
+for(var i=0;i<times.length;i++){if(new Date(times[i])>=now)return Math.max(0,i-1);}
+return times.length-1;
+}
+
+function getLevel(val) {
+if(!val||val<5) return 0;
+if(val<50) return 1;
+if(val<200) return 2;
+if(val<500) return 3;
 return 4;
 }
 
-function pollenColor(lvl) {
-return ['var(--warn-0)','var(--warn-1)','var(--warn-2)','var(--warn-3)','var(--warn-4)'][lvl];
+function isMyAllergen(name) {
+var sel=S.profil.pollen.map(function(a){return a.toLowerCase();});
+var n=name.toLowerCase();
+return sel.some(function(s){return n.includes(s)||s.includes(n);});
 }
 
-const POLLEN_NAMES = {
-alder_pollen: 'Erle',
-birch_pollen: 'Birke',
-grass_pollen: 'Gräser',
-mugwort_pollen: 'Beifuß',
-olive_pollen: 'Olive',
-ragweed_pollen: 'Ragweed'
-};
+function renderWarnBanner() {
+if(!S.pollenData) return;
+var idx=getCurrentHourIdx(),maxLvl=0,maxName=’’;
+POLLEN_API_KEYS.forEach(function(k){
+var arr=S.pollenData.hourly[k];if(!arr) return;
+var lvl=getLevel(arr[idx]||0);
+var name=POLLEN_NAMES[k];
+var eff=Math.min(4,lvl+(isMyAllergen(name)?1:0));
+if(eff>maxLvl){maxLvl=eff;maxName=name;}
+});
+var w=WARN_DATA[maxLvl];
+document.getElementById(‘warnBanner’).className=‘wb ‘+w.cls;
+document.getElementById(‘warnVal’).textContent=w.lbl;
+document.getElementById(‘warnSub’).textContent=maxLvl>0?maxName+’ am staerksten’:w.sub;
+}
 
-function renderAmpel(data) {
-var row = document.getElementById('ampelRow');
-row.innerHTML = '';
-var keys = Object.keys(POLLEN_NAMES);
-var times = data.hourly.time;
-var dailyMap = {};
-var selected = state.profil.pollen.map(function(a){ return a.toLowerCase(); });
-
-times.forEach(function(t, i) {
-var day = t.slice(0, 10);
-if (!dailyMap[day]) dailyMap[day] = {};
-keys.forEach(function(k) {
-var arr = data.hourly[k];
-if (!arr) return;
-var v = arr[i] || 0;
-if (!dailyMap[day][k] || v > dailyMap[day][k]) dailyMap[day][k] = v;
+function renderAmpel() {
+if(!S.pollenData) return;
+var row=document.getElementById(‘ampelRow’);
+row.innerHTML=’’;
+var times=S.pollenData.hourly.time,dailyMax={};
+times.forEach(function(t,i){
+var day=t.slice(0,10);
+if(!dailyMax[day]) dailyMax[day]=0;
+POLLEN_API_KEYS.forEach(function(k){
+var arr=S.pollenData.hourly[k];if(!arr) return;
+var lvl=getLevel(arr[i]||0);
+if(lvl>dailyMax[day]) dailyMax[day]=lvl;
 });
 });
-
-var today = new Date().toISOString().slice(0,10);
-var days = Object.keys(dailyMap).slice(0, 5);
-
-days.forEach(function(day) {
-var vals = dailyMap[day];
-var maxLvl = 0;
-var maxName = '';
-keys.forEach(function(k) {
-var lvl = getPollenLevel(vals[k]||0);
-var name = POLLEN_NAMES[k];
-var boost = selected.some(function(s){ return name.toLowerCase().includes(s) || s.includes(name.toLowerCase()); }) ? 1 : 0;
-var eff = Math.min(4, lvl + boost);
-if (eff > maxLvl) { maxLvl = eff; maxName = name; }
-});
-
-var col = ['#3a8c35','#b8b800','#d97c00','#c83232','#8b0000'][maxLvl];
-var d = new Date(day + 'T12:00:00');
-var wday = d.toLocaleDateString('de-DE', { weekday:'short' });
-var dayNum = d.toLocaleDateString('de-DE', { day:'numeric', month:'numeric' });
-var isToday = day === today;
-var lbls = ['Keine','Gering','Mäßig','Hoch','Sehr hoch'];
-
-var el = document.createElement('div');
-el.className = 'ampel-tag' + (isToday ? ' heute' : '');
-el.style.borderColor = maxLvl > 0 ? col : '';
-if (isToday) el.style.background = 'var(--surface2)';
-el.innerHTML = '<div class="amp-wday">' + wday + '</div>'
-+ '<div class="amp-day">' + dayNum + '</div>'
-+ '<div class="amp-circle" style="background:' + col + '"></div>'
-+ '<div class="amp-lbl">' + (maxLvl > 0 ? maxName : 'Okay') + '</div>';
+var today=new Date().toISOString().slice(0,10);
+var cols=[’#2a3d2a’,’#3a8c35’,’#b8b800’,’#d97c00’,’#c83232’];
+Object.keys(dailyMax).slice(0,5).forEach(function(day){
+var lvl=dailyMax[day]||0;
+var col=cols[lvl];
+var d=new Date(day+‘T12:00:00’);
+var el=document.createElement(‘div’);
+el.className=‘amp-day’+(day===today?’ heute’:’’);
+el.style.borderColor=lvl>0?col:’’;
+el.innerHTML=’<div class="amp-wday">’+d.toLocaleDateString(‘de-DE’,{weekday:‘short’})+’</div>’
++’<div class="amp-date">’+d.toLocaleDateString(‘de-DE’,{day:‘numeric’,month:‘numeric’})+’</div>’
++’<div class="amp-dot" style="background:'+col+'"></div>’
++’<div class="amp-lbl">’+[’–’,’↑’,’↑↑’,’↑↑↑’,’!!!’][lvl]+’</div>’;
 row.appendChild(el);
 });
 }
 
-
-function renderPollenFliegt(data) {
-var wrap = document.getElementById('pollenFliegt');
-if (!wrap) return;
-var idx = getCurrentHourIndex(data);
-var keys = Object.keys(POLLEN_NAMES);
-var selected = state.profil.pollen.map(function(a){ return a.toLowerCase(); });
-var lvlCols = ['var(--text3)','#3a8c35','#b8b800','#d97c00','#c83232','#8b0000'];
-var lvlLbls = ['Keine','Gering','Mäßig','Hoch','Sehr hoch'];
-
-// Alle Pollen sammeln, auch lvl=0, dann Top 5
-var alle = [];
-keys.forEach(function(k) {
-var arr = data.hourly[k];
-if (!arr) return;
-var val = arr[idx] || 0;
-var lvl = getPollenLevel(val);
-var name = POLLEN_NAMES[k];
-var isAllerg = selected.some(function(s){
-return name.toLowerCase().includes(s) || s.includes(name.toLowerCase());
+function renderPollenListe() {
+if(!S.pollenData) return;
+var wrap=document.getElementById(‘pollenListe’);
+var idx=getCurrentHourIdx();
+var alle=POLLEN_API_KEYS.map(function(k){
+var arr=S.pollenData.hourly[k];
+var val=arr?(arr[idx]||0):0;
+var name=POLLEN_NAMES[k];
+return {name:name,val:val,lvl:getLevel(val),isA:isMyAllergen(name)};
 });
-alle.push({ name:name, val:val, lvl:lvl, isAllerg:isAllerg });
+alle.sort(function(a,b){return b.val-a.val;});
+var top5=alle.slice(0,5);
+var maxVal=top5[0]&&top5[0].val>0?top5[0].val:1;
+var html=’’;
+top5.forEach(function(p){
+var col=LVL_COLS[p.lvl];
+var pct=Math.round(p.val/maxVal*100);
+var badge=p.isA?’<span class="allerg-badge">Meine Allergie</span>’:’’;
+html+=’<div class="pollen-item">’
++’<span class="pollen-name" style="color:'+(p.isA?'var(--text)':'var(--text2)')+';font-weight:'+(p.isA?'600':'400')+'">’+p.name+’</span>’
++’<div class="pollen-bw">’
++’<div class="pollen-head">’+badge+’<span style="font-size:10px;color:'+col+';margin-left:auto">’+LVL_LBLS[p.lvl]+’</span></div>’
++’<div class="pollen-bar"><div class="pollen-fill" style="width:'+(p.val>0?Math.max(pct,3):0)+'%;background:'+col+'"></div></div>’
++’</div>’
++’</div>’;
 });
+wrap.innerHTML=html||’<div style="font-size:12px;color:var(--text3)">Keine Daten</div>’;
+}
 
-alle.sort(function(a,b){ return b.val - a.val || b.lvl - a.lvl; });
-var top5 = alle.slice(0, 5);
-var maxVal = top5[0] && top5[0].val > 0 ? top5[0].val : 1;
+function toggleSym(key) {
+symVals[key]=!symVals[key];
+var btn=document.getElementById(‘sb-’+key);
+if(symVals[key]) btn.classList.add(‘an’);
+else btn.classList.remove(‘an’);
+}
 
-var html = '<div class="card-title" style="margin-bottom:10px">Pollenflug heute</div>';
-top5.forEach(function(p) {
-var col = lvlCols[p.lvl];
-var pct = Math.round(p.val / maxVal * 100);
-var allergieBadge = p.isAllerg
-? ' <span style="font-size:10px;padding:1px 7px;border-radius:10px;background:#1e3a18;border:1px solid var(--accent);color:var(--accent);vertical-align:middle">Meine Allergie</span>'
-: '';
-html += '<div style="margin-bottom:11px">'
-+ '<div style="display:flex;align-items:center;margin-bottom:4px">'
-+ '<span style="font-size:13px;color:' + (p.isAllerg ? 'var(--text)' : 'var(--text2)') + ';font-weight:' + (p.isAllerg ? '600' : '400') + '">' + p.name + '</span>'
-+ allergieBadge
-+ '<span style="margin-left:auto;font-size:11px;color:' + col + '">' + lvlLbls[p.lvl] + '</span>'
-+ '</div>'
-+ '<div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden">'
-+ '<div style="width:' + (p.val > 0 ? Math.max(pct,3) : 0) + '%;height:100%;background:' + col + ';border-radius:3px;transition:width 0.8s ease"></div>'
-+ '</div>'
-+ '</div>';
+function resetSyms() {
+Object.keys(symVals).forEach(function(k){
+symVals[k]=false;
+var btn=document.getElementById(‘sb-’+k);
+if(btn) btn.classList.remove(‘an’);
 });
-
-wrap.innerHTML = '<div style="margin-bottom:20px">' + html + '</div>';
-}
-
-function renderWarnBanner(data) {
-const idx = getCurrentHourIndex(data);
-const keys = Object.keys(POLLEN_NAMES);
-let maxLvl = 0;
-let maxName = '';
-
-// Check user profile for selected allergens
-const selected = [...state.profil.pollen.map(a => a.toLowerCase())];
-
-keys.forEach(key => {
-const arr = data.hourly[key];
-if (!arr) return;
-const val = arr[idx] || 0;
-const lvl = getPollenLevel(val);
-const name = POLLEN_NAMES[key];
-// Boost level if user is allergic to this
-const boost = selected.some(s => name.toLowerCase().includes(s) || s.includes(name.toLowerCase())) ? 1 : 0;
-const effective = Math.min(4, lvl + boost);
-if (effective > maxLvl) { maxLvl = effective; maxName = name; }
-});
-
-const banner = document.getElementById('warnBanner');
-const wl = WARN_LEVELS[maxLvl];
-banner.className = `warn-banner ${wl.cls}`;
-document.getElementById('warnLevel').textContent = wl.label;
-document.getElementById('warnSub').textContent = maxLvl > 0 ? `${maxName} aktuell am stärksten · ${wl.sub}` : wl.sub;
-}
-
-
-// ═══════════════════════════════════════
-// SYMPTOME – TAP BUTTONS
-// ═══════════════════════════════════════
-const symptomValues = { nase:false, augen:false, haut:false, atem:false, muede:false, kopf:false };
-
-function toggleSymptom(key) {
-symptomValues[key] = !symptomValues[key];
-var btn = document.getElementById('sb-' + key);
-if (symptomValues[key]) {
-btn.classList.add('an');
-} else {
-btn.classList.remove('an');
-}
-}
-
-function resetSymptoms() {
-var keys = ['nase','augen','haut','atem','muede','kopf'];
-for (var i = 0; i < keys.length; i++) {
-symptomValues[keys[i]] = false;
-var btn = document.getElementById('sb-' + keys[i]);
-if (btn) btn.classList.remove('an');
-}
-}
-
-function renderKontaktTags() {
-const wrap = document.getElementById('kontaktTags');
-if (!wrap) return;
-const all = [...state.profil.pollen, ...state.profil.tiere, ...state.profil.sonstiges];
-if (!all.length) { wrap.innerHTML = '<div style="font-size:12px;color:var(--text3)">Lege erst dein Profil an</div>'; return; }
-wrap.innerHTML = all.map(a =>
-`<span class="allergen-tag" id="kt-${a}" onclick="toggleKontakt('${a}')">${a}</span>`
-).join('');
-}
-
-let activeKontakte = [];
-function toggleKontakt(name) {
-const el = document.getElementById('kt-' + name);
-if (activeKontakte.includes(name)) {
-activeKontakte = activeKontakte.filter(x => x !== name);
-el.classList.remove('selected');
-} else {
-activeKontakte.push(name);
-el.classList.add('selected');
-}
 }
 
 function saveEntry() {
-var skeys = ['nase','augen','haut','atem','muede','kopf'];
-var anyActive = skeys.some(function(k) { return symptomValues[k]; });
-if (!anyActive) {
-showToast('Keine Beschwerden markiert – nichts gespeichert');
-return;
-}
-var symps = {};
-for (var si = 0; si < skeys.length; si++) {
-symps[skeys[si]] = symptomValues[skeys[si]] ? 1 : 0;
-}
-const note = document.getElementById('entryNote').value.trim();
-
-const entry = {
-id: Date.now(),
-date: localDateStr(),
-time: new Date().toLocaleTimeString('de-DE', { hour:'2-digit', minute:'2-digit' }),
-location: state.locationName || '',
-symptoms: symps,
-kontakte: [...activeKontakte],
-note,
-pollenLevel: getCurrentPollenSummary()
+var keys=Object.keys(symVals);
+if(!keys.some(function(k){return symVals[k];})){showToast(‘Nichts markiert’);return;}
+var symps={};
+keys.forEach(function(k){symps[k]=symVals[k]?1:0;});
+var now=new Date();
+var entry={
+id:Date.now(),
+date:now.getFullYear()+’-’+pad(now.getMonth()+1)+’-’+pad(now.getDate()),
+time:now.toLocaleTimeString(‘de-DE’,{hour:‘2-digit’,minute:‘2-digit’}),
+location:S.locationName||’’,
+symptoms:symps,
+note:document.getElementById(‘entryNote’).value.trim(),
+pollenLevel:getPollenSummary()
 };
-
-state.entries.unshift(entry);
+S.entries.unshift(entry);
 saveStorage();
-
-// Reset
-resetSymptoms();
-document.getElementById('entryNote').value = '';
-activeKontakte = [];
-document.querySelectorAll('#kontaktTags .allergen-tag').forEach(el => el.classList.remove('selected'));
-
-renderTagebuch();
-renderSymptomStats();
-populateFilterMonths();
-showTab('tagebuch');
-showToast('Eintrag gespeichert ✓');
+resetSyms();
+document.getElementById(‘entryNote’).value=’’;
+renderTagebuch();populateMonths();
+showTab(‘tagebuch’);
+showToast(‘Gespeichert’);
 }
 
-function getCurrentPollenSummary() {
-if (!state.pollenData) return null;
-const idx = getCurrentHourIndex(state.pollenData);
-const summary = {};
-Object.keys(POLLEN_NAMES).forEach(k => {
-const arr = state.pollenData.hourly[k];
-if (arr) summary[POLLEN_NAMES[k]] = Math.round(arr[idx] || 0);
+function getPollenSummary() {
+if(!S.pollenData) return null;
+var idx=getCurrentHourIdx(),out={};
+POLLEN_API_KEYS.forEach(function(k){
+var arr=S.pollenData.hourly[k];
+if(arr) out[POLLEN_NAMES[k]]=Math.round(arr[idx]||0);
 });
-return summary;
+return out;
 }
 
-function localDateStr() {
-const d = new Date();
-return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-}
+function pad(n){return n<10?‘0’+n:’’+n;}
 
-// ═══════════════════════════════════════
-// TAGEBUCH
-// ═══════════════════════════════════════
 function renderTagebuch() {
-const list = document.getElementById('tagebuchList');
-const filter = document.getElementById('filterMonth')?.value || '';
-let entries = state.entries;
-if (filter) entries = entries.filter(e => e.date.startsWith(filter));
-
-if (!entries.length) {
-list.innerHTML = '<div class="empty"><div class="emj">📓</div>Noch keine Einträge</div>';
+var list=document.getElementById(‘tagebuchList’);
+var fv=document.getElementById(‘filterMonth’)?document.getElementById(‘filterMonth’).value:’’;
+var entries=S.entries.slice();
+if(fv) entries=entries.filter(function(e){return e.date.startsWith(fv);});
+if(!entries.length){
+list.innerHTML=’<div class="empty"><div class="emj">📓</div>Noch keine Einträge</div>’;
 return;
 }
-
-list.innerHTML = entries.map(e => {
-const total = Object.values(e.symptoms).reduce((a,b)=>a+b,0);
-const pills = Object.entries(e.symptoms)
-.filter(([,v]) => v > 0)
-.map(([k]) => {
-return '<span class="symptom-pill s-mid">' + (SYMPTOM_LABELS[k] || k) + '</span>';
-}).join('');
-
-const kontaktPills = e.kontakte?.map(k =>
-`<span class="symptom-pill">🌿 ${k}</span>`
-).join('') || '';
-
-const dateLabel = new Date(e.date + 'T12:00:00').toLocaleDateString('de-DE', { weekday:'short', day:'numeric', month:'short' });
-
-return `<div class="entry-item">
-<div class="entry-date">${dateLabel} · ${e.time || ''} · Gesamt ${total}/25</div>
-<div class="entry-symptoms">${pills || '<span style="font-size:11px;color:var(--text3)">Keine Symptome</span>'}${kontaktPills}</div>
-${e.note ? `<div class="entry-note">"${e.note}"</div>` : ''}
-</div>`;
-}).join('');
+var sel=S.profil.pollen.map(function(a){return a.toLowerCase();});
+list.innerHTML=entries.map(function(e){
+var d=new Date(e.date+‘T12:00:00’);
+var meta=d.toLocaleDateString(‘de-DE’,{weekday:‘short’,day:‘numeric’,month:‘short’}).toUpperCase();
+if(e.time) meta+=’ · ‘+e.time;
+if(e.location) meta+=’ · 📍’+e.location;
+var symPills=Object.keys(e.symptoms||{}).filter(function(k){return e.symptoms[k];})
+.map(function(k){return ‘<span class="sym-pill">’+(SYM_LABELS[k]||k)+’</span>’;}).join(’’);
+var pollenPills=’’;
+if(e.pollenLevel){
+var ap=Object.keys(e.pollenLevel)
+.map(function(name){
+var val=e.pollenLevel[name];
+var lvl=val<5?0:val<50?1:val<200?2:val<500?3:4;
+var isA=sel.some(function(s){return name.toLowerCase().includes(s)||s.includes(name.toLowerCase());});
+return {name:name,lvl:lvl,isA:isA};
+})
+.filter(function(p){return p.lvl>0;})
+.sort(function(a,b){return b.lvl-a.lvl;});
+if(ap.length){
+pollenPills=’<div class="pollen-pills">’+ap.map(function(p){
+var col=LVL_COLS[p.lvl];
+return ‘<span class="pollen-pill" style="border:1px solid '+(p.isA?col:'var(--border)')+';color:'+col+';'+(p.isA?'font-weight:600;':'')+'">’
++p.name+’ ‘+LVL_LBLS[p.lvl]+(p.isA?’ ⚠’:’’)+’</span>’;
+}).join(’’)+’</div>’;
+}
+}
+var noteHtml=e.note?’<div class="entry-note">“’+e.note+’”</div>’:’’;
+return ‘<div class="entry-item">’
++’<div class="entry-date">’+meta+’</div>’
++’<div class="entry-syms">’+(symPills||’<span style="font-size:11px;color:var(--text3)">Keine Symptome</span>’)+’</div>’
++pollenPills+noteHtml+’</div>’;
+}).join(’’);
 }
 
-function populateFilterMonths() {
-const sel = document.getElementById('filterMonth');
-if (!sel) return;
-const months = [...new Set(state.entries.map(e => e.date.slice(0,7)))].sort().reverse();
-const cur = sel.value;
-sel.innerHTML = '<option value="">Alle Monate</option>' +
-months.map(m => {
-const [y,mo] = m.split('-');
-const label = new Date(y, mo-1, 1).toLocaleDateString('de-DE', { month:'long', year:'numeric' });
-return `<option value="${m}" ${m===cur?'selected':''}>${label}</option>`;
-}).join('');
-}
-
-// ═══════════════════════════════════════
-// POLLEN UEBERSICHT (Heute-Tab)
-// ═══════════════════════════════════════
-
-function renderRecentSymptoms() {
-var wrap = document.getElementById('recentSymptoms');
-var recent = state.entries.slice(0, 5);
-if (!recent.length) {
-wrap.innerHTML = '<div class="empty"><div class="emj">📓</div>Noch keine Einträge</div>';
-return;
-}
-var symLabels = { nase:'Nase', augen:'Augen', haut:'Haut', atem:'Atem', muede:'Müdigkeit', kopf:'Kopf' };
-wrap.innerHTML = recent.map(function(e) {
-var dateLabel = new Date(e.date + 'T12:00:00').toLocaleDateString('de-DE', { weekday:'short', day:'numeric', month:'short' });
-var pills = Object.keys(e.symptoms).filter(function(k){ return e.symptoms[k]; })
-.map(function(k){ return '<span style="display:inline-block;font-size:11px;padding:2px 8px;border-radius:12px;background:var(--surface2);border:1px solid var(--accent);color:var(--accent);margin:2px">' + (symLabels[k]||k) + '</span>'; }).join('');
-return '<div style="padding:8px 0;border-bottom:1px solid var(--border)">'
-+ '<div style="font-size:11px;color:var(--text3);margin-bottom:4px">' + dateLabel + '</div>'
-+ (pills || '<span style="font-size:11px;color:var(--text3)">Keine Beschwerden</span>')
-+ '</div>';
-}).join('');
-}
-
-// ═══════════════════════════════════════
-// MUSTER
-// ═══════════════════════════════════════
-function renderSymptomStats() {
-const wrap = document.getElementById('symptomStats');
-if (!wrap) return;
-if (state.entries.length < 2) {
-wrap.innerHTML = '<div class="empty"><div class="emj">📊</div>Zu wenig Daten</div>';
-return;
-}
-
-const totals = { nase:0, augen:0, haut:0, atem:0, muede:0, kopf:0 };
-state.entries.forEach(function(e) {
-Object.keys(totals).forEach(function(k) { totals[k] += e.symptoms[k] ? 1 : 0; });
-});
-const max = Math.max.apply(null, Object.values(totals)) || 1;
-
-wrap.innerHTML = Object.entries(totals).map(([k,v]) => {
-const pct = Math.round((v/max)*100);
-return `<div class="muster-bar-wrap">
-<div class="muster-label"><span>${SYMPTOM_LABELS[k]}</span><span>${v} Punkte</span></div>
-<div class="muster-bar"><div class="muster-fill" style="width:${pct}%"></div></div>
-</div>`;
-}).join('');
+function populateMonths() {
+var sel=document.getElementById(‘filterMonth’);if(!sel) return;
+var months=[];
+S.entries.forEach(function(e){var m=e.date.slice(0,7);if(months.indexOf(m)<0)months.push(m);});
+months.sort().reverse();
+var cur=sel.value;
+sel.innerHTML=’<option value="">Alle Monate</option>’+months.map(function(m){
+var parts=m.split(’-’);
+var lbl=new Date(parts[0],parts[1]-1,1).toLocaleDateString(‘de-DE’,{month:‘long’,year:‘numeric’});
+return ‘<option value=”’+m+’”’+(m===cur?’ selected’:’’)+’>’+lbl+’</option>’;
+}).join(’’);
 }
 
 function analyseMuster() {
-var wrap = document.getElementById('musterContent');
-var entries = state.entries;
-
-if (entries.length < 3) {
-wrap.innerHTML = '<div class="empty"><div class="emj">&#128269;</div>Mindestens 3 Einträge nötig</div>';
-return;
-}
-
-// Pollen-Korrelation: bei welchen Pollen traten Beschwerden auf?
-var pollenCount = {}; // wie oft erhoeht an Beschwerdetagen
-var pollenDays = {}; // wie oft dieser Pollen insgesamt gespeichert
-entries.forEach(function(e) {
-if (!e.pollenLevel) return;
-Object.entries(e.pollenLevel).forEach(function(kv) {
-var name = kv[0], val = kv[1];
-if (!pollenDays[name]) { pollenCount[name]=0; pollenDays[name]=0; }
+var wrap=document.getElementById(‘musterContent’);
+var n=S.entries.length;
+if(n<3){wrap.innerHTML=’<div class="empty"><div class="emj">🔍</div>Mindestens 3 Einträge nötig</div>’;return;}
+var pollenCount={},pollenDays={};
+S.entries.forEach(function(e){
+if(!e.pollenLevel) return;
+Object.keys(e.pollenLevel).forEach(function(name){
+var val=e.pollenLevel[name];
+if(!pollenDays[name]){pollenCount[name]=0;pollenDays[name]=0;}
 pollenDays[name]++;
-if (val > 10) pollenCount[name]++;
+if(val>10) pollenCount[name]++;
 });
 });
-
-// Kontakt-Muster
-var kontaktCount = {};
-entries.forEach(function(e) {
-(e.kontakte||[]).forEach(function(k) {
-kontaktCount[k] = (kontaktCount[k]||0)+1;
+var wahrsch=[];
+Object.keys(pollenDays).forEach(function(p){
+if(pollenDays[p]<2) return;
+var pct=Math.round(pollenCount[p]/pollenDays[p]*100);
+if(pct>=50) wahrsch.push({name:p,pct:pct});
 });
-});
-
-var n = entries.length;
-var cols = { 0:'var(--accent)', 1:'#d97c00', 2:'#c83232' };
-
-// Wahrscheinliche Allergene ermitteln (>= 60% Korrelation)
-var wahrscheinlich = [];
-Object.keys(pollenDays).forEach(function(p) {
-if (pollenDays[p] < 2) return;
-var pct = Math.round(pollenCount[p] / pollenDays[p] * 100);
-if (pct >= 60) wahrscheinlich.push({ name:p, pct:pct, typ:'pollen' });
-});
-Object.entries(kontaktCount).forEach(function(kv) {
-var pct = Math.round(kv[1] / n * 100);
-if (pct >= 40) wahrscheinlich.push({ name:kv[0], pct:pct, typ:'kontakt' });
-});
-wahrscheinlich.sort(function(a,b){ return b.pct - a.pct; });
-
-var d1 = new Date(entries[entries.length-1].date+'T12:00:00').toLocaleDateString('de-DE',{day:'numeric',month:'short'});
-var d2 = new Date(entries[0].date+'T12:00:00').toLocaleDateString('de-DE',{day:'numeric',month:'short'});
-
-var html = '<div style="font-size:11px;color:var(--text3);margin-bottom:16px">'
-+ 'Basis: ' + n + ' Einträge &middot; ' + d1 + '–' + d2 + '</div>';
-
-if (!wahrscheinlich.length) {
-html += '<div style="font-size:13px;color:var(--text3);line-height:1.6">'
-+ 'Noch kein klares Muster erkennbar.<br>Weiter sammeln — ab ca. 10 Einträgen wird es deutlicher.</div>';
+wahrsch.sort(function(a,b){return b.pct-a.pct;});
+var d1=new Date(S.entries[n-1].date+‘T12:00:00’).toLocaleDateString(‘de-DE’,{day:‘numeric’,month:‘short’});
+var d2=new Date(S.entries[0].date+‘T12:00:00’).toLocaleDateString(‘de-DE’,{day:‘numeric’,month:‘short’});
+var html=’<div style="font-size:10px;color:var(--text3);margin-bottom:14px">Basis: ‘+n+’ Einträge · ‘+d1+’–’+d2+’</div>’;
+if(!wahrsch.length){
+html+=’<div style="font-size:13px;color:var(--text2);line-height:1.6">Noch kein klares Muster.<br>Weiter sammeln — ab ca. 10 Einträgen wird es deutlicher.</div>’;
 } else {
-wahrscheinlich.forEach(function(a) {
-var strength = a.pct >= 80 ? 2 : a.pct >= 60 ? 1 : 0;
-var col = ['#3a8c35','#d97c00','#c83232'][strength];
-var badge = ['Wahrscheinlich','Stark','Sehr wahrscheinlich'][strength];
-var icon = a.typ === 'pollen' ? '&#127807;' : '&#128062;';
-html += '<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)">'
-+ '<div style="width:36px;height:36px;border-radius:50%;background:' + col + '22;border:2px solid ' + col + ';display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">' + icon + '</div>'
-+ '<div style="flex:1">'
-+ '<div style="font-size:15px;font-weight:600;color:var(--text)">' + a.name + '</div>'
-+ '<div style="font-size:11px;color:' + col + ';margin-top:2px">' + badge + ' &middot; ' + a.pct + '% Korrelation</div>'
-+ '</div>'
-+ '<div style="width:40px;height:40px;border-radius:8px;background:' + col + ';display:flex;align-items:center;justify-content:center;font-family:var(--font-serif);font-size:16px;color:#0a1a0a;font-weight:700">' + a.pct + '%</div>'
-+ '</div>';
+wahrsch.forEach(function(a){
+var col=a.pct>=80?’#c83232’:a.pct>=65?’#d97c00’:’#3a8c35’;
+var stlbl=a.pct>=80?‘Sehr wahrscheinlich’:a.pct>=65?‘Wahrscheinlich’:‘Moeglicherweise’;
+html+=’<div class="allerg-result">’
++’<div class="allerg-icon" style="background:'+col+'22;border:2px solid '+col+'">🌿</div>’
++’<div style="flex:1"><div style="font-size:15px;font-weight:600;color:var(--text)">’+a.name+’</div>’
++’<div style="font-size:11px;color:'+col+';margin-top:2px">’+stlbl+’</div></div>’
++’<div class="allerg-pct" style="background:'+col+'">’+a.pct+’%</div>’
++’</div>’;
+});
+}
+wrap.innerHTML=html;
+}
+
+function renderProfil() {
+Object.keys(ALLERGENS).forEach(function(cat){
+var wrap=document.getElementById(‘profil-’+cat);if(!wrap) return;
+wrap.innerHTML=ALLERGENS[cat].map(function(item){
+var selected=S.profil[cat]&&S.profil[cat].indexOf(item)>=0;
+return ‘<span class="allergen-tag'+(selected?' selected':'')+'" id="pt-'+item+'" onclick="toggleAllergen(\''+cat+'\',\''+item+'\')">’+item+’</span>’;
+}).join(’’);
 });
 }
 
-wrap.innerHTML = html;
-}
-
-// ═══════════════════════════════════════
-// PROFIL
-// ═══════════════════════════════════════
-function renderProfilTags() {
-Object.entries(ALLERGENS).forEach(([cat, items]) => {
-const wrap = document.getElementById(`${cat}Allergens`);
-if (!wrap) return;
-wrap.innerHTML = items.map(item => {
-const sel = state.profil[cat]?.includes(item);
-return `<span class="allergen-tag ${sel?'selected':''}" id="pt-${item}" onclick="toggleAllergen('${cat}','${item}')">${item}</span>`;
-}).join('');
-});
-}
-
-function toggleAllergen(cat, name) {
-const arr = state.profil[cat] || [];
-const idx = arr.indexOf(name);
-if (idx >= 0) state.profil[cat].splice(idx, 1);
-else { state.profil[cat] = arr; state.profil[cat].push(name); }
-document.getElementById('pt-' + name)?.classList.toggle('selected', state.profil[cat].includes(name));
+function toggleAllergen(cat,name) {
+var arr=S.profil[cat]||[];
+var idx=arr.indexOf(name);
+if(idx>=0) arr.splice(idx,1); else arr.push(name);
+S.profil[cat]=arr;
+var el=document.getElementById(‘pt-’+name);
+if(el) el.className=‘allergen-tag’+(arr.indexOf(name)>=0?’ selected’:’’);
 }
 
 function saveProfil() {
 saveStorage();
-renderKontaktTags();
-if (state.pollenData) renderWarnBanner(state.pollenData);
-showToast('Profil gespeichert ✓');
-}
-
-// ═══════════════════════════════════════
-// NAVIGATION
-// ═══════════════════════════════════════
-function showTab(id) {
-document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-document.getElementById('tab-' + id)?.classList.add('active');
-const btns = document.querySelectorAll('nav button');
-const map = { heute:0, eintrag:1, tagebuch:2, muster:3, profil:4 };
-btns[map[id]]?.classList.add('active');
-if (id === 'tagebuch') { renderTagebuch(); populateFilterMonths(); }
-if (id === 'muster') { analyseMuster(); }
-if (id === 'eintrag') { renderKontaktTags(); }
-}
-
-// ═══════════════════════════════════════
-// UTILS
-// ═══════════════════════════════════════
-function showToast(msg) {
-const t = document.createElement('div');
-t.textContent = msg;
-Object.assign(t.style, {
-position:'fixed', bottom:'24px', left:'50%', transform:'translateX(-50%)',
-background:'var(--accent)', color:'#0a1a0a', padding:'10px 20px',
-borderRadius:'24px', fontFamily:'var(--font-mono)', fontSize:'13px',
-zIndex:'9999', fontWeight:'500', whiteSpace:'nowrap',
-animation:'fadeUp 0.3s ease'
-});
-const style = document.createElement('style');
-style.textContent = '@keyframes fadeUp{from{opacity:0;transform:translateX(-50%) translateY(12px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}';
-document.head.appendChild(style);
-document.body.appendChild(t);
-setTimeout(() => t.remove(), 2500);
+if(S.pollenData){renderWarnBanner();renderPollenListe();}
+showToast(‘Profil gespeichert’);
 }
 
 function exportData() {
-const blob = new Blob([JSON.stringify({ entries: state.entries, profil: state.profil }, null, 2)], { type:'application/json' });
-const url = URL.createObjectURL(blob);
-const a = document.createElement('a');
-a.href = url; a.download = `allergie-pilot-${localDateStr()}.json`;
-a.click(); URL.revokeObjectURL(url);
+var blob=new Blob([JSON.stringify({entries:S.entries,profil:S.profil},null,2)],{type:‘application/json’});
+var url=URL.createObjectURL(blob);
+var a=document.createElement(‘a’);
+a.href=url;a.download=‘allergie-pilot.json’;a.click();URL.revokeObjectURL(url);
 }
 
 function clearData() {
-if (!confirm('Wirklich alle Daten löschen?')) return;
-state.entries = [];
-state.profil = { pollen:[], tiere:[], sonstiges:[] };
-saveStorage();
-renderTagebuch();
-renderSymptomStats();
-renderProfilTags();
-showToast('Alle Daten gelöscht');
+if(!confirm(‘Wirklich alle Daten loeschen?’)) return;
+S.entries=[];S.profil={pollen:[],tiere:[],sonstiges:[]};
+saveStorage();renderTagebuch();renderProfil();
+showToast(‘Geloescht’);
 }
 
-
-// ═══════════════════════════════════════
-// STADTSUCHE
-// ═══════════════════════════════════════
-async function searchCity() {
-var query = document.getElementById('cityInput').value.trim();
-if (!query) return;
-var resultsDiv = document.getElementById('cityResults');
-resultsDiv.innerHTML = '<div style="font-size:12px;color:var(--text3);padding:4px 0">Suche\u2026</div>';
-try {
-var r = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=4&q=' + encodeURIComponent(query));
-var results = await r.json();
-if (!results.length) {
-resultsDiv.innerHTML = '<div style="font-size:12px;color:var(--text3);padding:4px 0">Keine Ergebnisse</div>';
-return;
-}
-var html = '';
-for (var i = 0; i < results.length; i++) {
-var p = results[i];
-var label = p.display_name.split(',').slice(0,3).join(', ');
-var shortName = p.display_name.split(',')[0];
-html += '<button onclick="selectCity(' + p.lat + ',' + p.lon + ',\'' + shortName.replace(/'/g,'') + '\')" '
-+ 'style="display:block;width:100%;text-align:left;background:var(--surface2);border:1px solid var(--border);'
-+ 'border-radius:8px;color:var(--text2);font-family:var(--font-mono);font-size:12px;padding:8px 10px;'
-+ 'margin-top:4px;cursor:pointer">' + label + '</button>';
-}
-resultsDiv.innerHTML = html;
-} catch(e) {
-resultsDiv.innerHTML = '<div style="font-size:12px;color:var(--warn-3);padding:4px 0">Fehler bei der Suche</div>';
-}
+function showToast(msg) {
+var t=document.createElement(‘div’);
+t.textContent=msg;
+Object.assign(t.style,{position:‘fixed’,bottom:‘24px’,left:‘50%’,transform:‘translateX(-50%)’,
+background:‘var(–accent)’,color:’#0a1a0a’,padding:‘9px 20px’,borderRadius:‘24px’,
+fontFamily:‘var(–mono)’,fontSize:‘13px’,fontWeight:‘500’,zIndex:‘9999’,whiteSpace:‘nowrap’});
+document.body.appendChild(t);
+setTimeout(function(){t.remove();},2200);
 }
 
-function selectCity(lat, lon, name) {
-state.lat = parseFloat(lat);
-state.lon = parseFloat(lon);
-state.locationName = name;
-document.getElementById('locLabel').textContent = name;
-document.getElementById('cityResults').innerHTML = '';
-document.getElementById('cityInput').value = '';
-localStorage.setItem('ap_city', JSON.stringify({lat:state.lat, lon:state.lon, name:name}));
-fetchPollenData();
-}
-
-function loadSavedCity() {
-var saved = localStorage.getItem('ap_city');
-if (saved) {
-var c = JSON.parse(saved);
-state.lat = c.lat;
-state.lon = c.lon;
-state.locationName = c.name;
-document.getElementById('locLabel').textContent = c.name;
-fetchPollenData();
-}
-}
-
-// Start
 init();
 </script>
 
