@@ -254,24 +254,28 @@ if(c){S.lat=c.lat;S.lon=c.lon;S.locationName=c.name;document.getElementById(‘l
 } catch(x){}
 }
 
-async function searchCity() {
+function searchCity() {
 var q=document.getElementById(‘cityInput’).value.trim();
 if(!q) return;
 var div=document.getElementById(‘cityResults’);
 div.innerHTML=’<div style="font-size:12px;color:var(--text3);padding:6px 0">Suche…</div>’;
-try {
-var r=await fetch(‘https://nominatim.openstreetmap.org/search?format=json&limit=4&q=’+encodeURIComponent(q));
-var res=await r.json();
+fetch(‘https://nominatim.openstreetmap.org/search?format=json&limit=4&q=’+encodeURIComponent(q))
+.then(function(r){return r.json();})
+.then(function(res){
 if(!res.length){div.innerHTML=’<div style="font-size:12px;color:var(--text3);padding:6px 0">Keine Ergebnisse</div>’;return;}
-var html=’’;
+div.innerHTML=’’;
 for(var i=0;i<res.length;i++){
-var p=res[i];
-var name=p.display_name.split(’,’)[0].replace(/’/g,’’);
+(function(p){
+var name=p.display_name.split(’,’)[0];
 var label=p.display_name.split(’,’).slice(0,3).join(’, ‘);
-html+=’<button onclick="selectCity('+p.lat+','+p.lon+',\''+name+'\')">’+label+’</button>’;
+var btn=document.createElement(‘button’);
+btn.textContent=label;
+btn.onclick=function(){ selectCity(p.lat,p.lon,name); };
+div.appendChild(btn);
+})(res[i]);
 }
-div.innerHTML=html;
-} catch(e){div.innerHTML=’<div style="font-size:12px;color:var(--w3);padding:6px 0">Suchfehler</div>’;}
+})
+.catch(function(){div.innerHTML=’<div style="font-size:12px;color:var(--w3);padding:6px 0">Suchfehler</div>’;});
 }
 
 function selectCity(lat,lon,name) {
@@ -283,14 +287,16 @@ localStorage.setItem(‘ap_city’,JSON.stringify({lat:S.lat,lon:S.lon,name:name
 fetchPollen();
 }
 
-async function fetchPollen() {
+function fetchPollen() {
 var fields=POLLEN_API_KEYS.join(’,’);
 var url=‘https://air-quality-api.open-meteo.com/v1/air-quality?latitude=’+S.lat+’&longitude=’+S.lon+’&hourly=’+fields+’&forecast_days=7&timezone=auto’;
-try {
-var r=await fetch(url);
-S.pollenData=await r.json();
+fetch(url)
+.then(function(r){return r.json();})
+.then(function(d){
+S.pollenData=d;
 renderWarnBanner();renderAmpel();renderPollenListe();
-} catch(e){document.getElementById(‘warnVal’).textContent=‘Ladefehler’;}
+})
+.catch(function(){document.getElementById(‘warnVal’).textContent=‘Ladefehler’;});
 }
 
 function getCurrentHourIdx() {
