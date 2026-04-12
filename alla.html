@@ -119,8 +119,10 @@ select{background:var(--surface2);border:1px solid var(--border);border-radius:8
 </div>
 <div class="loc-bar">
 <div class="loc-top">&#128205; <span id="locLabel">Kein Standort gesetzt</span></div>
+<script>try{var _c=JSON.parse(localStorage.getItem("ap_city")||"null");if(_c&&_c.name)document.getElementById("locLabel").textContent=_c.name;}catch(e){}</script>
 <div class="loc-row">
 <input id="cityInput" type="text" placeholder="Stadt eingeben, z.B. Frechen" onkeydown="if(event.key==='Enter')searchCity()">
+<script>try{var _c2=JSON.parse(localStorage.getItem("ap_city")||"null");if(_c2&&_c2.name)document.getElementById("cityInput").placeholder=_c2.name;}catch(e){}</script>
 <button type="button" class="btn" style="padding:8px 14px;font-size:12px" onclick="searchCity()">Suchen</button>
 </div>
 <div id="cityResults"></div>
