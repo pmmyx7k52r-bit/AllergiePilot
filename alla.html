@@ -8,7 +8,7 @@
 <meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#1a2e1a">
-<title>AllergiePilot 2.0.6</title>
+<title>AllergiePilot 2.0.7</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -97,7 +97,7 @@ select{background:var(--surface2);border:1px solid var(--border);border-radius:8
 <body>
 <header>
 <div class="logo">Allergie<span>Pilot</span></div>
-<div class="ver">v2.0.6</div>
+<div class="ver">v2.0.7</div>
 </header>
 <nav>
 <button type="button" class="active" onclick="showTab('heute')">Heute</button>
@@ -112,6 +112,16 @@ select{background:var(--surface2);border:1px solid var(--border);border-radius:8
 
 <div class="section active" id="tab-heute">
 <div class="today-lbl" id="todayLbl"></div>
+<div id="debugLoc" style="font-size:10px;color:#ff0;padding:2px 0"></div>
+<script>
+try {
+var _dbg = localStorage.getItem("ap_city");
+document.getElementById("debugLoc").textContent =
+"LocalStorage: " + (_dbg ? _dbg.slice(0,60) : "LEER");
+} catch(e) {
+document.getElementById("debugLoc").textContent = "LS-Fehler: " + e;
+}
+</script>
 <div id="warnBanner" class="wb wl0">
 <div class="wb-lbl">Aktuelle Belastung</div>
 <div class="wb-val" id="warnVal">Kein Standort</div>
@@ -206,80 +216,80 @@ select{background:var(--surface2);border:1px solid var(--border);border-radius:8
 </main>
 <script>
 
-var POLLEN_API_KEYS = [‘alder_pollen’,‘birch_pollen’,‘grass_pollen’,‘mugwort_pollen’,‘olive_pollen’,‘ragweed_pollen’];
-var POLLEN_NAMES = {alder_pollen:‘Erle’,birch_pollen:‘Birke’,grass_pollen:‘Gr\u00e4ser’,mugwort_pollen:‘Beifu\u00df’,olive_pollen:‘Olive’,ragweed_pollen:‘Ragweed’};
+var POLLEN_API_KEYS = [“alder_pollen”,“birch_pollen”,“grass_pollen”,“mugwort_pollen”,“olive_pollen”,“ragweed_pollen”];
+var POLLEN_NAMES = {alder_pollen:“Erle”,birch_pollen:“Birke”,grass_pollen:“Gr\u00e4ser”,mugwort_pollen:“Beifu\u00df”,olive_pollen:“Olive”,ragweed_pollen:“Ragweed”};
 var ALLERGENS = {
-pollen:[‘Birke’,‘Erle’,‘Esche’,‘Gr\u00e4ser’,‘Roggen’,‘Beifu\u00df’,‘Ragweed’,‘Hasel’],
-tiere:[‘Katze’,‘Hund’,‘Pferd’,‘Meerschweinchen’,‘Vogel’,‘Hausstaubmilben’],
-sonstiges:[‘Schimmel’,‘Latex’,‘Insektengift’,‘Nickel’,‘Parf\u00fcm’]
+pollen:[“Birke”,“Erle”,“Esche”,“Gr\u00e4ser”,“Roggen”,“Beifu\u00df”,“Ragweed”,“Hasel”],
+tiere:[“Katze”,“Hund”,“Pferd”,“Meerschweinchen”,“Vogel”,“Hausstaubmilben”],
+sonstiges:[“Schimmel”,“Latex”,“Insektengift”,“Nickel”,“Parf\u00fcm”]
 };
-var SYM_LABELS = {nase:‘Nase’,augen:‘Augen’,haut:‘Haut’,atem:‘Atem’,muede:‘M\u00fcdigkeit’,kopf:‘Kopf’};
-var LVL_COLS = [‘var(–text3)’,’#3a8c35’,’#b8b800’,’#d97c00’,’#c83232’,’#8b0000’];
-var LVL_LBLS = [‘Keine’,‘Gering’,‘M\u00e4\u00dfig’,‘Hoch’,‘Sehr hoch’];
+var SYM_LABELS = {nase:“Nase”,augen:“Augen”,haut:“Haut”,atem:“Atem”,muede:“M\u00fcdigkeit”,kopf:“Kopf”};
+var LVL_COLS = [“var(–text3)”,”#3a8c35”,”#b8b800”,”#d97c00”,”#c83232”,”#8b0000”];
+var LVL_LBLS = [“Keine”,“Gering”,“M\u00e4\u00dfig”,“Hoch”,“Sehr hoch”];
 var WARN_DATA = [
-{lbl:‘Keine Belastung’,sub:‘Alles entspannt’,cls:‘wl0’},
-{lbl:‘Gering’,sub:‘Leicht erhoehte Werte’,cls:‘wl1’},
-{lbl:‘M\u00e4\u00dfig’,sub:‘Vorsicht empfohlen’,cls:‘wl2’},
-{lbl:‘Hoch’,sub:‘Ma\u00dfnahmen ergreifen’,cls:‘wl3’},
-{lbl:‘Sehr hoch’,sub:‘Fenster schliessen’,cls:‘wl4’}
+{lbl:“Keine Belastung”,sub:“Alles entspannt”,cls:“wl0”},
+{lbl:“Gering”,sub:“Leicht erhoehte Werte”,cls:“wl1”},
+{lbl:“M\u00e4\u00dfig”,sub:“Vorsicht empfohlen”,cls:“wl2”},
+{lbl:“Hoch”,sub:“Ma\u00dfnahmen ergreifen”,cls:“wl3”},
+{lbl:“Sehr hoch”,sub:“Fenster schliessen”,cls:“wl4”}
 ];
 
 var S = {lat:null,lon:null,locationName:String(),pollenData:null,entries:[],profil:{pollen:[],tiere:[],sonstiges:[]}};
 
 // DWD Pollen Regionen (region_id, partregion_id, name, lat_min, lat_max, lon_min, lon_max)
 var DWD_REGIONS = [
-{r:10,p:11,n:‘Inseln und Marschen’, la1:54.0,la2:55.1,lo1:7.8,lo2:9.5},
-{r:10,p:12,n:‘Geest SH und Hamburg’, la1:53.4,la2:54.9,lo1:8.4,lo2:11.0},
-{r:20,p:-1,n:‘Mecklenburg-Vorpommern’, la1:53.1,la2:54.7,lo1:10.5,lo2:14.5},
-{r:30,p:31,n:‘Westl. Niedersachsen/Bremen’, la1:52.2,la2:53.9,lo1:6.6,lo2:9.4},
-{r:30,p:32,n:‘Oestl. Niedersachsen’, la1:52.0,la2:53.5,lo1:9.3,lo2:11.6},
-{r:40,p:41,n:‘Rhein.-Westfael. Tiefland’, la1:51.0,la2:52.5,lo1:5.9,lo2:8.5},
-{r:40,p:42,n:‘Ostwestfalen’, la1:51.2,la2:52.4,lo1:7.8,lo2:9.5},
-{r:40,p:43,n:‘Mittelgebirge NRW’, la1:50.7,la2:51.8,lo1:6.8,lo2:9.0},
-{r:50,p:-1,n:‘Brandenburg und Berlin’, la1:51.3,la2:53.6,lo1:11.3,lo2:14.8},
-{r:60,p:61,n:‘Tiefland Sachsen-Anhalt’, la1:51.4,la2:53.0,lo1:10.6,lo2:13.2},
-{r:60,p:62,n:‘Harz’, la1:51.4,la2:52.0,lo1:10.2,lo2:11.5},
-{r:70,p:71,n:‘Tiefland Thueringen’, la1:50.6,la2:51.7,lo1:9.8,lo2:12.6},
-{r:70,p:72,n:‘Mittelgebirge Thueringen’, la1:50.2,la2:51.0,lo1:9.9,lo2:12.2},
-{r:80,p:81,n:‘Tiefland Sachsen’, la1:51.0,la2:52.0,lo1:12.0,lo2:15.0},
-{r:80,p:82,n:‘Mittelgebirge Sachsen’, la1:50.2,la2:51.2,lo1:12.0,lo2:14.8},
-{r:90,p:91,n:‘Nordhessen’, la1:51.0,la2:52.0,lo1:8.5,lo2:10.5},
-{r:90,p:92,n:‘Sudhessen’, la1:49.5,la2:51.1,lo1:7.8,lo2:9.5},
-{r:100,p:101,n:‘Rheintal/Baar/Hochrhein’, la1:47.5,la2:48.5,lo1:7.5,lo2:8.8},
-{r:100,p:102,n:‘Hochlagen BW’, la1:47.6,la2:48.4,lo1:8.0,lo2:9.0},
-{r:100,p:103,n:‘Oberrhein/Markgraefler Land’, la1:47.5,la2:49.8,lo1:7.5,lo2:8.5},
-{r:100,p:104,n:‘Bergisches Land/Eifel’, la1:49.5,la2:51.0,lo1:6.5,lo2:8.5},
-{r:100,p:105,n:‘Odenwald/Spessart/Suedrh.’, la1:49.0,la2:50.5,lo1:8.5,lo2:10.0},
-{r:100,p:106,n:‘Mittelgebirge RP’, la1:49.5,la2:51.0,lo1:7.0,lo2:8.5},
-{r:100,p:107,n:‘Mosel/Eifel’, la1:49.5,la2:50.5,lo1:6.3,lo2:7.5},
-{r:110,p:111,n:‘Allgaeu/Oberbayern/Bay. Wald’, la1:47.2,la2:48.8,lo1:9.5,lo2:13.5},
-{r:110,p:112,n:‘Donau/Isar-Huegelland’, la1:47.5,la2:49.0,lo1:10.5,lo2:13.5},
-{r:110,p:113,n:‘Bayern n. der Donau’, la1:49.0,la2:50.5,lo1:10.0,lo2:13.5},
-{r:110,p:114,n:‘Franken’, la1:49.0,la2:50.5,lo1:9.5,lo2:12.5},
-{r:120,p:-1,n:‘Sachsen’, la1:50.1,la2:51.7,lo1:11.8,lo2:15.1}
+{r:10,p:11,n:“Inseln und Marschen”, la1:54.0,la2:55.1,lo1:7.8,lo2:9.5},
+{r:10,p:12,n:“Geest SH und Hamburg”, la1:53.4,la2:54.9,lo1:8.4,lo2:11.0},
+{r:20,p:-1,n:“Mecklenburg-Vorpommern”, la1:53.1,la2:54.7,lo1:10.5,lo2:14.5},
+{r:30,p:31,n:“Westl. Niedersachsen/Bremen”, la1:52.2,la2:53.9,lo1:6.6,lo2:9.4},
+{r:30,p:32,n:“Oestl. Niedersachsen”, la1:52.0,la2:53.5,lo1:9.3,lo2:11.6},
+{r:40,p:41,n:“Rhein.-Westfael. Tiefland”, la1:51.0,la2:52.5,lo1:5.9,lo2:8.5},
+{r:40,p:42,n:“Ostwestfalen”, la1:51.2,la2:52.4,lo1:7.8,lo2:9.5},
+{r:40,p:43,n:“Mittelgebirge NRW”, la1:50.7,la2:51.8,lo1:6.8,lo2:9.0},
+{r:50,p:-1,n:“Brandenburg und Berlin”, la1:51.3,la2:53.6,lo1:11.3,lo2:14.8},
+{r:60,p:61,n:“Tiefland Sachsen-Anhalt”, la1:51.4,la2:53.0,lo1:10.6,lo2:13.2},
+{r:60,p:62,n:“Harz”, la1:51.4,la2:52.0,lo1:10.2,lo2:11.5},
+{r:70,p:71,n:“Tiefland Thueringen”, la1:50.6,la2:51.7,lo1:9.8,lo2:12.6},
+{r:70,p:72,n:“Mittelgebirge Thueringen”, la1:50.2,la2:51.0,lo1:9.9,lo2:12.2},
+{r:80,p:81,n:“Tiefland Sachsen”, la1:51.0,la2:52.0,lo1:12.0,lo2:15.0},
+{r:80,p:82,n:“Mittelgebirge Sachsen”, la1:50.2,la2:51.2,lo1:12.0,lo2:14.8},
+{r:90,p:91,n:“Nordhessen”, la1:51.0,la2:52.0,lo1:8.5,lo2:10.5},
+{r:90,p:92,n:“Sudhessen”, la1:49.5,la2:51.1,lo1:7.8,lo2:9.5},
+{r:100,p:101,n:“Rheintal/Baar/Hochrhein”, la1:47.5,la2:48.5,lo1:7.5,lo2:8.8},
+{r:100,p:102,n:“Hochlagen BW”, la1:47.6,la2:48.4,lo1:8.0,lo2:9.0},
+{r:100,p:103,n:“Oberrhein/Markgraefler Land”, la1:47.5,la2:49.8,lo1:7.5,lo2:8.5},
+{r:100,p:104,n:“Bergisches Land/Eifel”, la1:49.5,la2:51.0,lo1:6.5,lo2:8.5},
+{r:100,p:105,n:“Odenwald/Spessart/Suedrh.”, la1:49.0,la2:50.5,lo1:8.5,lo2:10.0},
+{r:100,p:106,n:“Mittelgebirge RP”, la1:49.5,la2:51.0,lo1:7.0,lo2:8.5},
+{r:100,p:107,n:“Mosel/Eifel”, la1:49.5,la2:50.5,lo1:6.3,lo2:7.5},
+{r:110,p:111,n:“Allgaeu/Oberbayern/Bay. Wald”, la1:47.2,la2:48.8,lo1:9.5,lo2:13.5},
+{r:110,p:112,n:“Donau/Isar-Huegelland”, la1:47.5,la2:49.0,lo1:10.5,lo2:13.5},
+{r:110,p:113,n:“Bayern n. der Donau”, la1:49.0,la2:50.5,lo1:10.0,lo2:13.5},
+{r:110,p:114,n:“Franken”, la1:49.0,la2:50.5,lo1:9.5,lo2:12.5},
+{r:120,p:-1,n:“Sachsen”, la1:50.1,la2:51.7,lo1:11.8,lo2:15.1}
 ];
 
 var DWD_POLLEN_LABELS = {
-‘Graeser’: ‘Gr\u00e4ser’,
-‘Roggen’: ‘Roggen’,
-‘Hasel’: ‘Hasel’,
-‘Erle’: ‘Erle’,
-‘Esche’: ‘Esche’,
-‘Birke’: ‘Birke’,
-‘Beifuss’: ‘Beif\u00fc\u00df’,
-‘Ambrosia’: ‘Ambrosia’,
-‘Eiche’: ‘Eiche’,
-‘Buche’: ‘Buche’,
-‘Platane’: ‘Platane’,
-‘Wegerich’: ‘Wegerich’,
-‘Brennnessel’:‘Brennnessel’,
-‘Baumbl’: ‘Bl\u00fchende B\u00e4ume’
+“Graeser”: “Gr\u00e4ser”,
+“Roggen”: “Roggen”,
+“Hasel”: “Hasel”,
+“Erle”: “Erle”,
+“Esche”: “Esche”,
+“Birke”: “Birke”,
+“Beifuss”: “Beif\u00fc\u00df”,
+“Ambrosia”: “Ambrosia”,
+“Eiche”: “Eiche”,
+“Buche”: “Buche”,
+“Platane”: “Platane”,
+“Wegerich”: “Wegerich”,
+“Brennnessel”:“Brennnessel”,
+“Baumbl”: “Bl\u00fchende B\u00e4ume”
 };
 
 // DWD Skala: 0=keine, 1=gering, 2=mittel, 3=hoch
 // Zwischenwerte: 0.5, 1.5, 2.5
-var DWD_LVL_LABELS = [‘Keine’,‘Gering’,‘M\u00e4\u00dfig’,‘Hoch’];
-var DWD_LVL_COLS = [‘var(–text3)’,’#3a8c35’,’#b8b800’,’#c83232’];
+var DWD_LVL_LABELS = [“Keine”,“Gering”,“M\u00e4\u00dfig”,“Hoch”];
+var DWD_LVL_COLS = [“var(–text3)”,”#3a8c35”,”#b8b800”,”#c83232”];
 
 var dwdData = null; // wird bef\u00fcllt von fetchDWD()
 
@@ -299,9 +309,9 @@ function fetchDWD() {
 if (!S.lat || !S.lon) return;
 var region = getDWDRegion(S.lat, S.lon);
 if (!region) return;
-var url = ‘https://finnhub-proxy.zzbuk.workers.dev/dwd-pollen’;
+var url = “https://finnhub-proxy.zzbuk.workers.dev/dwd-pollen”;
 var xhr = new XMLHttpRequest();
-xhr.open(‘GET’, url);
+xhr.open(“GET”, url);
 xhr.onload = function() {
 if (xhr.status !== 200) return;
 try {
@@ -334,17 +344,17 @@ xhr.send();
 }
 
 function parseDWDValue(raw) {
-if (!raw || raw === ‘-1’) return -1;
+if (!raw || raw === “-1”) return -1;
 // DWD gibt Werte wie “0”, “1”, “2”, “3”, “0-1”, “1-2”, “2-3”
-if (raw.indexOf(’-’) > 0) {
-var parts = raw.split(’-’);
+if (raw.indexOf(”-”) > 0) {
+var parts = raw.split(”-”);
 return (parseFloat(parts[0]) + parseFloat(parts[1])) / 2;
 }
 return parseFloat(raw);
 }
 
 function renderDWDPollen() {
-var wrap = document.getElementById(‘dwdPollenListe’);
+var wrap = document.getElementById(“dwdPollenListe”);
 if (!wrap || !dwdData) return;
 
 var today = new Date().toISOString().slice(0, 10);
@@ -380,26 +390,26 @@ if (!a.isA && b.isA) return 1;
 return b.val - a.val;
 });
 
-var html = ‘<div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">’
-+ ’DWD-Pollenflug · ’ + (S.dwdRegionName || ‘’) + ‘</div>’;
+var html = “<div style="font-size:10px;color:var(–text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">”
++ “DWD-Pollenflug · “ + (S.dwdRegionName || “”) + “</div>”;
 
 for (var i = 0; i < items.length; i++) {
 var p = items[i];
 if (p.val <= 0) continue; // nur aktive Pollen zeigen
 var col = DWD_LVL_COLS[p.lvl];
 var pct = Math.min(100, Math.round(p.val / 3 * 100));
-var badge = p.isA ? ‘<span class="allerg-badge">Meine Allergie</span>’ : ‘’;
-html += ‘<div class="pollen-item">’
-+ ‘<span class="pollen-name" style="color:' + (p.isA ? 'var(--text)' : 'var(--text2)') + ';font-weight:' + (p.isA ? '600' : '400') + '">’ + p.label + ‘</span>’
-+ ‘<div class="pollen-bw">’
-+ ‘<div class="pollen-head">’ + badge + ‘<span style="font-size:10px;color:var(--text3);margin-right:4px">’ + p.val + ‘</span>’
-+ ‘<span style="font-size:10px;color:' + col + ';margin-left:auto">’ + DWD_LVL_LABELS[p.lvl] + ‘</span></div>’
-+ ‘<div class="pollen-bar"><div class="pollen-fill" style="width:' + Math.max(pct,2) + '%;background:' + col + '"></div></div>’
-+ ‘</div></div>’;
+var badge = p.isA ? “<span class="allerg-badge">Meine Allergie</span>” : “”;
+html += “<div class="pollen-item">”
++ “<span class="pollen-name" style="color:” + (p.isA ? “var(–text)” : “var(–text2)”) + “;font-weight:” + (p.isA ? “600” : “400”) + “">” + p.label + “</span>”
++ “<div class="pollen-bw">”
++ “<div class="pollen-head">” + badge + “<span style="font-size:10px;color:var(–text3);margin-right:4px">” + p.val + “</span>”
++ “<span style="font-size:10px;color:” + col + “;margin-left:auto">” + DWD_LVL_LABELS[p.lvl] + “</span></div>”
++ “<div class="pollen-bar"><div class="pollen-fill" style="width:” + Math.max(pct,2) + “%;background:” + col + “"></div></div>”
++ “</div></div>”;
 }
 
 if (items.filter(function(p){return p.val>0;}).length === 0) {
-html += ‘<div style="font-size:12px;color:var(--text3)">Keine aktiven Pollen heute</div>’;
+html += “<div style="font-size:12px;color:var(–text3)">Keine aktiven Pollen heute</div>”;
 }
 
 wrap.innerHTML = html;
@@ -407,10 +417,21 @@ wrap.innerHTML = html;
 
 var symVals = {nase:false,augen:false,haut:false,atem:false,muede:false,kopf:false};
 
+var APP_VERSION = “2.0.7”;
+
 function init() {
+// Version check - clear cache if version changed
+var storedVersion = localStorage.getItem(“ap_version”);
+if(storedVersion !== APP_VERSION) {
+// Neue Version - ap_city behalten, Rest zuruecksetzen
+var savedCity = localStorage.getItem(“ap_city”);
+localStorage.clear();
+if(savedCity) localStorage.setItem(“ap_city”, savedCity);
+localStorage.setItem(“ap_version”, APP_VERSION);
+}
 loadStorage();
-var lbl = document.getElementById(‘todayLbl’);
-if(lbl) lbl.textContent = new Date().toLocaleDateString(‘de-DE’,{weekday:‘long’,day:‘numeric’,month:‘long’,year:‘numeric’}).toUpperCase();
+var lbl = document.getElementById(“todayLbl”);
+if(lbl) lbl.textContent = new Date().toLocaleDateString(“de-DE”,{weekday:“long”,day:“numeric”,month:“long”,year:“numeric”}).toUpperCase();
 renderProfil();
 renderTagebuch();
 populateMonths();
@@ -418,35 +439,35 @@ loadSavedCity();
 }
 
 function loadStorage() {
-try { var e=localStorage.getItem(‘ap_entries’); if(e) S.entries=JSON.parse(e); } catch(x){}
-try { var p=localStorage.getItem(‘ap_profil’); if(p) S.profil=JSON.parse(p); } catch(x){}
+try { var e=localStorage.getItem(“ap_entries”); if(e) S.entries=JSON.parse(e); } catch(x){}
+try { var p=localStorage.getItem(“ap_profil”); if(p) S.profil=JSON.parse(p); } catch(x){}
 }
 
 function saveStorage() {
-localStorage.setItem(‘ap_entries’,JSON.stringify(S.entries));
-localStorage.setItem(‘ap_profil’,JSON.stringify(S.profil));
+localStorage.setItem(“ap_entries”,JSON.stringify(S.entries));
+localStorage.setItem(“ap_profil”,JSON.stringify(S.profil));
 }
 
 function showTab(id) {
-document.querySelectorAll(’.section’).forEach(function(s){s.classList.remove(‘active’);});
-document.querySelectorAll(‘nav button’).forEach(function(b){b.classList.remove(‘active’);});
-document.getElementById(‘tab-’+id).classList.add(‘active’);
-var tabs=[‘heute’,‘symptome’,‘tagebuch’,‘muster’,‘profil’];
+document.querySelectorAll(”.section”).forEach(function(s){s.classList.remove(“active”);});
+document.querySelectorAll(“nav button”).forEach(function(b){b.classList.remove(“active”);});
+document.getElementById(“tab-”+id).classList.add(“active”);
+var tabs=[“heute”,“symptome”,“tagebuch”,“muster”,“profil”];
 var idx=tabs.indexOf(id);
-if(idx>=0) document.querySelectorAll(‘nav button’)[idx].classList.add(‘active’);
-if(id===‘heute’){restoreCityInput();}
-if(id===‘tagebuch’){renderTagebuch();populateMonths();}
-if(id===‘muster’) analyseMuster();
+if(idx>=0) document.querySelectorAll(“nav button”)[idx].classList.add(“active”);
+if(id===“heute”){restoreCityInput();}
+if(id===“tagebuch”){renderTagebuch();populateMonths();}
+if(id===“muster”) analyseMuster();
 }
 
 function loadSavedCity() {
-var saved = localStorage.getItem(‘ap_city’);
+var saved = localStorage.getItem(“ap_city”);
 if(!saved) return;
 var c = JSON.parse(saved);
 if(!c || !c.lat || !c.lon) return;
 S.lat = parseFloat(c.lat);
 S.lon = parseFloat(c.lon);
-S.locationName = c.name || ‘’;
+S.locationName = c.name || “”;
 if(isNaN(S.lat) || isNaN(S.lon)) return;
 setCityLabel(S.locationName);
 fetchPollen();
@@ -454,7 +475,7 @@ fetchDWD();
 }
 
 function setCityLabel(name) {
-var el = document.getElementById(‘locLabel’);
+var el = document.getElementById(“locLabel”);
 if(el) { el.textContent = name; return; }
 // DOM noch nicht bereit - kurz warten und nochmal
 setTimeout(function(){ setCityLabel(name); }, 50);
@@ -462,53 +483,53 @@ setTimeout(function(){ setCityLabel(name); }, 50);
 
 function restoreCityInput() {
 if(!S.locationName) return;
-var inp = document.getElementById(‘cityInput’);
+var inp = document.getElementById(“cityInput”);
 if(inp) inp.placeholder = S.locationName;
 }
 function searchCity() {
-var q = document.getElementById(‘cityInput’).value.trim();
+var q = document.getElementById(“cityInput”).value.trim();
 if (!q) return;
-var div = document.getElementById(‘cityResults’);
-div.innerHTML = ‘<div style="font-size:12px;color:var(--text3);padding:6px 0">Suche…</div>’;
+var div = document.getElementById(“cityResults”);
+div.innerHTML = “<div style="font-size:12px;color:var(–text3);padding:6px 0">Suche…</div>”;
 var xhr = new XMLHttpRequest();
-xhr.open(‘GET’, ‘https://nominatim.openstreetmap.org/search?format=json&limit=5&q=’ + encodeURIComponent(q));
+xhr.open(“GET”, “https://nominatim.openstreetmap.org/search?format=json&limit=5&q=” + encodeURIComponent(q));
 xhr.onload = function() {
 if (xhr.status !== 200) {
-div.innerHTML = ‘<div style="font-size:12px;color:var(--w3);padding:6px 0">Fehler ’ + xhr.status + ‘</div>’;
+div.innerHTML = “<div style="font-size:12px;color:var(–w3);padding:6px 0">Fehler “ + xhr.status + “</div>”;
 return;
 }
 var res;
 try { res = JSON.parse(xhr.responseText); } catch(e) {
-div.innerHTML = ‘<div style="font-size:12px;color:var(--w3);padding:6px 0">Parse-Fehler</div>’;
+div.innerHTML = “<div style="font-size:12px;color:var(–w3);padding:6px 0">Parse-Fehler</div>”;
 return;
 }
 if (!res || !res.length) {
-div.innerHTML = ‘<div style="font-size:12px;color:var(--text3);padding:6px 0">Keine Ergebnisse</div>’;
+div.innerHTML = “<div style="font-size:12px;color:var(–text3);padding:6px 0">Keine Ergebnisse</div>”;
 return;
 }
-div.innerHTML = ‘’;
+div.innerHTML = “”;
 for (var i = 0; i < res.length; i++) {
 var p = res[i];
 var lat = p.lat;
 var lon = p.lon;
-var parts = p.display_name.split(’,’);
+var parts = p.display_name.split(”,”);
 var name = parts[0].trim();
-var label = parts.slice(0, 3).join(’, ’);
-var btn = document.createElement(‘button’);
-btn.type = ‘button’;
+var label = parts.slice(0, 3).join(”, “);
+var btn = document.createElement(“button”);
+btn.type = “button”;
 btn.textContent = label;
-btn.style.cssText = ‘display:block;width:100%;text-align:left;background:var(–surface2);border:1px solid var(–border);border-radius:8px;color:var(–text2);font-family:var(–mono);font-size:12px;padding:9px 12px;margin-top:5px;cursor:pointer;’;
-btn.setAttribute(‘data-lat’, lat);
-btn.setAttribute(‘data-lon’, lon);
-btn.setAttribute(‘data-name’, name);
+btn.style.cssText = “display:block;width:100%;text-align:left;background:var(–surface2);border:1px solid var(–border);border-radius:8px;color:var(–text2);font-family:var(–mono);font-size:12px;padding:9px 12px;margin-top:5px;cursor:pointer;”;
+btn.setAttribute(“data-lat”, lat);
+btn.setAttribute(“data-lon”, lon);
+btn.setAttribute(“data-name”, name);
 btn.onclick = function() {
-selectCity(this.getAttribute(‘data-lat’), this.getAttribute(‘data-lon’), this.getAttribute(‘data-name’));
+selectCity(this.getAttribute(“data-lat”), this.getAttribute(“data-lon”), this.getAttribute(“data-name”));
 };
 div.appendChild(btn);
 }
 };
 xhr.onerror = function() {
-div.innerHTML = ‘<div style="font-size:12px;color:var(--w3);padding:6px 0">Verbindungsfehler</div>’;
+div.innerHTML = “<div style="font-size:12px;color:var(–w3);padding:6px 0">Verbindungsfehler</div>”;
 };
 xhr.send();
 }
@@ -517,28 +538,28 @@ function selectCity(lat,lon,name) {
 S.lat=parseFloat(lat);
 S.lon=parseFloat(lon);
 S.locationName=name;
-var locEl=document.getElementById(‘locLabel’);
+var locEl=document.getElementById(“locLabel”);
 if(locEl) locEl.textContent=name;
-var inpEl=document.getElementById(‘cityInput’);
-if(inpEl){ inpEl.value=’’; inpEl.placeholder=name; }
-var resEl=document.getElementById(‘cityResults’);
-if(resEl) resEl.innerHTML=’’;
-localStorage.setItem(‘ap_city’,JSON.stringify({lat:S.lat,lon:S.lon,name:name}));
+var inpEl=document.getElementById(“cityInput”);
+if(inpEl){ inpEl.value=””; inpEl.placeholder=name; }
+var resEl=document.getElementById(“cityResults”);
+if(resEl) resEl.innerHTML=””;
+localStorage.setItem(“ap_city”,JSON.stringify({lat:S.lat,lon:S.lon,name:name}));
 fetchPollen();
 fetchDWD();
 }
 
 function fetchPollen() {
 if(!S.lat||!S.lon) return;
-var fields=POLLEN_API_KEYS.join(’,’);
-var url=‘https://air-quality-api.open-meteo.com/v1/air-quality?latitude=’+S.lat+’&longitude=’+S.lon+’&hourly=’+fields+’&forecast_days=7&timezone=auto’;
+var fields=POLLEN_API_KEYS.join(”,”);
+var url=“https://air-quality-api.open-meteo.com/v1/air-quality?latitude=”+S.lat+”&longitude=”+S.lon+”&hourly=”+fields+”&forecast_days=7&timezone=auto”;
 fetch(url)
 .then(function(r){return r.json();})
 .then(function(d){
 S.pollenData=d;
 renderWarnBanner();renderAmpel();renderPollenListe();
 })
-.catch(function(){document.getElementById(‘warnVal’).textContent=‘Ladefehler’;});
+.catch(function(){document.getElementById(“warnVal”).textContent=“Ladefehler”;});
 }
 
 function getCurrentHourIdx() {
@@ -565,7 +586,7 @@ return sel.some(function(s){return n.includes(s)||s.includes(n);});
 
 function renderWarnBanner() {
 if(!S.pollenData) return;
-var idx=getCurrentHourIdx(),maxLvl=0,maxName=’’,boosted=false;
+var idx=getCurrentHourIdx(),maxLvl=0,maxName=””,boosted=false;
 POLLEN_API_KEYS.forEach(function(k){
 var arr=S.pollenData.hourly[k];if(!arr) return;
 var val=arr[idx]||0;
@@ -578,23 +599,23 @@ var eff=Math.min(4,lvl+boost);
 if(eff>maxLvl){maxLvl=eff;maxName=name;boosted=isA&&boost>0;}
 });
 var w=WARN_DATA[maxLvl];
-var banner=document.getElementById(‘warnBanner’);
-if(banner) banner.className=‘wb ‘+w.cls;
-document.getElementById(‘warnVal’).textContent=w.lbl;
-var sub=’’;
+var banner=document.getElementById(“warnBanner”);
+if(banner) banner.className=“wb “+w.cls;
+document.getElementById(“warnVal”).textContent=w.lbl;
+var sub=””;
 if(maxLvl>0){
-sub=maxName+’ am staerksten’;
-if(boosted) sub+=’ (pers. Allergie +1)’;
+sub=maxName+” am staerksten”;
+if(boosted) sub+=” (pers. Allergie +1)”;
 } else {
 sub=w.sub;
 }
-document.getElementById(‘warnSub’).textContent=sub;
+document.getElementById(“warnSub”).textContent=sub;
 }
 
 function renderAmpel() {
 if(!S.pollenData) return;
-var row=document.getElementById(‘ampelRow’);
-row.innerHTML=’’;
+var row=document.getElementById(“ampelRow”);
+row.innerHTML=””;
 var times=S.pollenData.hourly.time,dailyMax={};
 times.forEach(function(t,i){
 var day=t.slice(0,10);
@@ -606,25 +627,25 @@ if(lvl>dailyMax[day]) dailyMax[day]=lvl;
 });
 });
 var today=new Date().toISOString().slice(0,10);
-var cols=[’#2a3d2a’,’#3a8c35’,’#b8b800’,’#d97c00’,’#c83232’];
+var cols=[”#2a3d2a”,”#3a8c35”,”#b8b800”,”#d97c00”,”#c83232”];
 Object.keys(dailyMax).slice(0,5).forEach(function(day){
 var lvl=dailyMax[day]||0;
 var col=cols[lvl];
-var d=new Date(day+‘T12:00:00’);
-var el=document.createElement(‘div’);
-el.className=‘amp-day’+(day===today?’ heute’:’’);
-el.style.borderColor=lvl>0?col:’’;
-el.innerHTML=’<div class="amp-wday">’+d.toLocaleDateString(‘de-DE’,{weekday:‘short’})+’</div>’
-+’<div class="amp-date">’+d.toLocaleDateString(‘de-DE’,{day:‘numeric’,month:‘numeric’})+’</div>’
-+’<div class="amp-dot" style="background:'+col+'"></div>’
-+’<div class="amp-lbl">’+[’–’,’|’,’||’,’|||’,’!!!’][lvl]+’</div>’;
+var d=new Date(day+“T12:00:00”);
+var el=document.createElement(“div”);
+el.className=“amp-day”+(day===today?” heute”:””);
+el.style.borderColor=lvl>0?col:””;
+el.innerHTML=”<div class="amp-wday">”+d.toLocaleDateString(“de-DE”,{weekday:“short”})+”</div>”
++”<div class="amp-date">”+d.toLocaleDateString(“de-DE”,{day:“numeric”,month:“numeric”})+”</div>”
++”<div class="amp-dot" style="background:”+col+”"></div>”
++”<div class="amp-lbl">”+[”–”,”|”,”||”,”|||”,”!!!”][lvl]+”</div>”;
 row.appendChild(el);
 });
 }
 
 function renderPollenListe() {
 if(!S.pollenData) return;
-var wrap=document.getElementById(‘pollenListe’);
+var wrap=document.getElementById(“pollenListe”);
 var idx=getCurrentHourIdx();
 var alle=POLLEN_API_KEYS.map(function(k){
 var arr=S.pollenData.hourly[k];
@@ -640,64 +661,64 @@ if(!a.isA && b.isA) return 1;
 return b.val-a.val;
 });
 if(!aktiv.length){
-wrap.innerHTML=’<div style="font-size:12px;color:var(--text3)">Aktuell keine Pollendaten</div>’;
+wrap.innerHTML=”<div style="font-size:12px;color:var(–text3)">Aktuell keine Pollendaten</div>”;
 return;
 }
-var html=’’;
+var html=””;
 aktiv.forEach(function(p){
 var col=LVL_COLS[p.lvl];
 var pct=Math.min(100,Math.round(p.val/500*100));
-var badge=p.isA?’<span class="allerg-badge">Meine Allergie</span>’:’’;
-html+=’<div class="pollen-item">’
-+’<span class="pollen-name" style="color:'+(p.isA?'var(--text)':'var(--text2)')+';font-weight:'+(p.isA?'600':'400')+'">’+p.name+’</span>’
-+’<div class="pollen-bw">’
-+’<div class="pollen-head">’+badge+’<span style="font-size:10px;color:var(--text3);margin-right:4px">’+Math.round(p.val)+’</span>’
-+’<span style="font-size:10px;color:'+col+';margin-left:auto">’+LVL_LBLS[p.lvl]+’</span></div>’
-+’<div class="pollen-bar"><div class="pollen-fill" style="width:'+Math.max(pct,3)+'%;background:'+col+'"></div></div>’
-+’</div>’
-+’</div>’;
+var badge=p.isA?”<span class="allerg-badge">Meine Allergie</span>”:””;
+html+=”<div class="pollen-item">”
++”<span class="pollen-name" style="color:”+(p.isA?“var(–text)”:“var(–text2)”)+”;font-weight:”+(p.isA?“600”:“400”)+”">”+p.name+”</span>”
++”<div class="pollen-bw">”
++”<div class="pollen-head">”+badge+”<span style="font-size:10px;color:var(–text3);margin-right:4px">”+Math.round(p.val)+”</span>”
++”<span style="font-size:10px;color:”+col+”;margin-left:auto">”+LVL_LBLS[p.lvl]+”</span></div>”
++”<div class="pollen-bar"><div class="pollen-fill" style="width:”+Math.max(pct,3)+”%;background:”+col+”"></div></div>”
++”</div>”
++”</div>”;
 });
 wrap.innerHTML=html;
 }
 
 function toggleSym(key) {
 symVals[key]=!symVals[key];
-var btn=document.getElementById(‘sb-’+key);
-if(symVals[key]) btn.classList.add(‘an’);
-else btn.classList.remove(‘an’);
+var btn=document.getElementById(“sb-”+key);
+if(symVals[key]) btn.classList.add(“an”);
+else btn.classList.remove(“an”);
 }
 
 function resetSyms() {
 Object.keys(symVals).forEach(function(k){
 symVals[k]=false;
-var btn=document.getElementById(‘sb-’+k);
-if(btn) btn.classList.remove(‘an’);
+var btn=document.getElementById(“sb-”+k);
+if(btn) btn.classList.remove(“an”);
 });
 }
 
 function saveEntry() {
 var keys=Object.keys(symVals);
-if(!keys.some(function(k){return symVals[k];})){showToast(‘Nichts markiert’);return;}
+if(!keys.some(function(k){return symVals[k];})){showToast(“Nichts markiert”);return;}
 var symps={};
 keys.forEach(function(k){symps[k]=symVals[k]?1:0;});
 var now=new Date();
 var entry={
 id:Date.now(),
-date:now.getFullYear()+’-’+pad(now.getMonth()+1)+’-’+pad(now.getDate()),
-time:now.toLocaleTimeString(‘de-DE’,{hour:‘2-digit’,minute:‘2-digit’}),
-location:S.locationName||’’,
+date:now.getFullYear()+”-”+pad(now.getMonth()+1)+”-”+pad(now.getDate()),
+time:now.toLocaleTimeString(“de-DE”,{hour:“2-digit”,minute:“2-digit”}),
+location:S.locationName||””,
 symptoms:symps,
-note:document.getElementById(‘entryNote’).value.trim(),
+note:document.getElementById(“entryNote”).value.trim(),
 pollenLevel:getPollenSummary()
 };
 S.entries.unshift(entry);
 saveStorage();
 resetSyms();
-document.getElementById(‘entryNote’).value=’’;
+document.getElementById(“entryNote”).value=””;
 renderTagebuch();
 populateMonths();
-showTab(‘tagebuch’);
-showToast(‘Gespeichert’);
+showTab(“tagebuch”);
+showToast(“Gespeichert”);
 }
 
 function getPollenSummary() {
@@ -710,27 +731,27 @@ if(arr) out[POLLEN_NAMES[k]]=Math.round(arr[idx]||0);
 return out;
 }
 
-function pad(n){return n<10?‘0’+n:’’+n;}
+function pad(n){return n<10?“0”+n:””+n;}
 
 function renderTagebuch() {
-var list=document.getElementById(‘tagebuchList’);
+var list=document.getElementById(“tagebuchList”);
 if(!list) return;
-var fv=document.getElementById(‘filterMonth’)?document.getElementById(‘filterMonth’).value:’’;
+var fv=document.getElementById(“filterMonth”)?document.getElementById(“filterMonth”).value:””;
 var entries=S.entries.slice();
 if(fv) entries=entries.filter(function(e){return e.date.startsWith(fv);});
 if(!entries.length){
-list.innerHTML=’<div class="empty"><div class="emj">📓</div>Noch keine Eintr\u00e4ge</div>’;
+list.innerHTML=”<div class="empty"><div class="emj">📓</div>Noch keine Eintr\u00e4ge</div>”;
 return;
 }
 var sel=S.profil.pollen.map(function(a){return a.toLowerCase();});
 list.innerHTML=entries.map(function(e){
-var d=new Date(e.date+‘T12:00:00’);
-var meta=d.toLocaleDateString(‘de-DE’,{weekday:‘short’,day:‘numeric’,month:‘short’}).toUpperCase();
-if(e.time) meta+=’ · ‘+e.time;
-if(e.location) meta+=’ · 📍’+e.location;
+var d=new Date(e.date+“T12:00:00”);
+var meta=d.toLocaleDateString(“de-DE”,{weekday:“short”,day:“numeric”,month:“short”}).toUpperCase();
+if(e.time) meta+=” · “+e.time;
+if(e.location) meta+=” · 📍”+e.location;
 var symPills=Object.keys(e.symptoms||{}).filter(function(k){return e.symptoms[k];})
-.map(function(k){return ‘<span class="sym-pill">’+(SYM_LABELS[k]||k)+’</span>’;}).join(’’);
-var pollenPills=’’;
+.map(function(k){return “<span class="sym-pill">”+(SYM_LABELS[k]||k)+”</span>”;}).join(””);
+var pollenPills=””;
 if(e.pollenLevel){
 var ap=Object.keys(e.pollenLevel)
 .map(function(name){
@@ -742,39 +763,39 @@ return {name:name,lvl:lvl,isA:isA};
 .filter(function(p){return p.lvl>0;})
 .sort(function(a,b){return b.lvl-a.lvl;});
 if(ap.length){
-pollenPills=’<div class="pollen-pills">’+ap.map(function(p){
+pollenPills=”<div class="pollen-pills">”+ap.map(function(p){
 var col=LVL_COLS[p.lvl];
-return ‘<span class="pollen-pill" style="border:1px solid '+(p.isA?col:'var(--border)')+';color:'+col+';'+(p.isA?'font-weight:600;':'')+'">’
-+p.name+’ ‘+LVL_LBLS[p.lvl]+(p.isA?’ (!)’:’’)+’</span>’;
-}).join(’’)+’</div>’;
+return “<span class="pollen-pill" style="border:1px solid “+(p.isA?col:“var(–border)”)+”;color:”+col+”;”+(p.isA?“font-weight:600;”:””)+”">”
++p.name+” “+LVL_LBLS[p.lvl]+(p.isA?” (!)”:””)+”</span>”;
+}).join(””)+”</div>”;
 }
 }
-var noteHtml=e.note?’<div class="entry-note">"’+e.note+’"</div>’:’’;
-return ‘<div class="entry-item">’
-+’<div class="entry-date">’+meta+’</div>’
-+’<div class="entry-syms">’+(symPills||’<span style="font-size:11px;color:var(--text3)">Keine Symptome</span>’)+’</div>’
-+pollenPills+noteHtml+’</div>’;
-}).join(’’);
+var noteHtml=e.note?”<div class="entry-note">"”+e.note+”"</div>”:””;
+return “<div class="entry-item">”
++”<div class="entry-date">”+meta+”</div>”
++”<div class="entry-syms">”+(symPills||”<span style="font-size:11px;color:var(–text3)">Keine Symptome</span>”)+”</div>”
++pollenPills+noteHtml+”</div>”;
+}).join(””);
 }
 
 function populateMonths() {
-var sel=document.getElementById(‘filterMonth’);if(!sel) return;
+var sel=document.getElementById(“filterMonth”);if(!sel) return;
 var months=[];
 S.entries.forEach(function(e){var m=e.date.slice(0,7);if(months.indexOf(m)<0)months.push(m);});
 months.sort().reverse();
 var cur=sel.value;
-sel.innerHTML=’<option value="">Alle Monate</option>’+months.map(function(m){
-var parts=m.split(’-’);
-var lbl=new Date(parts[0],parts[1]-1,1).toLocaleDateString(‘de-DE’,{month:‘long’,year:‘numeric’});
-return ‘<option value=”’+m+’”’+(m===cur?’ selected’:’’)+’>’+lbl+’</option>’;
-}).join(’’);
+sel.innerHTML=”<option value="">Alle Monate</option>”+months.map(function(m){
+var parts=m.split(”-”);
+var lbl=new Date(parts[0],parts[1]-1,1).toLocaleDateString(“de-DE”,{month:“long”,year:“numeric”});
+return “<option value="”+m+”"”+(m===cur?” selected”:””)+”>”+lbl+”</option>”;
+}).join(””);
 }
 
 function analyseMuster() {
-var wrap=document.getElementById(‘musterContent’);
+var wrap=document.getElementById(“musterContent”);
 var n=S.entries.length;
 if(n<3){
-wrap.innerHTML=’<div class="empty"><div class="emj">🔍</div>Mindestens 3 Eintr\u00e4ge n\u00f6tig</div>’;
+wrap.innerHTML=”<div class="empty"><div class="emj">🔍</div>Mindestens 3 Eintr\u00e4ge n\u00f6tig</div>”;
 return;
 }
 var pollenCount={},pollenDays={};
@@ -794,21 +815,21 @@ var pct=Math.round(pollenCount[p]/pollenDays[p]*100);
 if(pct>=50) wahrsch.push({name:p,pct:pct});
 });
 wahrsch.sort(function(a,b){return b.pct-a.pct;});
-var d1=new Date(S.entries[n-1].date+‘T12:00:00’).toLocaleDateString(‘de-DE’,{day:‘numeric’,month:‘short’});
-var d2=new Date(S.entries[0].date+‘T12:00:00’).toLocaleDateString(‘de-DE’,{day:‘numeric’,month:‘short’});
-var html=’<div style="font-size:10px;color:var(--text3);margin-bottom:14px">Basis: ‘+n+’ Eintr\u00e4ge · ‘+d1+’–’+d2+’</div>’;
+var d1=new Date(S.entries[n-1].date+“T12:00:00”).toLocaleDateString(“de-DE”,{day:“numeric”,month:“short”});
+var d2=new Date(S.entries[0].date+“T12:00:00”).toLocaleDateString(“de-DE”,{day:“numeric”,month:“short”});
+var html=”<div style="font-size:10px;color:var(–text3);margin-bottom:14px">Basis: “+n+” Eintr\u00e4ge · “+d1+”–”+d2+”</div>”;
 if(!wahrsch.length){
-html+=’<div style="font-size:13px;color:var(--text2);line-height:1.6">Noch kein klares Muster.<br>Weiter sammeln — ab ca. 10 Eintr\u00e4gen wird es deutlicher.</div>’;
+html+=”<div style="font-size:13px;color:var(–text2);line-height:1.6">Noch kein klares Muster.<br>Weiter sammeln — ab ca. 10 Eintr\u00e4gen wird es deutlicher.</div>”;
 } else {
 wahrsch.forEach(function(a){
-var col=a.pct>=80?’#c83232’:a.pct>=65?’#d97c00’:’#3a8c35’;
-var stlbl=a.pct>=80?‘Sehr wahrscheinlich’:a.pct>=65?‘Wahrscheinlich’:‘M\u00f6glicherweise’;
-html+=’<div class="allerg-result">’
-+’<div class="allerg-icon" style="background:'+col+'22;border:2px solid '+col+'">🌿</div>’
-+’<div style="flex:1"><div style="font-size:15px;font-weight:600;color:var(--text)">’+a.name+’</div>’
-+’<div style="font-size:11px;color:'+col+';margin-top:2px">’+stlbl+’</div></div>’
-+’<div class="allerg-pct" style="background:'+col+'">’+a.pct+’%</div>’
-+’</div>’;
+var col=a.pct>=80?”#c83232”:a.pct>=65?”#d97c00”:”#3a8c35”;
+var stlbl=a.pct>=80?“Sehr wahrscheinlich”:a.pct>=65?“Wahrscheinlich”:“M\u00f6glicherweise”;
+html+=”<div class="allerg-result">”
++”<div class="allerg-icon" style="background:”+col+“22;border:2px solid “+col+”">🌿</div>”
++”<div style="flex:1"><div style="font-size:15px;font-weight:600;color:var(–text)">”+a.name+”</div>”
++”<div style="font-size:11px;color:”+col+”;margin-top:2px">”+stlbl+”</div></div>”
++”<div class="allerg-pct" style="background:”+col+”">”+a.pct+”%</div>”
++”</div>”;
 });
 }
 wrap.innerHTML=html;
@@ -816,11 +837,11 @@ wrap.innerHTML=html;
 
 function renderProfil() {
 Object.keys(ALLERGENS).forEach(function(cat){
-var wrap=document.getElementById(‘profil-’+cat);if(!wrap) return;
+var wrap=document.getElementById(“profil-”+cat);if(!wrap) return;
 wrap.innerHTML=ALLERGENS[cat].map(function(item){
 var selected=S.profil[cat]&&S.profil[cat].indexOf(item)>=0;
-return ‘<span class=“allergen-tag’+(selected?’ selected’:’’)+’ id=“pt-’+item+’” onclick=“toggleAllergen('’+cat+’','’+item+’')”>’+item+’</span>’;
-}).join(’’);
+return “<span class="allergen-tag”+(selected?” selected”:””)+” id="pt-”+item+”" onclick="toggleAllergen('”+cat+”','”+item+”')">”+item+”</span>”;
+}).join(””);
 });
 }
 
@@ -829,36 +850,36 @@ var arr=S.profil[cat]||[];
 var idx=arr.indexOf(name);
 if(idx>=0) arr.splice(idx,1); else arr.push(name);
 S.profil[cat]=arr;
-var el=document.getElementById(‘pt-’+name);
-if(el) el.className=‘allergen-tag’+(arr.indexOf(name)>=0?’ selected’:’’);
+var el=document.getElementById(“pt-”+name);
+if(el) el.className=“allergen-tag”+(arr.indexOf(name)>=0?” selected”:””);
 }
 
 function saveProfil() {
 saveStorage();
 if(S.pollenData){renderWarnBanner();renderPollenListe();}
-showToast(‘Profil gespeichert’);
+showToast(“Profil gespeichert”);
 }
 
 function exportData() {
-var blob=new Blob([JSON.stringify({entries:S.entries,profil:S.profil},null,2)],{type:‘application/json’});
+var blob=new Blob([JSON.stringify({entries:S.entries,profil:S.profil},null,2)],{type:“application/json”});
 var url=URL.createObjectURL(blob);
-var a=document.createElement(‘a’);
-a.href=url;a.download=‘allergie-pilot.json’;a.click();URL.revokeObjectURL(url);
+var a=document.createElement(“a”);
+a.href=url;a.download=“allergie-pilot.json”;a.click();URL.revokeObjectURL(url);
 }
 
 function clearData() {
-if(!confirm(‘Wirklich alle Daten l\u00f6schen?’)) return;
+if(!confirm(“Wirklich alle Daten l\u00f6schen?”)) return;
 S.entries=[];S.profil={pollen:[],tiere:[],sonstiges:[]};
 saveStorage();renderTagebuch();renderProfil();
-showToast(‘Gel\u00f6scht’);
+showToast(“Gel\u00f6scht”);
 }
 
 function showToast(msg) {
-var t=document.createElement(‘div’);
+var t=document.createElement(“div”);
 t.textContent=msg;
-Object.assign(t.style,{position:‘fixed’,bottom:‘24px’,left:‘50%’,transform:‘translateX(-50%)’,
-background:‘var(–accent)’,color:’#0a1a0a’,padding:‘9px 20px’,borderRadius:‘24px’,
-fontFamily:‘var(–mono)’,fontSize:‘13px’,fontWeight:‘500’,zIndex:‘9999’,whiteSpace:‘nowrap’});
+Object.assign(t.style,{position:“fixed”,bottom:“24px”,left:“50%”,transform:“translateX(-50%)”,
+background:“var(–accent)”,color:”#0a1a0a”,padding:“9px 20px”,borderRadius:“24px”,
+fontFamily:“var(–mono)”,fontSize:“13px”,fontWeight:“500”,zIndex:“9999”,whiteSpace:“nowrap”});
 document.body.appendChild(t);
 setTimeout(function(){t.remove();},2200);
 }
