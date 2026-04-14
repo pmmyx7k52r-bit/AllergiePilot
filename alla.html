@@ -112,6 +112,16 @@ select{background:var(--surface2);border:1px solid var(--border);border-radius:8
 
 <div class="section active" id="tab-heute">
 <div class="today-lbl" id="todayLbl"></div>
+<div id="debugLoc" style="font-size:10px;color:#ff0;padding:2px 0"></div>
+<script>
+try {
+var _dbg = localStorage.getItem("ap_city");
+document.getElementById("debugLoc").textContent =
+"LocalStorage: " + (_dbg ? _dbg.slice(0,60) : "LEER");
+} catch(e) {
+document.getElementById("debugLoc").textContent = "LS-Fehler: " + e;
+}
+</script>
 <div id="warnBanner" class="wb wl0">
 <div class="wb-lbl">Aktuelle Belastung</div>
 <div class="wb-val" id="warnVal">Kein Standort</div>
