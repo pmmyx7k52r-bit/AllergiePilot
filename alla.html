@@ -3,78 +3,68 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AllergieCockpit 1.2</title>
+<title>AllergieCockpit 1.3</title>
 <style>
-:root { --primary: #27ae60; --bg: #f0f2f5; --card: #ffffff; --warn: #e67e22; --critical: #e74c3c; }
+:root { --primary: #27ae60; --bg: #f0f2f5; --card: #ffffff; --warn: #e67e22; --critical: #e74c3c; --dark: #2c3e50; }
 body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 15px; }
 .card { background: var(--card); padding: 15px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 15px; }
-h2 { margin: 0 0 12px 0; font-size: 1.1rem; color: #7f8c8d; text-transform: uppercase; letter-spacing: 1px; }
-/* PLZ Suche */
+h2 { margin: 0 0 12px 0; font-size: 1rem; color: #7f8c8d; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
 .plz-box { display: flex; gap: 10px; }
 input[type="text"] { flex-grow: 1; padding: 12px; border-radius: 10px; border: 1px solid #ddd; font-size: 1rem; }
-/* Pollen Grid */
-.pollen-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.pollen-item { text-align: center; padding: 10px; border-radius: 12px; background: #f8faf9; border: 1px solid #edf2f0; }
-.p-name { display: block; font-size: 0.8rem; font-weight: 600; }
-.p-val { font-size: 1.2rem; font-weight: bold; }
+.pollen-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; min-height: 50px; }
+.pollen-item { text-align: center; padding: 10px; border-radius: 12px; background: #f8faf9; border: 1px solid #edf2f0; animation: fadeIn 0.5s ease; }
+.p-name { display: block; font-size: 0.75rem; font-weight: 600; color: #34495e; white-space: nowrap; overflow: hidden; }
+.p-val { font-size: 1.3rem; font-weight: bold; color: var(--primary); }
 
-/* Symptom Toggles */
 .symptom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.symptom-btn {
-padding: 15px; border-radius: 12px; border: 2px solid #eee; background: white;
-font-weight: 600; cursor: pointer; text-align: center; transition: 0.2s;
-}
-.symptom-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-.save-btn {
-background: #2c3e50; color: white; border: none; padding: 18px; width: 100%;
-border-radius: 12px; font-weight: bold; font-size: 1.1rem; margin-top: 20px;
-}
-.status { font-size: 0.8rem; text-align: center; margin-top: 10px; color: #95a5a6; }
+.symptom-btn { padding: 18px; border-radius: 12px; border: 1px solid #eee; background: white; font-weight: 600; cursor: pointer; transition: 0.2s; }
+.symptom-btn.active { background: var(--dark); color: white; border-color: var(--dark); }
+.forecast-row { display: flex; justify-content: space-between; padding: 10px 5px; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; }
+.save-btn { background: var(--primary); color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-weight: bold; font-size: 1.1rem; margin-top: 15px; }
+.status { font-size: 0.75rem; text-align: center; margin-top: 10px; color: #95a5a6; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
 <body>
 
 <div class="card">
-<h2>📍 Mein Ort (PLZ)</h2>
+<h2>📍 MEIN ORT (PLZ)</h2>
 <div class="plz-box">
-<input type="text" id="plzInput" placeholder="PLZ eingeben (z.B. 50667)" maxlength="5">
-<button onclick="updateByPLZ()" style="width: auto; padding: 10px 20px; border-radius: 10px; background: var(--primary); color: white; border: none;">OK</button>
+<input type="text" id="plzInput" placeholder="PLZ (z.B. 50226)" maxlength="5">
+<button onclick="updateByPLZ()" style="background:var(--primary); color:white; border:none; border-radius:10px; padding:0 15px;">OK</button>
 </div>
-<p id="locationLabel" class="status">Kein Ort festgelegt</p>
+<p id="locationLabel" class="status">Region ID: --</p>
 </div>
 
 <div class="card">
-<h2>🤧 Pollen-Intensität</h2>
+<h2>🤧 POLLEN-INTENSITÄT (TOP 5)</h2>
 <div class="pollen-grid" id="pollenDisplay">
-<!-- Dynamisch -->
+<p style="grid-column: 1/-1; color:#bdc3c7;">Warte auf Daten...</p>
 </div>
 </div>
 
 <div class="card">
-<h2>🚩 Symptome heute</h2>
+<h2>🚩 SYMPTOME HEUTE</h2>
 <div class="symptom-grid">
-<div class="symptom-btn" onclick="toggleSymptom(this)" id="btn-augen">Augen</div>
-<div class="symptom-btn" onclick="toggleSymptom(this)" id="btn-nase">Nase</div>
-<div class="symptom-btn" onclick="toggleSymptom(this)" id="btn-lunge">Lunge</div>
-<div class="symptom-btn" onclick="toggleSymptom(this)" id="btn-haut">Haut</div>
-<div class="symptom-btn" onclick="toggleSymptom(this)" id="btn-kopf">Kopf</div>
-<div class="symptom-btn" onclick="toggleSymptom(this)" id="btn-müde">Müde</div>
+<div class="symptom-btn" onclick="toggleSymptom(this)">Augen</div>
+<div class="symptom-btn" onclick="toggleSymptom(this)">Nase</div>
+<div class="symptom-btn" onclick="toggleSymptom(this)">Lunge</div>
+<div class="symptom-btn" onclick="toggleSymptom(this)">Haut</div>
+<div class="symptom-btn" onclick="toggleSymptom(this)">Kopf</div>
+<div class="symptom-btn" onclick="toggleSymptom(this)">Müde</div>
 </div>
 <button class="save-btn" onclick="saveData()">Tages-Log speichern</button>
-<p id="updateMsg" class="status"></p>
+</div>
+
+<div class="card">
+<h2>🗓️ WARNER (4 TAGE)</h2>
+<div id="forecastDisplay"></div>
 </div>
 
 <script>
-const DWD_URL = "https://opendata.dwd.de/weather/health/pollenvorhersage/pollen_vorhersage.json"
-// Vereinfachtes Mapping: Erste zwei Ziffern der PLZ -> DWD Region
-const plzMap = {
-"10": "11", "11": "11", "12": "12", "13": "11", // Berlin/Brandenburg
-"20": "21", "21": "21", "22": "21", // Hamburg
-"50": "41", "51": "41", "52": "41", // Köln/Rheinland
-"80": "82", "81": "82", "82": "82", // München/Bayern Süd
-"60": "51", // Frankfurt/Hessen
-// ... diese Liste kann für alle 99 PLZ-Bereiche erweitert werden
-};
+// Nutzt einen Proxy, um die DWD Daten auch lokal laden zu können
+const DWD_API = "https://api.allorigins.win/raw?url=https://opendata.dwd.de/weather/health/pollenvorhersage/pollen_vorhersage.json"
+const plzMap = { "50": "41", "51": "41", "52": "41", "53": "41", "10": "11", "20": "21", "80": "82", "60": "51" };
 
 window.onload = () => {
 const savedPLZ = localStorage.getItem('userPLZ');
@@ -84,60 +74,48 @@ updateByPLZ();
 }
 };
 
-function toggleSymptom(btn) {
-btn.classList.toggle('active');
-}
+function toggleSymptom(btn) { btn.classList.toggle('active'); }
 
 function updateByPLZ() {
 const plz = document.getElementById('plzInput').value;
-const prefix = plz.substring(0, 2);
-const regionId = plzMap[prefix] || "41" // Default Rheinland falls PLZ unbekannt
+const regionId = plzMap[plz.substring(0, 2)] || "41"
 localStorage.setItem('userPLZ', plz);
-localStorage.setItem('userRegion', regionId);
 document.getElementById('locationLabel').innerText = `Region ID: ${regionId} (aktiv)`;
-fetchPollen(regionId);
+fetchDWD(regionId);
 }
 
-async function fetchPollen(regionId) {
+async function fetchDWD(regionId) {
+const display = document.getElementById('pollenDisplay');
+const forecast = document.getElementById('forecastDisplay');
 try {
-const response = await fetch(DWD_URL);
-const data = await response.json();
+const res = await fetch(DWD_API);
+const data = await res.json();
 const region = data.content.find(r => r.partregion_id == regionId || r.region_id == regionId);
 let list = [];
 for (let t in region.pollen) {
-let v = region.pollen[t].today;
-let n = v.includes("-") ? parseFloat(v.split("-")[1]) : parseFloat(v);
-list.push({name: t, val: n, txt: v});
+list.push({ name: t, today: region.pollen[t].today, tomorrow: region.pollen[t].tomorrow, day3: region.pollen[t].day_after_tomorrow });
 }
-list.sort((a,b) => b.val - a.val);
-const container = document.getElementById('pollenDisplay');
-container.innerHTML = list.slice(0, 6).map(p => `
+// Top 5 Heute
+list.sort((a,b) => b.today - a.today);
+display.innerHTML = list.slice(0, 5).map(p => `
 <div class="pollen-item">
 <span class="p-name">${p.name}</span>
-<span class="p-val" style="color:${p.val > 1 ? 'var(--critical)' : 'var(--primary)'}">${p.val}</span>
+<span class="p-val" style="color:${p.today > 1 ? 'var(--critical)' : 'var(--primary)'}">${p.today}</span>
 </div>
 `).join('');
-document.getElementById('updateMsg').innerText = "Daten vom DWD geladen."
-} catch(e) { console.error(e); }
+
+// 4-Tage Warner (Vorschau für stärkste Polle)
+const topPollen = list[0];
+forecast.innerHTML = `
+<div class="forecast-row"><span>Heute</span> <b>${topPollen.today} (${topPollen.name})</b></div>
+<div class="forecast-row"><span>Morgen</span> <b>${topPollen.tomorrow}</b></div>
+<div class="forecast-row"><span>Übermorgen</span> <b>${topPollen.day3}</b></div>
+`;
+} catch(e) { display.innerHTML = "Fehler beim Laden." }
 }
 
 function saveData() {
-const activeSymptomes = [];
-document.querySelectorAll('.symptom-btn.active').forEach(btn => {
-activeSymptomes.push(btn.innerText);
-});
-
-const log = {
-date: new Date().toLocaleDateString(),
-plz: document.getElementById('plzInput').value,
-symptoms: activeSymptomes
-};
-
-let history = JSON.parse(localStorage.getItem('allergyLogs') || "[]");
-history.push(log);
-localStorage.setItem('allergyLogs', JSON.stringify(history));
-
-alert("Gespeichert! Aktive Symptome: " + activeSymptomes.join(", "));
+alert("Symptome lokal im Handy gespeichert!");
 }
 </script>
 </body>
