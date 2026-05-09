@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>AllergieCockpit 1.4.1</title>
+<title>AllergieCockpit 1.4.2</title>
 <style>
 :root { --primary: #27ae60; --bg: #f0f2f5; --card: #ffffff; --warn: #e67e22; --critical: #e74c3c; --dark: #2c3e50; }
 body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 10px; color: var(--dark); }
@@ -16,7 +16,7 @@ h2 { margin: 0 0 10px 0; font-size: 0.7rem; color: #95a5a6; text-transform: uppe
 .s-btn { padding: 16px; border-radius: 15px; border: 1px solid #edf2f7; background: white; font-weight: 600; text-align: center; -webkit-tap-highlight-color: transparent; }
 .s-btn.active { background: var(--primary); color: white; }
 .btn-save { background: var(--dark); color: white; border: none; padding: 18px; width: 100%; border-radius: 15px; font-weight: bold; margin-top: 15px; font-size: 1.1rem; }
-.err-box { grid-column: span 3; text-align: center; color: var(--critical); font-size: 0.8rem; padding: 10px; border: 1px dashed var(--critical); border-radius: 10px; cursor: pointer; }
+.status-box { grid-column: span 3; text-align: center; font-size: 0.8rem; padding: 15px; border-radius: 12px; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -31,7 +31,7 @@ h2 { margin: 0 0 10px 0; font-size: 0.7rem; color: #95a5a6; text-transform: uppe
 <div class="card">
 <h2>🤧 POLLEN-STATUS</h2>
 <div class="p-grid" id="out">
-<div style="grid-column: span 3; text-align: center; color: #95a5a6; padding: 20px;">Suche Datenquelle...</div>
+<div class="status-box" style="color: #95a5a6;">Initialisiere Datensuche...</div>
 </div>
 </div>
 
@@ -50,29 +50,32 @@ h2 { margin: 0 0 10px 0; font-size: 0.7rem; color: #95a5a6; text-transform: uppe
 
 <script>
 const PROXIES = ["https://corsproxy.io/?", "https://api.allorigins.win/raw?url="];
-// Aktualisierter Pfad (DWD nutzt manchmal Unterordner je nach Saison)
-const DWD_PATH = "https://opendata.dwd.de/weather/health/pollenvorhersage/pollen_vorhersage.json"
+// Wir probieren zwei mögliche Pfade des DWD aus
+const PATHS = [
+"https://opendata.dwd.de/weather/health/pollenvorhersage/pollen_vorhersage.json",
+"https://opendata.dwd.de/weather/health/pollenvorhersage/pollen_vorhersage_aktuell.json"
+];
 const MAP = { "50": "41", "51": "41", "52": "41", "10": "11", "60": "51", "80": "82" };
 
 window.onload = () => {
 const plz = localStorage.getItem('userPLZ') || "50226"
 document.getElementById('curLoc').innerText = plz;
-load(plz);
+smartLoad(plz);
 };
 
 function change() {
-const p = prompt("PLZ:", "50226");
+const p = prompt("Neue PLZ:", "50226");
 if(p) { localStorage.setItem('userPLZ', p); location.reload(); }
 }
 
-async function load(plz) {
+async function smartLoad(plz) {
 const rid = MAP[plz.substring(0,2)] || "41"
 const display = document.getElementById('out');
 
+for (let path of PATHS) {
 for (let proxy of PROXIES) {
 try {
-const res = await fetch(proxy + encodeURIComponent(DWD_PATH));
-if (res.status === 404) continue; // Versuche nächsten Proxy falls 404
+const res = await fetch(proxy + encodeURIComponent(path + "?nocache=" + Date.now()));
 if (res.ok) {
 const d = await res.json();
 render(d, rid);
@@ -80,8 +83,9 @@ return;
 }
 } catch (e) {}
 }
-display.innerHTML = `<div class="err-box" onclick="location.reload()">
-<b>DWD DATEN-FEHLER (404)</b><br>Quelle momentan nicht erreichbar.<br>Tippe zum Neuladen.
+}
+display.innerHTML = `<div class="status-box" style="border:1px dashed var(--critical); color:var(--critical);" onclick="location.reload()">
+<b>WARTUNGSMODUS DWD</b><br>Server liefert keine Daten (404).<br>Tippe hier für neuen Versuch.
 </div>`;
 }
 
