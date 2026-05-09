@@ -6,17 +6,23 @@
 <title>AllergieCockpit 1.4.1</title>
 <style>
 :root { --primary: #27ae60; --bg: #f0f2f5; --card: #ffffff; --warn: #e67e22; --critical: #e74c3c; --dark: #2c3e50; }
-body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 10px; color: var(--dark); }
+body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); margin: 0; padding: 10px; color: var(--dark); -webkit-tap-highlight-color: transparent; }
 .card { background: var(--card); padding: 15px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 12px; }
 h2 { margin: 0 0 10px 0; font-size: 0.7rem; color: #95a5a6; text-transform: uppercase; letter-spacing: 1.2px; }
 .loc-badge { font-size: 0.85rem; font-weight: 800; color: var(--primary); background: #eafaf1; padding: 5px 12px; border-radius: 12px; }
-.p-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; min-height: 80px; }
+.p-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; min-height: 80px; align-items: center; }
 .p-item { text-align: center; padding: 12px; border-radius: 15px; background: #f8fafb; border: 1px solid #f0f0f0; }
 .s-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .s-btn { padding: 16px; border-radius: 15px; border: 1px solid #edf2f7; background: white; font-weight: 600; text-align: center; }
 .s-btn.active { background: var(--primary); color: white; }
 .btn-save { background: var(--dark); color: white; border: none; padding: 18px; width: 100%; border-radius: 15px; font-weight: bold; margin-top: 15px; font-size: 1.1rem; }
-.error-box { grid-column: span 3; border: 2px solid var(--critical); padding: 15px; border-radius: 15px; text-align: center; color: var(--critical); font-weight: bold; background: #fff5f5; cursor: pointer; }
+/* Der neue Aktivierungs-Button */
+.fetch-trigger {
+grid-column: span 3; background: var(--primary); color: white;
+padding: 20px; border-radius: 15px; text-align: center; font-weight: bold;
+cursor: pointer; border: none; font-size: 1rem; width: 100%;
+box-shadow: 0 4px 10px rgba(39, 174, 96, 0.2);
+}
 </style>
 </head>
 <body>
@@ -31,7 +37,11 @@ h2 { margin: 0 0 10px 0; font-size: 0.7rem; color: #95a5a6; text-transform: uppe
 <div class="card">
 <h2>🤧 POLLEN-STATUS</h2>
 <div class="p-grid" id="pollenOut">
-<div style="grid-column: span 3; text-align: center; padding: 20px; color: #95a5a6;">Verbindung wird geprüft...</div>
+<!-- Manueller Start-Button um Browser-Sperre zu umgehen -->
+<button class="fetch-trigger" id="startBtn" onclick="manualStart()">
+Pollen-Daten jetzt laden<br>
+<span style="font-size:0.7rem; font-weight:normal; opacity:0.8;">(Tippen zum Aktivieren)</span>
+</button>
 </div>
 </div>
 
@@ -49,71 +59,68 @@ h2 { margin: 0 0 10px 0; font-size: 0.7rem; color: #95a5a6; text-transform: uppe
 </div>
 
 <script>
-const DWD_URL = "https://opendata.dwd.de/weather/health/pollenvorhersage/pollen_vorhersage.json"
 const PROXIES = [
 "https://api.allorigins.win/raw?url=",
-"https://corsproxy.io/?",
-"https://thingproxy.freeboard.io/fetch/"
+"https://corsproxy.io/?"
 ];
+const TARGET = "https://opendata.dwd.de/weather/health/pollenvorhersage/pollen_vorhersage.json"
 const MAP = { "50": "41", "51": "41", "52": "41", "10": "11", "60": "51", "80": "82" };
 
 window.onload = () => {
 const plz = localStorage.getItem('userPLZ') || "50226"
 document.getElementById('curLoc').innerText = plz;
-fetchData(plz);
 };
 
-function changePLZ() {
-const p = prompt("PLZ ändern:", "50226");
-if(p) { localStorage.setItem('userPLZ', p); location.reload(); }
+function manualStart() {
+const btn = document.getElementById('startBtn');
+btn.innerText = "Verbindung wird aufgebaut..."
+btn.disabled = true;
+fetchData(localStorage.getItem('userPLZ') || "50226");
 }
 
 async function fetchData(plz) {
 const rid = MAP[plz.substring(0,2)] || "41"
 const out = document.getElementById('pollenOut');
 
-for (const proxy of PROXIES) {
+for (let p of PROXIES) {
 try {
-const fullUrl = proxy + encodeURIComponent(DWD_URL + "?nocache=" + Date.now());
-const response = await fetch(fullUrl);
-if (response.ok) {
-const json = await response.json();
-renderData(json, rid);
+const res = await fetch(p + encodeURIComponent(TARGET + "?nocache=" + Date.now()));
+if (res.ok) {
+const d = await res.json();
+render(d, rid);
 return;
 }
-} catch (err) {
-console.warn("Versuch mit Proxy fehlgeschlagen");
+} catch (e) { console.error("Proxy fail"); }
 }
-}
-
-out.innerHTML = `
-<div class="error-box" onclick="location.reload()">
-DWD-DATEN BLOCKIERT<br>
-<span style="font-size:0.7rem; font-weight:normal;">Tippe zum Neuladen (Sicherheits-Bypass)</span>
-</div>
-`;
+out.innerHTML = `<div style="grid-column: span 3; text-align:center; color:var(--critical); font-weight:bold;" onclick="location.reload()">
+ERNEUT BLOCKIERT<br><span style="font-size:0.7rem; font-weight:normal;">Bitte Seite in Safari neu laden</span>
+</div>`;
 }
 
-function renderData(data, rid) {
-const region = data.content.find(r => r.partregion_id == rid || r.region_id == rid);
-let pItems = [];
-for(let key in region.pollen) {
-let v = region.pollen[key].today;
+function render(d, rid) {
+const reg = d.content.find(r => r.partregion_id == rid || r.region_id == rid);
+let items = [];
+for(let key in reg.pollen) {
+let v = reg.pollen[key].today;
 let n = v.includes('-') ? parseFloat(v.split('-')[0]) + 0.5 : parseFloat(v);
-if(!isNaN(n)) pItems.push({name: key, val: n, text: v});
+if(!isNaN(n)) items.push({n: key, v: n, t: v});
 }
-pItems.sort((a,b) => b.val - a.val);
-
-document.getElementById('pollenOut').innerHTML = pItems.slice(0, 3).map(i => `
+items.sort((a,b) => b.v - a.v);
+document.getElementById('pollenOut').innerHTML = items.slice(0, 3).map(i => `
 <div class="p-item">
-<span style="display:block; font-size:0.65rem; font-weight:700; color:#7f8c8d;">${i.name}</span>
-<span style="font-size:1.1rem; font-weight:800; color:${i.val >= 2 ? '#e74c3c' : (i.val >= 1 ? '#e67e22' : '#27ae60')}">${i.text}</span>
+<span style="display:block; font-size:0.65rem; font-weight:700; color:#7f8c8d;">${i.n}</span>
+<span style="font-size:1.1rem; font-weight:800; color:${i.v >= 2 ? '#e74c3c' : (i.v >= 1 ? '#e67e22' : '#27ae60')}">${i.t}</span>
 </div>
 `).join('');
 }
 
+function changePLZ() {
+const p = prompt("PLZ ändern:", "50226");
+if(p) { localStorage.setItem('userPLZ', p); location.reload(); }
+}
+
 function save() {
-alert("Erfolgreich gespeichert!");
+alert("Lokal gespeichert!");
 document.querySelectorAll('.s-btn').forEach(b => b.classList.remove('active'));
 }
 </script>
