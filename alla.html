@@ -3,25 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>AllergieCockpit 1.4.1</title>
+<title>AllergieCockpit 1.4.2</title>
 <style>
 :root { --primary: #27ae60; --bg: #f0f2f5; --card: #ffffff; --warn: #e67e22; --critical: #e74c3c; --dark: #2c3e50; }
-body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); margin: 0; padding: 10px; color: var(--dark); -webkit-font-smoothing: antialiased; }
+body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 10px; color: var(--dark); }
 .card { background: var(--card); padding: 18px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 12px; }
 h2 { margin: 0 0 12px 0; font-size: 0.7rem; color: #95a5a6; text-transform: uppercase; letter-spacing: 1.2px; }
 .loc-badge { font-size: 0.85rem; font-weight: 800; color: var(--primary); background: #eafaf1; padding: 5px 12px; border-radius: 12px; }
-.p-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; min-height: 90px; align-items: center; }
+.p-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; min-height: 90px; }
 .p-item { text-align: center; padding: 12px; border-radius: 15px; background: #f8fafb; border: 1px solid #f0f0f0; }
 .s-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.s-btn { padding: 16px; border-radius: 15px; border: 1px solid #edf2f7; background: white; font-weight: 600; text-align: center; -webkit-tap-highlight-color: transparent; }
-.s-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-.btn-main { background: var(--dark); color: white; border: none; padding: 18px; width: 100%; border-radius: 15px; font-weight: bold; font-size: 1.1rem; cursor: pointer; }
-/* Der neue Live-Knopf */
-.live-bridge {
-grid-column: span 3; background: #eafaf1; border: 2px dashed var(--primary);
-color: var(--primary); padding: 15px; border-radius: 15px; text-align: center;
-font-weight: bold; cursor: pointer; text-decoration: none;
-}
+.s-btn { padding: 16px; border-radius: 15px; border: 1px solid #edf2f7; background: white; font-weight: 600; text-align: center; }
+.s-btn.active { background: var(--primary); color: white; }
+.btn-main { background: var(--dark); color: white; border: none; padding: 18px; width: 100%; border-radius: 15px; font-weight: bold; font-size: 1.1rem; }
+.bridge-btn { grid-column: span 3; background: #f8fafb; border: 2px solid #ddd; padding: 20px; border-radius: 15px; text-align: center; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -29,16 +24,16 @@ font-weight: bold; cursor: pointer; text-decoration: none;
 <div class="card">
 <div style="display: flex; justify-content: space-between; align-items: center;">
 <h2>📍 STANDORT</h2>
-<div id="curLoc" class="loc-badge" onclick="setNewPLZ()">50226</div>
+<div id="curLoc" class="loc-badge" onclick="location.reload()">50226</div>
 </div>
 </div>
 
 <div class="card">
 <h2>🤧 POLLEN-STATUS</h2>
 <div class="p-grid" id="pollenOut">
-<div class="live-bridge" onclick="forceFetch()">
-📡 LIVE-DATEN LADEN<br>
-<span style="font-size:0.6rem; font-weight:normal;">(Tippen zum Verbinden)</span>
+<div class="bridge-btn" onclick="loadLive()">
+<b>DATEN JETZT ABRUFEN</b><br>
+<span id="statusSub" style="font-size:0.7rem; color:#7f8c8d;">Tippen zur Live-Verbindung</span>
 </div>
 </div>
 </div>
@@ -53,72 +48,49 @@ font-weight: bold; cursor: pointer; text-decoration: none;
 <div class="s-btn" onclick="this.classList.toggle('active')">Kopf</div>
 <div class="s-btn" onclick="this.classList.toggle('active')">Müde</div>
 </div>
-<button class="btn-main" style="margin-top:15px;" onclick="saveLog()">Log speichern</button>
+<button class="btn-main" style="margin-top:15px;" onclick="alert('Gespeichert!')">Log speichern</button>
 </div>
 
 <script>
-const PROXIES = [
-"https://api.allorigins.win/raw?url=",
-"https://corsproxy.io/?",
-"https://thingproxy.freeboard.io/fetch/"
-];
-const DWD = "https://opendata.dwd.de/weather/health/pollenvorhersage/pollen_vorhersage.json"
-const REGIONS = { "50": "41", "51": "41", "52": "41", "10": "11", "60": "51", "80": "82" };
-
-window.onload = () => {
-const plz = localStorage.getItem('userPLZ') || "50226"
-document.getElementById('curLoc').innerText = plz;
-};
-
-function setNewPLZ() {
-const p = prompt("PLZ ändern:", localStorage.getItem('userPLZ') || "50226");
-if(p) { localStorage.setItem('userPLZ', p); location.reload(); }
-}
-
-async function forceFetch() {
-const plz = localStorage.getItem('userPLZ') || "50226"
-const rid = REGIONS[plz.substring(0,2)] || "41"
-const out = document.getElementById('pollenOut');
-out.innerHTML = '<div style="grid-column:span 3; text-align:center; color:#95a5a6;">Verbindung wird aufgebaut...</div>';
-
-for (let p of PROXIES) {
+async function loadLive() {
+const sub = document.getElementById('statusSub');
+sub.innerText = "Verbinde mit DWD..."
+// Neuer, oft stabilerer Proxy
+const proxy = "https://api.allorigins.win/get?url="
+const target = "https://opendata.dwd.de/weather/health/pollenvorhersage/pollen_vorhersage.json"
 try {
-const response = await fetch(p + encodeURIComponent(DWD + "?nocache=" + Date.now()));
-if (response.ok) {
-const data = await response.json();
-renderPollen(data, rid);
-return;
+const res = await fetch(proxy + encodeURIComponent(target));
+const json = await res.json();
+// Allorigins kapselt die Daten in "contents"
+const data = JSON.parse(json.contents);
+render(data);
+} catch (e) {
+sub.innerHTML = "<b style='color:red'>Blockiert.</b><br>Prüfe Internet oder versuche es später."
+console.error(e);
 }
-} catch (e) { console.error("Proxy fail"); }
-}
-out.innerHTML = '<div class="live-bridge" style="border-color:red; color:red;" onclick="location.reload()">VERBINDUNG FEHLGESCHLAGEN<br><span style="font-size:0.6rem;">(Tippe zum Neustarten)</span></div>';
 }
 
-function renderPollen(data, rid) {
-const region = data.content.find(r => r.partregion_id == rid || r.region_id == rid);
+function render(data) {
+// Wir suchen die Region für PLZ 50... (ID 41)
+const region = data.content.find(r => r.partregion_id === 41 || r.region_id === 41);
+if(!region) { alert("Region nicht gefunden"); return; }
+
 let items = [];
-for(let pollen in region.pollen) {
-let status = region.pollen[pollen].today;
-let val = status.includes('-') ? parseFloat(status.split('-')[0]) + 0.5 : parseFloat(status);
-if(!isNaN(val)) items.push({n: pollen, v: val, t: status});
+for(let p in region.pollen) {
+let val = region.pollen[p].today;
+if(val !== "0") items.push({name: p, val: val});
 }
-items.sort((a,b) => b.v - a.v);
 document.getElementById('pollenOut').innerHTML = items.slice(0, 3).map(i => `
 <div class="p-item">
-<span style="display:block; font-size:0.65rem; font-weight:700; color:#7f8c8d; text-transform:uppercase;">${i.n}</span>
-<span style="font-size:1.1rem; font-weight:800; color:${i.v >= 2 ? '#e74c3c' : (i.v >= 1 ? '#e67e22' : '#27ae60')}">${translate(i.t)}</span>
+<span style="display:block; font-size:0.6rem; color:#95a5a6;">${i.name}</span>
+<span style="font-size:1.1rem; font-weight:800;">${translate(i.val)}</span>
 </div>
-`).join('');
+`).join('') || '<div style="grid-column:span 3; text-align:center;">Keine Belastung</div>';
 }
 
-function translate(val) {
-const m = {"0": "Keine", "0-1": "Leicht", "1": "Leicht", "1-2": "Mittel", "2": "Mittel", "2-3": "Hoch", "3": "Hoch"};
-return m[val] || val;
-}
-
-function saveLog() {
-alert("Erfolgreich protokolliert!");
-document.querySelectorAll('.s-btn').forEach(b => b.classList.remove('active'));
+function translate(v) {
+const m = {"0-1": "Leicht", "1": "Leicht", "1-2": "Mittel", "2": "Mittel", "2-3": "Hoch", "3": "Hoch"};
+return m[v] || v;
 }
 </script>
 </body>
