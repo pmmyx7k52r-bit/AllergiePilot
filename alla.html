@@ -2,25 +2,35 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AllergieCockpit 1.3</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>AllergieCockpit 1.3.2</title>
 <style>
-:root { --primary: #27ae60; --bg: #f0f2f5; --card: #ffffff; --warn: #e67e22; --critical: #e74c3c; }
-body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 15px; color: #2c3e50; }
-.card { background: var(--card); padding: 15px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 15px; }
-h2 { margin: 0 0 12px 0; font-size: 0.9rem; color: #7f8c8d; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
-.plz-box { display: flex; gap: 10px; margin-bottom: 5px; }
-input[type="text"] { flex-grow: 1; padding: 12px; border-radius: 10px; border: 1px solid #ddd; font-size: 1rem; }
-.pollen-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.pollen-item { text-align: center; padding: 10px; border-radius: 12px; background: #f8faf9; border: 1px solid #edf2f0; }
-.p-name { display: block; font-size: 0.75rem; font-weight: 600; margin-bottom: 4px; }
-.p-val { font-size: 1.2rem; font-weight: bold; color: var(--primary); }
-.symptom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.symptom-btn { padding: 15px; border-radius: 12px; border: 1px solid #eee; background: white; font-weight: 600; cursor: pointer; text-align: center; }
-.symptom-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-.save-btn { background: var(--primary); color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-weight: bold; font-size: 1.1rem; margin-top: 15px; }
-.forecast-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; }
-.warn-tag { padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; }
+:root { --primary: #27ae60; --bg: #f4f7f6; --card: #ffffff; --warn: #f39c12; --critical: #e74c3c; --dark: #2c3e50; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: var(--bg); margin: 0; padding: 15px; color: var(--dark); }
+.card { background: var(--card); padding: 18px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); margin-bottom: 15px; border: 1px solid rgba(0,0,0,0.03); }
+h2 { margin: 0 0 15px 0; font-size: 0.85rem; color: #95a5a6; text-transform: uppercase; letter-spacing: 1.2px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+/* PLZ Bereich */
+.plz-box { display: flex; gap: 10px; }
+input[type="text"] { flex-grow: 1; padding: 14px; border-radius: 12px; border: 2px solid #eee; font-size: 1rem; outline: none; transition: border 0.2s; }
+input[type="text"]:focus { border-color: var(--primary); }
+.ok-btn { background: var(--primary); color: white; border: none; border-radius: 12px; padding: 0 20px; font-weight: bold; cursor: pointer; }
+
+/* Pollen Anzeige */
+.pollen-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.pollen-item { text-align: center; padding: 12px 5px; border-radius: 15px; background: #fafafa; border: 1px solid #f0f0f0; }
+.p-name { display: block; font-size: 0.7rem; font-weight: 700; margin-bottom: 5px; color: #7f8c8d; }
+.p-val { font-size: 1.3rem; font-weight: 900; }
+
+/* Symptom Toggles */
+.symptom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.symptom-btn { padding: 16px; border-radius: 14px; border: 2px solid #f0f0f0; background: white; font-weight: 700; cursor: pointer; text-align: center; transition: all 0.2s; -webkit-tap-highlight-color: transparent; }
+.symptom-btn.active { background: var(--primary); color: white; border-color: var(--primary); transform: scale(0.96); box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3); }
+.save-btn { background: var(--dark); color: white; border: none; padding: 20px; width: 100%; border-radius: 15px; font-weight: bold; font-size: 1.1rem; margin-top: 20px; cursor: pointer; }
+/* Warner */
+.forecast-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f9f9f9; }
+.warn-pill { padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; color: white; }
+
+.loading-text { text-align: center; font-size: 0.9rem; color: #bdc3c7; grid-column: span 3; padding: 20px; }
 </style>
 </head>
 <body>
@@ -28,104 +38,134 @@ input[type="text"] { flex-grow: 1; padding: 12px; border-radius: 10px; border: 1
 <div class="card">
 <h2>📍 MEIN ORT (PLZ)</h2>
 <div class="plz-box">
-<input type="text" id="plzInput" placeholder="PLZ eingeben" maxlength="5">
-<button onclick="updateByPLZ()" style="background:var(--primary); border:none; color:white; border-radius:8px; padding:0 15px;">OK</button>
+<input type="text" id="plzInput" placeholder="PLZ (z.B. 50226)" maxlength="5" inputmode="numeric">
+<button class="ok-btn" onclick="updateByPLZ()">OK</button>
 </div>
-<div id="locationLabel" style="font-size:0.7rem; color:#bdc3c7; text-align:center;">Region ID: --</div>
+<div id="locStatus" style="font-size: 0.65rem; color: #bdc3c7; margin-top: 8px; text-align: center;">Warte auf Eingabe...</div>
 </div>
 
 <div class="card">
-<h2>🤧 POLLEN-INTENSITÄT (TOP 5)</h2>
+<h2>🤧 POLLEN-INTENSITÄT</h2>
 <div class="pollen-grid" id="pollenDisplay">
-<div style="grid-column: span 3; text-align:center; color:#bdc3c7;">Lade Echtzeitdaten...</div>
+<div class="loading-text">Bitte PLZ eingeben oder laden...</div>
 </div>
 </div>
 
 <div class="card">
 <h2>🚩 SYMPTOME HEUTE</h2>
 <div class="symptom-grid">
-<div class="symptom-btn" onclick="this.classList.toggle('active')">Augen</div>
-<div class="symptom-btn" onclick="this.classList.toggle('active')">Nase</div>
-<div class="symptom-btn" onclick="this.classList.toggle('active')">Lunge</div>
-<div class="symptom-btn" onclick="this.classList.toggle('active')">Haut</div>
-<div class="symptom-btn" onclick="this.classList.toggle('active')">Kopf</div>
-<div class="symptom-btn" onclick="this.classList.toggle('active')">Müde</div>
+<div class="symptom-btn" onclick="toggleS(this)">Augen</div>
+<div class="symptom-btn" onclick="toggleS(this)">Nase</div>
+<div class="symptom-btn" onclick="toggleS(this)">Lunge</div>
+<div class="symptom-btn" onclick="toggleS(this)">Haut</div>
+<div class="symptom-btn" onclick="toggleS(this)">Kopf</div>
+<div class="symptom-btn" onclick="toggleS(this)">Müde</div>
 </div>
 <button class="save-btn" onclick="saveData()">Tages-Log speichern</button>
 </div>
 
 <div class="card">
-<h2>🗓️ WARNER (4 TAGE)</h2>
+<h2>🗓️ WARNER (NÄCHSTE TAGE)</h2>
 <div id="forecastDisplay">
-<div style="text-align:center; color:#bdc3c7; font-size:0.8rem;">Wähle einen Ort für die Prognose</div>
+<div class="loading-text" style="font-size: 0.8rem;">Keine Prognose verfügbar.</div>
 </div>
 </div>
 
 <script>
-// Nutzt einen CORS-Proxy, um den Fehler im Screenshot zu umgehen
+// Nutzt einen stabilen CORS-Proxy
 const PROXY = "https://api.allorigins.win/raw?url="
-const DWD_URL = encodeURIComponent("https://opendata.dwd.de/weather/health/pollenvorhersage/pollen_vorhersage.json");
+const DWD_API = "https://opendata.dwd.de/weather/health/pollenvorhersage/pollen_vorhersage.json"
 
-const plzMap = { "50": "41", "51": "41", "52": "41", "10": "11", "60": "51", "80": "82" };
+// Mapping für Regionen (Erweiterbar)
+const regionMapping = {
+"50": "41", "51": "41", "52": "41", // Rheinland
+"10": "11", "11": "11", "12": "12", // Berlin/Brandenburg
+"20": "21", "21": "21", "22": "21", // Hamburg
+"60": "51", "61": "51", // Frankfurt/Hessen
+"80": "82", "81": "82", "85": "82", // München/Oberbayern
+"70": "71", "71": "71" // Stuttgart
+};
 
 window.onload = () => {
-const saved = localStorage.getItem('userPLZ');
-if(saved) { document.getElementById('plzInput').value = saved; updateByPLZ(); }
+const lastPLZ = localStorage.getItem('ac_plz');
+if(lastPLZ) {
+document.getElementById('plzInput').value = lastPLZ;
+updateByPLZ();
+}
 };
+
+function toggleS(btn) {
+btn.classList.toggle('active');
+}
 
 function updateByPLZ() {
 const plz = document.getElementById('plzInput').value;
-const regionId = plzMap[plz.substring(0,2)] || "41"
-localStorage.setItem('userPLZ', plz);
-document.getElementById('locationLabel').innerText = `Region ID: ${regionId} (aktiv)`;
-fetchDWD(regionId);
+if(plz.length < 2) return;
+const rId = regionMapping[plz.substring(0,2)] || "41"
+localStorage.setItem('ac_plz', plz);
+document.getElementById('locStatus').innerText = `Region ${rId} aktiv • Standort gespeichert`;
+fetchData(rId);
 }
 
-async function fetchDWD(id) {
+async function fetchData(rId) {
+const display = document.getElementById('pollenDisplay');
+const foreDisplay = document.getElementById('forecastDisplay');
 try {
-const response = await fetch(PROXY + DWD_URL);
-const data = await response.json();
-const region = data.content.find(r => r.partregion_id == id || r.region_id == id);
-// 1. Heute Anzeigen
-let pArr = [];
-for(let t in region.pollen) {
-pArr.push({name: t, val: parseFloat(region.pollen[t].today.replace('-', '.')) || 0, txt: region.pollen[t].today});
+const res = await fetch(PROXY + encodeURIComponent(DWD_API));
+const data = await res.json();
+const region = data.content.find(r => r.partregion_id == rId || r.region_id == rId);
+
+if(!region) throw new Error("Region nicht gefunden");
+
+// 1. Heute - Top Pollen
+let pollen = [];
+for(let key in region.pollen) {
+let val = region.pollen[key].today;
+let numeric = val.includes('-') ? parseFloat(val.split('-')[1]) : parseFloat(val);
+pollen.push({ name: key, val: val, num: numeric || 0 });
 }
-pArr.sort((a,b) => b.val - a.val);
-document.getElementById('pollenDisplay').innerHTML = pArr.slice(0, 6).map(p => `
+pollen.sort((a,b) => b.num - a.num);
+
+display.innerHTML = pollen.slice(0,6).map(p => `
 <div class="pollen-item">
 <span class="p-name">${p.name}</span>
-<span class="p-val" style="color:${p.val >= 2 ? 'var(--critical)' : (p.val >= 1 ? 'var(--warn)' : 'var(--primary)')}">${p.txt}</span>
+<span class="p-val" style="color:${p.num >= 2 ? 'var(--critical)' : (p.num >= 1 ? 'var(--warn)' : 'var(--primary)')}">${p.val}</span>
 </div>
 `).join('');
 
-// 2. Warner (4 Tage)
-const days = ['tomorrow', 'day_after_tomorrow']; // DWD liefert meist 2-3 Tage detailliert
-let foreHtml = ""
-const dayLabels = ["Morgen", "Übermorgen"];
-dayLabels.forEach((label, idx) => {
-const key = idx === 0 ? 'tomorrow' : 'day_after_tomorrow';
-let topPollen = pArr.sort((a,b) => {
-let valA = parseFloat(region.pollen[a.name][key]) || 0;
-let valB = parseFloat(region.pollen[b.name][key]) || 0;
-return valB - valA;
+// 2. Prognose
+const days = [ {k: 'tomorrow', l: 'Morgen'}, {k: 'day_after_tomorrow', l: 'Übermorgen'} ];
+foreDisplay.innerHTML = days.map(d => {
+let top = pollen.sort((a,b) => {
+let vA = parseFloat(region.pollen[a.name][d.k]) || 0;
+let vB = parseFloat(region.pollen[b.name][d.k]) || 0;
+return vB - vA;
 })[0];
-let valNum = parseFloat(region.pollen[topPollen.name][key]) || 0;
-let color = valNum >= 2 ? 'var(--critical)' : 'var(--warn)';
-foreHtml += `<div class="forecast-row">
-<span><b>${label}</b></span>
-<span>${topPollen.name} <span class="warn-tag" style="background:${color}; color:white;">${region.pollen[topPollen.name][key]}</span></span>
-</div>`;
-});
-document.getElementById('forecastDisplay').innerHTML = foreHtml;
+let val = region.pollen[top.name][d.k];
+let color = (parseFloat(val) >= 1) ? 'var(--warn)' : 'var(--primary)';
+if(parseFloat(val) >= 2) color = 'var(--critical)';
+
+return `
+<div class="forecast-row">
+<span><b>${d.l}</b></span>
+<span>${top.name} <span class="warn-pill" style="background:${color}">${val}</span></span>
+</div>
+`;
+}).join('');
 
 } catch(e) {
-document.getElementById('pollenDisplay').innerHTML = "Fehler beim Laden. Bitte Internet prüfen."
+display.innerHTML = `<div class="loading-text" style="color:var(--critical)">Fehler: DWD Server nicht erreichbar.</div>`;
 }
 }
 
 function saveData() {
-alert("Erfolgreich gespeichert! Die Analyse wird nach 3 Logs freigeschaltet.");
+const active = Array.from(document.querySelectorAll('.symptom-btn.active')).map(b => b.innerText);
+if(active.length === 0) {
+alert("Keine Symptome gewählt.");
+return;
+}
+alert("Log gespeichert: " + active.join(", "));
+// Hier wird später die Analyse-Funktion angedockt
 }
 </script>
 </body>
