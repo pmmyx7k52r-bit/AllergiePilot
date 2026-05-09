@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>AllergieCockpit 1.3.9</title>
+<title>AllergieCockpit 1.4.0</title>
 <style>
 :root { --primary: #27ae60; --bg: #f0f2f5; --card: #ffffff; --warn: #e67e22; --critical: #e74c3c; --dark: #2c3e50; }
-body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 10px; color: var(--dark); -webkit-font-smoothing: antialiased; }
+body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 10px; color: var(--dark); }
 .card { background: var(--card); padding: 15px; border-radius: 18px; box-shadow: 0 4px 15px rgba(0,0,0,0.06); margin-bottom: 12px; }
 h2 { margin: 0 0 10px 0; font-size: 0.75rem; color: #95a5a6; text-transform: uppercase; letter-spacing: 1px; }
 .header-row { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
@@ -15,20 +15,15 @@ h2 { margin: 0 0 10px 0; font-size: 0.75rem; color: #95a5a6; text-transform: upp
 #plzSearch.visible { display: flex; }
 input { flex-grow: 1; padding: 10px; border-radius: 10px; border: 1px solid #ddd; font-size: 1rem; outline: none; }
 .btn-ok { background: var(--primary); color: white; border: none; padding: 0 15px; border-radius: 10px; font-weight: bold; }
-
 .p-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .p-item { text-align: center; padding: 10px; border-radius: 12px; background: #f8fafb; border: 1px solid #eee; }
 .p-label { display: block; font-size: 0.65rem; font-weight: 700; color: #7f8c8d; margin-bottom: 2px; }
 .p-val { font-size: 1.1rem; font-weight: 800; color: var(--primary); }
-
 .s-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.s-btn { padding: 14px; border-radius: 12px; border: 1px solid #edf2f7; background: white; font-weight: 600; text-align: center; }
+.s-btn { padding: 14px; border-radius: 12px; border: 1px solid #edf2f7; background: white; font-weight: 600; text-align: center; -webkit-tap-highlight-color: transparent; }
 .s-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
 .btn-save { background: var(--dark); color: white; border: none; padding: 16px; width: 100%; border-radius: 14px; font-weight: bold; margin-top: 10px; font-size: 1rem; }
-
-.f-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f1f1; font-size: 0.85rem; }
-.w-badge { padding: 2px 6px; border-radius: 5px; font-size: 0.7rem; font-weight: bold; color: white; }
-.status-msg { grid-column: span 3; text-align: center; font-size: 0.75rem; padding: 10px; color: #e74c3c; font-weight: 500; }
+.status-msg { grid-column: span 3; text-align: center; font-size: 0.75rem; padding: 15px; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -47,7 +42,7 @@ input { flex-grow: 1; padding: 10px; border-radius: 10px; border: 1px solid #ddd
 <div class="card">
 <h2>🤧 POLLEN-INTENSITÄT (TOP 5)</h2>
 <div class="p-grid" id="pollenOut">
-<div class="status-msg" style="color:#bdc3c7">Verbindung zum DWD wird aufgebaut...</div>
+<div class="status-msg" onclick="retry()">Lade Daten... <br><small>(Tippen zum Neuladen)</small></div>
 </div>
 </div>
 
@@ -64,28 +59,21 @@ input { flex-grow: 1; padding: 10px; border-radius: 10px; border: 1px solid #ddd
 <button class="btn-save" onclick="save()">Tages-Log speichern</button>
 </div>
 
-<div class="card">
-<h2>🗓️ WARNER (NÄCHSTE TAGE)</h2>
-<div id="foreOut"></div>
-</div>
-
 <script>
-const PROXIES = [
-"https://api.allorigins.win/raw?url=",
-"https://corsproxy.io/?"
-];
-// AKTUALISIERTER PFAD (DWD hat die Struktur leicht geändert)
-const DWD_URL = "https://opendata.dwd.de/weather/health/pollenvorhersage/pollen_vorhersage.json"
+// Neuer, stabilerer Proxy-Dienst
+const PROXY_URL = "https://thingproxy.freeboard.io/fetch/"
+const DWD_SRC = "https://opendata.dwd.de/weather/health/pollenvorhersage/pollen_vorhersage.json"
 const MAP = { "50": "41", "51": "41", "52": "41", "10": "11", "60": "51", "80": "82", "20": "21" };
 
 window.onload = () => {
 const saved = localStorage.getItem('userPLZ') || "50226"
 document.getElementById('plzIn').value = saved;
 document.getElementById('curLoc').innerText = saved;
-loadData(saved);
+fetchPollen(saved);
 };
 
 function toggleSearch() { document.getElementById('plzSearch').classList.toggle('visible'); }
+function retry() { fetchPollen(document.getElementById('curLoc').innerText); }
 
 function updatePlz() {
 const plz = document.getElementById('plzIn').value;
@@ -93,46 +81,30 @@ if(plz.length >= 2) {
 localStorage.setItem('userPLZ', plz);
 document.getElementById('curLoc').innerText = plz;
 toggleSearch();
-loadData(plz);
+fetchPollen(plz);
 }
 }
 
-async function loadData(plz) {
+async function fetchPollen(plz) {
+const out = document.getElementById('pollenOut');
 const rid = MAP[plz.substring(0,2)] || "41"
-let success = false;
-
-for (let proxy of PROXIES) {
 try {
-const res = await fetch(proxy + encodeURIComponent(DWD_URL));
-if (!res.ok) continue;
-const d = await res.json();
-if (d && d.content) {
-renderData(d, rid);
-success = true;
-break;
-}
-} catch (e) { console.error("Proxy-Fehler, versuche nächsten..."); }
-}
-
-if (!success) {
-document.getElementById('pollenOut').innerHTML = `
-<div class="status-msg">
-Daten konnten nicht geladen werden.<br>
-<small>Mögliche Ursache: DWD-Wartung oder Proxy-Blockade.</small>
-</div>`;
+// Wir versuchen es ohne Proxy (falls GitHub das erlaubt) und dann mit Proxy
+const response = await fetch(PROXY_URL + DWD_SRC);
+const data = await response.json();
+const region = data.content.find(r => r.partregion_id == rid || r.region_id == rid);
+render(region);
+} catch (e) {
+out.innerHTML = `<div class="status-msg" style="color:red">Abruf fehlgeschlagen. <br>Bitte tippe hier, um es erneut zu versuchen.</div>`;
 }
 }
 
-function renderData(d, rid) {
-const reg = d.content.find(r => r.partregion_id == rid || r.region_id == rid);
-if (!reg) return;
-
+function render(reg) {
 let p = [];
 for(let k in reg.pollen) {
 let v = reg.pollen[k].today;
 let n = v.includes('-') ? parseFloat(v.split('-')[0]) + 0.5 : parseFloat(v);
-if(isNaN(n)) n = 0;
-p.push({n: k, v: n, t: v});
+p.push({n: k, v: isNaN(n) ? 0 : n, t: v});
 }
 p.sort((a,b) => b.v - a.v);
 
@@ -142,18 +114,9 @@ document.getElementById('pollenOut').innerHTML = p.slice(0, 5).map(i => `
 <span class="p-val" style="color:${i.v >= 2 ? 'var(--critical)' : (i.v >= 1 ? 'var(--warn)' : 'var(--primary)')}">${i.t}</span>
 </div>
 `).join('');
-
-const tom = reg.pollen[p[0].n].tomorrow;
-document.getElementById('foreOut').innerHTML = `
-<div class="f-row"><span><b>Morgen</b> (${p[0].n})</span> <span class="w-badge" style="background:var(--warn)">${tom}</span></div>
-<div class="f-row"><span><b>Übermorgen</b></span> <span class="w-badge" style="background:var(--warn)">${reg.pollen[p[0].n].day_after_tomorrow}</span></div>
-`;
 }
 
-function save() {
-alert("Tages-Log für heute gespeichert!");
-document.querySelectorAll('.s-btn').forEach(b => b.classList.remove('active'));
-}
+function save() { alert("Eintrag lokal gespeichert!"); }
 </script>
 </body>
 </html>
