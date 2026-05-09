@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>AllergieCockpit 1.4.1</title>
+<title>AllergieCockpit 1.4.2</title>
 <style>
-:root { --primary: #27ae60; --bg: #f0f2f5; --card: #ffffff; --warn: #e67e22; --critical: #e74c3c; --dark: #2c3e50; }
-body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 12px; color: var(--dark); -webkit-tap-highlight-color: transparent; }
-.card { background: var(--card); padding: 18px; border-radius: 22px; box-shadow: 0 5px 25px rgba(0,0,0,0.04); margin-bottom: 15px; }
-h2 { margin: 0 0 12px 0; font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; }
-.loc-badge { font-size: 0.9rem; font-weight: 800; color: var(--primary); background: #f0fdf4; padding: 6px 14px; border-radius: 14px; }
-.p-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; min-height: 100px; align-items: center; }
-.p-item { text-align: center; padding: 14px; border-radius: 18px; background: #f8fafc; border: 1px solid #f1f5f9; }
+:root { --primary: #27ae60; --bg: #f8fafc; --card: #ffffff; --warn: #e67e22; --critical: #e74c3c; --dark: #1e293b; }
+body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); margin: 0; padding: 15px; color: var(--dark); -webkit-tap-highlight-color: transparent; }
+.card { background: var(--card); padding: 20px; border-radius: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 15px; border: 1px solid #e2e8f0; }
+h2 { margin: 0 0 15px 0; font-size: 0.7rem; color: #64748b; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 800; }
+.loc-badge { font-size: 0.9rem; font-weight: 800; color: var(--primary); background: #f0fdf4; padding: 6px 14px; border-radius: 12px; }
+.p-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.p-box { text-align: center; padding: 25px; border-radius: 20px; border: 2px dashed #cbd5e1; cursor: pointer; background: #ffffff; transition: all 0.2s; }
+.p-box:active { transform: scale(0.98); background: #f1f5f9; }
 .s-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.s-btn { padding: 18px; border-radius: 18px; border: 1px solid #f1f5f9; background: white; font-weight: 600; text-align: center; font-size: 1rem; color: #475569; }
-.s-btn.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 12px rgba(39, 174, 96, 0.2); }
-.btn-save { background: var(--dark); color: white; border: none; padding: 20px; width: 100%; border-radius: 18px; font-weight: 700; margin-top: 15px; font-size: 1.1rem; }
-.load-box { grid-column: span 3; text-align: center; padding: 20px; border: 2px dashed #e2e8f0; border-radius: 16px; cursor: pointer; }
-.btn-retry { background: var(--primary); color: white; padding: 10px 20px; border-radius: 10px; display: inline-block; margin-top: 8px; font-weight: bold; }
+.s-btn { padding: 18px; border-radius: 18px; border: 1px solid #e2e8f0; background: white; font-weight: 600; text-align: center; color: #475569; }
+.s-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+.btn-main { background: var(--dark); color: white; border: none; padding: 20px; width: 100%; border-radius: 20px; font-weight: 700; font-size: 1.1rem; margin-top: 10px; }
+.info-link { display: block; margin-top: 15px; font-size: 0.8rem; color: var(--primary); text-decoration: none; font-weight: 600; }
 </style>
 </head>
 <body>
@@ -25,22 +25,25 @@ h2 { margin: 0 0 12px 0; font-size: 0.75rem; color: #94a3b8; text-transform: upp
 <div class="card">
 <div style="display: flex; justify-content: space-between; align-items: center;">
 <h2>📍 STANDORT</h2>
-<div id="curLoc" class="loc-badge" onclick="changePLZ()">50226</div>
+<div id="curLoc" class="loc-badge" onclick="setPLZ()">50226</div>
 </div>
 </div>
 
 <div class="card">
 <h2>🤧 POLLEN-STATUS</h2>
-<div class="p-grid" id="pollenOut">
-<div class="load-box" id="loader" onclick="fetchData()">
-<div style="font-weight: 800; color: var(--dark); font-size: 1.1rem;">DATEN JETZT ABRUFEN</div>
-<div id="statusTxt" style="font-size: 0.8rem; color: #94a3b8; margin-top: 4px;">Tippe zum Starten</div>
+<div id="pollenOut" class="p-grid">
+<div class="p-box" onclick="loadPollen()">
+<div id="pBtnTxt" style="font-weight: 800; font-size: 1.1rem;">DATEN LADEN</div>
+<div id="pSubTxt" style="font-size: 0.85rem; color: #64748b; margin-top: 5px;">Tippe zum Verbinden</div>
 </div>
 </div>
+<a id="manualLink" href="https://www.dwd.de/DE/leistungen/gefahrenindizespollen/pollen_node.html" target="_blank" class="info-link" style="display:none; text-align:center;">
+Öffne DWD-Webseite (Manuelle Ansicht)
+</a>
 </div>
 
 <div class="card">
-<h2>🚩 HEUTE PROTOKOLLIERT</h2>
+<h2>🚩 SYMPTOME PROTOKOLL</h2>
 <div class="s-grid">
 <div class="s-btn" onclick="this.classList.toggle('active')">Augen</div>
 <div class="s-btn" onclick="this.classList.toggle('active')">Nase</div>
@@ -49,70 +52,75 @@ h2 { margin: 0 0 12px 0; font-size: 0.75rem; color: #94a3b8; text-transform: upp
 <div class="s-btn" onclick="this.classList.toggle('active')">Kopf</div>
 <div class="s-btn" onclick="this.classList.toggle('active')">Müde</div>
 </div>
-<button class="btn-save" onclick="save()">Log speichern</button>
+<button class="btn-main" onclick="saveLog()">Log speichern</button>
 </div>
 
 <script>
-const PROXIES = [
-"https://api.allorigins.win/raw?url=",
-"https://corsproxy.io/?",
-"https://thingproxy.freeboard.io/fetch/"
-];
-const TARGET = "https://opendata.dwd.de/weather/health/pollenvorhersage/pollen_vorhersage.json"
-const MAP = { "50": "41", "51": "41", "52": "41", "10": "11", "60": "51", "80": "82" };
+const DWD_API = "https://opendata.dwd.de/weather/health/pollenvorhersage/pollen_vorhersage.json"
+const PROXY = "https://api.allorigins.win/raw?url="
+const REGIONS = { "50": "41", "51": "41", "52": "41", "10": "11", "60": "51", "80": "82" };
 
 window.onload = () => {
-const plz = localStorage.getItem('userPLZ') || "50226"
-document.getElementById('curLoc').innerText = plz;
+document.getElementById('curLoc').innerText = localStorage.getItem('userPLZ') || "50226"
 };
 
-function changePLZ() {
-const p = prompt("PLZ ändern:", localStorage.getItem('userPLZ') || "50226");
+function setPLZ() {
+const p = prompt("PLZ eingeben:", "50226");
 if(p) { localStorage.setItem('userPLZ', p); location.reload(); }
 }
 
-async function fetchData() {
+async function loadPollen() {
+const btn = document.getElementById('pBtnTxt');
+const sub = document.getElementById('pSubTxt');
+const link = document.getElementById('manualLink');
 const plz = localStorage.getItem('userPLZ') || "50226"
-const rid = MAP[plz.substring(0,2)] || "41"
-const status = document.getElementById('statusTxt');
-const loader = document.getElementById('loader');
+const rid = REGIONS[plz.substring(0,2)] || "41"
 
-loader.style.pointerEvents = "none"
-status.innerHTML = "Verbinde... <span style='color:var(--primary)'>●</span>"
+btn.innerText = "VERBINDE..."
+sub.innerText = "Bitte warten"
 
-for (let p of PROXIES) {
 try {
-const res = await fetch(p + encodeURIComponent(TARGET + "?nocache=" + Date.now()));
-if (res.ok) {
-const d = await res.json();
-render(d, rid);
+// Versuch 1: Proxy
+const res = await fetch(PROXY + encodeURIComponent(DWD_API));
+if(res.ok) {
+const data = await res.json();
+showData(data, rid);
 return;
 }
-} catch (e) { console.error("Proxy-Fehler"); }
-}
-status.innerHTML = "<b style='color:var(--critical)'>Blockiert.</b><br>Prüfe Internet oder versuche es später."
-loader.style.pointerEvents = "auto"
+} catch (e) {}
+
+// Fehler-Zustand
+btn.innerText = "ABRUF GEBLOCKT"
+btn.style.color = "var(--critical)"
+sub.innerText = "Browser verhindert Zugriff."
+link.style.display = "block"
 }
 
-function render(d, rid) {
+function showData(d, rid) {
 const reg = d.content.find(r => r.partregion_id == rid || r.region_id == rid);
 let items = [];
-for(let key in reg.pollen) {
-let v = reg.pollen[key].today;
-let n = v.includes('-') ? parseFloat(v.split('-')[0]) + 0.5 : parseFloat(v);
-if(!isNaN(n)) items.push({n: key, v: n, t: v});
+for(let k in reg.pollen) {
+let val = reg.pollen[k].today;
+let num = val.includes('-') ? 1.5 : parseFloat(val);
+if(!isNaN(num)) items.push({n: k, v: num, t: val});
 }
 items.sort((a,b) => b.v - a.v);
-document.getElementById('pollenOut').innerHTML = items.slice(0, 3).map(i => `
-<div class="p-item">
-<span style="display:block; font-size:0.7rem; font-weight:700; color:#94a3b8; margin-bottom:4px;">${i.n}</span>
-<span style="font-size:1.3rem; font-weight:800; color:${i.v >= 2 ? 'var(--critical)' : (i.v >= 1 ? 'var(--warn)' : 'var(--primary)')}">${i.t}</span>
+
+document.getElementById('pollenOut').innerHTML = `
+<div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px;">
+${items.slice(0,3).map(i => `
+<div style="text-align:center; padding:15px; background:#f8fafc; border-radius:15px; border:1px solid #e2e8f0;">
+<div style="font-size:0.65rem; font-weight:700; color:#64748b; margin-bottom:5px;">${i.n}</div>
+<div style="font-size:1.2rem; font-weight:800; color:${i.v >= 2 ? 'var(--critical)' : (i.v >= 1 ? 'var(--warn)' : 'var(--primary)')}">${i.t}</div>
 </div>
-`).join('');
+`).join('')}
+</div>
+<div onclick="location.reload()" style="text-align:center; margin-top:15px; font-size:0.8rem; color:#64748b; font-weight:600;">↻ Aktualisieren</div>
+`;
 }
 
-function save() {
-alert("Erfolgreich protokolliert!");
+function saveLog() {
+alert("Symptome für heute gespeichert!");
 document.querySelectorAll('.s-btn').forEach(b => b.classList.remove('active'));
 }
 </script>
