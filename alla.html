@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#1a2e1a">
-<title>LuftiBuks 3.7.0</title>
+<title>LuftiBuks 3.7.1</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -207,7 +207,7 @@ main{padding:10px 12px 90px;}
 <body>
 <header>
   <div class="logo">Lufti<span>Buks</span></div>
-  <div class="ver">v3.7.0</div>
+  <div class="ver">v3.7.1</div>
 </header>
 <nav>
   <button type="button" class="active" onclick="showTab('heute')">Heute</button>
@@ -364,7 +364,7 @@ main{padding:10px 12px 90px;}
 
 <script>
 // ===================== KONSTANTEN =====================
-const APP_VERSION = "3.7.0";
+const APP_VERSION = "3.7.1";
 // Standard-Startort: Frechen, Grube Carl (Peter-Pesch-Weg 5, 50226 Frechen)
 // Koordinaten: Marienburger Weg im Ortsteil Grube Carl, ca. 100 m vom Peter-Pesch-Weg entfernt. Für Pollen (Modell-Raster ca. 11 km) unkritisch.
 const DEFAULT_LOC = {lat:50.9105, lon:6.7842, name:"Frechen, Grube Carl"};
@@ -617,6 +617,8 @@ async function fetchDWD(){
   renderAll();
 }
 function getDWDRegion(lat,lon){
+  // DWD-Daten gelten nur für Deutschland (Bounding-Box), sonst keine Zuordnung
+  if(!(lat>=47.2 && lat<=55.1 && lon>=5.8 && lon<=15.1)) return null;
   const inside=DWD_REGIONS.filter(r=>lat>=r.la1&&lat<=r.la2&&lon>=r.lo1&&lon<=r.lo2);
   if(inside.length===1) return inside[0];
   if(inside.length>1){
