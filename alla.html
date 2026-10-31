@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#1a2e1a">
-<title>LuftiBuks 3.4.1</title>
+<title>LuftiBuks 3.6.0</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -147,12 +147,67 @@ select{background:var(--surface);border:1px solid var(--border);border-radius:10
 
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--accent);color:var(--accent-ink);padding:10px 20px;border-radius:24px;font-size:14px;font-weight:600;z-index:9999;white-space:nowrap;box-shadow:0 8px 20px rgba(0,0,0,.4);}
 footer{text-align:center;}
+
+/* Stabilität: kein horizontales Verschieben */
+html,body{overflow-x:hidden;width:100%;max-width:100%;overscroll-behavior-x:none;}
+main{width:100%;max-width:600px;overflow-x:hidden;}
+.ampel-row{overflow:hidden;width:100%;}
+.amp-day{min-width:0;flex:1 1 0;padding-left:2px;padding-right:2px;}
+.amp-date{font-size:13px;white-space:nowrap;}
+.amp-wday{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.loc-row input,.loc-row button{min-width:0;}
+.wb,.card,.wind-mini,.pollen-list{max-width:100%;}
+.wh-name{font-size:18px;text-align:right;}
+.wh-head{gap:8px;}
+.wh-lbl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pollen-name{min-width:0;}
+
+/* Verdichtete Startseite */
+header{padding:12px 16px 8px;}
+.logo{font-size:22px;}
+nav button{padding:8px 9px 9px;font-size:13px;}
+main{padding:10px 12px 90px;}
+.today-lbl{margin:0 2px 8px;font-size:10px;}
+.loc-bar{padding:10px 12px;margin-bottom:10px;border-radius:14px;}
+.loc-row{display:flex;align-items:center;gap:6px;grid-template-columns:none;}
+.loc-pin{font-size:14px;}
+.loc-name{flex:1;min-width:0;font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ibtn{width:36px;height:36px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;}
+.loc-search{margin-top:8px;}
+.loc-search input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--sans);font-size:14px;padding:8px 12px;outline:none;}
+.loc-search input:focus{border-color:var(--accent);}
+#cityResults{margin-top:6px;}
+.wb{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;margin-bottom:10px;border-radius:14px;}
+.wb-main{display:flex;align-items:baseline;gap:8px;min-width:0;}
+.wb-lbl{font-size:10px;margin:0;}
+.wb-val{font-size:20px;margin:0;white-space:nowrap;line-height:1.2;}
+.wb-sub{font-size:12px;text-align:right;min-width:0;}
+.wind-mini{display:block;padding:12px 14px;margin-bottom:10px;border-radius:14px;}
+.wm-main{display:flex;align-items:center;gap:12px;}
+.wm-main .wh-arrow{width:38px;height:38px;font-size:17px;}
+.wm-txt{min-width:0;}
+.wm-txt .wh-name{font-size:19px;text-align:left;}
+.wh-chips-line{font-size:12px;color:var(--text2);margin-top:2px;}
+.wh-chips-line b{color:var(--text);font-weight:500;}
+.sec-title{margin:12px 2px 8px;font-size:10px;}
+.ampel-row{gap:6px;}
+.amp-day{padding:8px 2px;border-radius:12px;}
+.amp-wday{font-size:10px;}
+.amp-date{font-size:13px;margin-bottom:3px;}
+.amp-lvl{font-size:11px;font-weight:600;margin-bottom:2px;}
+.amp-wind{font-family:var(--mono);font-size:10px;}
+.pollen-list{padding:2px 12px;}
+.pollen-item{padding:8px 0;gap:10px;}
+.pollen-name{font-size:14px;width:84px;}
+.pollen-bar{height:5px;flex:1;}
+.pollen-val{font-size:12px;font-weight:600;width:62px;text-align:right;flex-shrink:0;}
+.pollen-item.is-a .pollen-name{color:var(--accent);font-weight:600;}
 </style>
 </head>
 <body>
 <header>
   <div class="logo">Lufti<span>Buks</span></div>
-  <div class="ver">v3.4.1</div>
+  <div class="ver">v3.6.0</div>
 </header>
 <nav>
   <button type="button" class="active" onclick="showTab('heute')">Heute</button>
@@ -166,36 +221,33 @@ footer{text-align:center;}
 
 <!-- HEUTE -->
 <div class="section active" id="tab-heute">
+  <div class="today-lbl" id="todayLbl"></div>
+
   <div class="loc-bar">
-    <div class="loc-top">&#128205; <span id="locLabel">Kein Standort gesetzt</span></div>
     <div class="loc-row">
-      <input id="cityInput" type="text" placeholder="Ort suchen, z.B. Köln" onkeydown="if(event.key==='Enter')searchCity()">
-      <button type="button" class="btn btn-small" onclick="searchCity()">Suchen</button>
-      <button type="button" class="btn btn-small btn-ghost" onclick="useGps()" title="Aktuellen GPS-Standort verwenden">&#128225; GPS</button>
-      <button type="button" class="btn btn-small btn-ghost" onclick="refreshAll()" title="Daten erneut laden">&#8635;</button>
+      <span class="loc-pin">📍</span>
+      <span id="locLabel" class="loc-name">Standort</span>
+      <button type="button" class="ibtn" onclick="useGps()" title="GPS">📡</button>
+      <button type="button" class="ibtn" onclick="refreshAll()" title="Neu laden">↻</button>
+    </div>
+    <div class="loc-search">
+      <input id="cityInput" type="search" enterkeyhint="search" placeholder="Ort suchen…" onkeydown="if(event.key==='Enter')searchCity()">
     </div>
     <div id="cityResults"></div>
   </div>
-  <div class="today-lbl" id="todayLbl"></div>
 
-
-  <div id="windMini" class="wind-mini"><div class="hint" style="padding:0">Wind wird geladen…</div></div>
-  <div id="warnBanner" class="wb wl0">
-    <div class="wb-lbl">Aktuelle Pollenbelastung</div>
-    <div class="wb-val" id="warnVal">Kein Standort</div>
-    <div class="wb-sub" id="warnSub">Bitte Stadt eingeben</div>
+  <div id="warnBanner" class="wb wl-none">
+    <div class="wb-main"><span class="wb-lbl">Pollen</span><span id="warnVal" class="wb-val">–</span></div>
+    <div id="warnSub" class="wb-sub"></div>
   </div>
 
+  <div id="windMini" class="wind-mini"><div class="wh-hint">Wind wird geladen…</div></div>
 
-  <div class="sec-title">5-Tage-Pollenbelastung</div>
-  <div class="ampel-row" id="ampelRow">
-    <div class="hint">Bitte Standort eingeben</div>
-  </div>
+  <div class="sec-title">5 Tage · Pollen &amp; 💨 Mittel · Böe</div>
+  <div id="ampelRow" class="ampel-row"><div class="hint">Bitte Standort eingeben</div></div>
 
-  <div class="sec-title">Pollenflug heute &ndash; Top 5</div>
-  <div id="pollenKombiniert" class="pollen-list">
-    <div class="hint">Warte auf Standort&hellip;</div>
-  </div>
+  <div class="sec-title">Heute am stärksten</div>
+  <div id="pollenKombiniert" class="pollen-list"><div class="hint">Warte auf Standort…</div></div>
 </div>
 
 <!-- WIND -->
@@ -309,7 +361,7 @@ footer{text-align:center;}
 
 <script>
 // ===================== KONSTANTEN =====================
-const APP_VERSION = "3.4.1";
+const APP_VERSION = "3.6.0";
 // Standard-Startort: Frechen, Grube Carl (Peter-Pesch-Weg 5, 50226 Frechen)
 // Koordinaten: Marienburger Weg im Ortsteil Grube Carl, ca. 100 m vom Peter-Pesch-Weg entfernt. Für Pollen (Modell-Raster ca. 11 km) unkritisch.
 const DEFAULT_LOC = {lat:50.9105, lon:6.7842, name:"Frechen, Grube Carl"};
@@ -371,6 +423,7 @@ const WARN = [
   {lbl:"Sehr hoch",       sub:"Fenster geschlossen halten", cls:"wl4"}
 ];
 const LVL_COLS = ["var(--text3)","#3a8c35","#b8b800","#d97c00","#c83232"];
+const TINTS = ["#152215","#1b3a1a","#3b3c10","#4a2d0a","#4a1414"];
 const LVL_LBLS = ["Keine","Gering","Mäßig","Hoch","Sehr hoch"];
 
 // Beaufort (Mittelwind km/h), Bezeichnungen nach DWD
@@ -589,7 +642,7 @@ async function fetchWind(){
   const url="https://api.open-meteo.com/v1/forecast?latitude="+S.lat+"&longitude="+S.lon
     +"&daily=wind_direction_10m_dominant,wind_speed_10m_max,wind_gusts_10m_max"
     +"&hourly=wind_speed_10m,wind_gusts_10m,wind_direction_10m"
-    +"&wind_speed_unit=kmh&timezone=auto&forecast_days=2";
+    +"&wind_speed_unit=kmh&timezone=auto&forecast_days=5";
   try{
     const r=await fetch(url); if(!r.ok) throw new Error(r.status);
     S.windData=await r.json(); S.windError=null;
@@ -674,35 +727,35 @@ function renderWarnBanner(items){
 }
 function renderAmpel(){
   const row=$("ampelRow");
-  if(!S.pollenData || !S.pollenData.hourly){
-    row.innerHTML='<div class="hint">'+(S.lat==null?"Bitte Standort eingeben":"Keine Daten")+'</div>';
+  const om=S.pollenData && S.pollenData.hourly;
+  if(!om){
+    row.innerHTML='<div class="hint">'+(S.lat==null?"Bitte Standort eingeben":"Keine Pollendaten")+'</div>';
     return;
   }
-  const times=S.pollenData.hourly.time;
   const dayMax={};
-  times.forEach((t,i)=>{
+  om.time.forEach((t,i)=>{
     const day=t.slice(0,10);
     POLLEN_KEYS.forEach(k=>{
-      const arr=S.pollenData.hourly[k]; if(!arr) return;
+      const arr=om[k]; if(!arr) return;
       const l=getLevel(arr[i]||0);
       if(dayMax[day]===undefined || l>dayMax[day]) dayMax[day]=l;
     });
   });
-  row.innerHTML="";
+  const wd=S.windData && S.windData.daily;
   const today=todayStr();
-  Object.keys(dayMax).slice(0,5).forEach(day=>{
-    const lvl=dayMax[day];
+  row.innerHTML=Object.keys(dayMax).slice(0,5).map((day,idx)=>{
+    const l=dayMax[day];
     const d=new Date(day+"T12:00:00");
-    const el=document.createElement("div");
-    el.className="amp-day"+(day===today?" heute":"");
-    if(lvl>0) el.style.borderColor=LVL_COLS[lvl];
-    el.innerHTML=
-      '<div class="amp-wday">'+d.toLocaleDateString("de-DE",{weekday:"short"})+'</div>'+
-      '<div class="amp-date">'+d.toLocaleDateString("de-DE",{day:"numeric",month:"numeric"})+'</div>'+
-      '<div class="amp-dot" style="background:'+LVL_COLS[lvl]+'"></div>'+
-      '<div class="amp-lbl">'+LVL_LBLS[lvl]+'</div>';
-    row.appendChild(el);
-  });
+    const hasWind = wd && wd.wind_speed_10m_max && wd.wind_speed_10m_max[idx]!==undefined;
+    const m = hasWind ? Math.round(wd.wind_speed_10m_max[idx]) : null;
+    const g = hasWind ? Math.round(wd.wind_gusts_10m_max[idx]) : null;
+    return '<div class="amp-day'+(day===today?' heute':'')+'" style="background:'+TINTS[l]+';border-color:'+(l>0?LVL_COLS[l]:'var(--border)')+'">'
+      +'<div class="amp-wday">'+d.toLocaleDateString("de-DE",{weekday:"short"})+'</div>'
+      +'<div class="amp-date">'+d.toLocaleDateString("de-DE",{day:"numeric",month:"numeric"})+'</div>'
+      +'<div class="amp-lvl" style="color:'+LVL_COLS[l]+'">'+LVL_LBLS[l]+'</div>'
+      +'<div class="amp-wind" style="color:'+(hasWind?windColor(g):'var(--text3)')+'">'+(hasWind?m+' · '+g:'–')+'</div>'
+      +'</div>';
+  }).join("");
 }
 function renderPollenKombiniert(items){
   const wrap=$("pollenKombiniert");
@@ -714,19 +767,31 @@ function renderPollenKombiniert(items){
   }).slice(0,5);
   wrap.innerHTML=sorted.map(p=>{
     const col=LVL_COLS[p.lvl];
-    const pct=Math.min(100, Math.round(p.lvl/4*100));
-    const badge=p.isA?'<span class="allerg-badge">Meine Allergie</span>':"";
-    return '<div class="pollen-item">'+
-      '<span class="pollen-name" style="color:'+(p.isA?"var(--text)":"var(--text2)")+';font-weight:'+(p.isA?"600":"400")+'">'+p.name+'</span>'+
-      '<div class="pollen-bw"><div class="pollen-head">'+badge+
-        '<span style="font-size:11px;color:var(--text3);margin-right:4px">'+p.val+'</span>'+
-        '<span style="font-size:10px;color:'+col+';margin-left:auto">'+LVL_LBLS[p.lvl]+'</span></div>'+
-        '<div class="pollen-bar"><div class="pollen-fill" style="width:'+Math.max(pct,3)+'%;background:'+col+'"></div></div>'+
-      '</div></div>';
+    const pct=Math.max(6, Math.round(p.lvl/4*100));
+    return '<div class="pollen-item'+(p.isA?' is-a':'')+'">'
+      +'<span class="pollen-name">'+(p.isA?'★ ':'')+p.name+'</span>'
+      +'<div class="pollen-bar"><div class="pollen-fill" style="width:'+pct+'%;background:'+col+'"></div></div>'
+      +'<span class="pollen-val" style="color:'+col+'">'+LVL_LBLS[p.lvl]+'</span>'
+      +'</div>';
   }).join("");
 }
 
 // ===================== WIND =====================
+// Lokale Adria-Winde (Sektoren wie ADRIA_8, Kroatisch)
+const LOCAL_WIND = ["Tramontana","Bura","Levante","Jugo","Ostro","Libeccio","Ponente","Maestral"];
+// Grobe Abgrenzung Kroatien (Festland + Küste + Inseln)
+function inCroatia(){
+  return S.lat!=null && S.lat>=42.3 && S.lat<=46.6 && S.lon>=13.3 && S.lon<=19.5;
+}
+// Hauptbezeichnung: in Kroatien ab 20 km/h der lokale Name, sonst Beaufort
+function windTitle(mean, deg){
+  const bft=getBeaufort(mean);
+  if(inCroatia() && mean>=20){
+    return {main: LOCAL_WIND[Math.round(d360(deg)/45)%8], sub: bft.name};
+  }
+  return {main: bft.name, sub: ""};
+}
+
 function renderWind(){
   const w=S.windData;
   if(!w){
@@ -763,10 +828,10 @@ function renderWind(){
   }
 }
 function renderWindDay(p, mean, gust, deg){
-  const bft=getBeaufort(mean);
+  const t=windTitle(mean,deg);
   const dir=getDirectionLabel(deg);
-  setText(p+"-wind-name", bft.name);
-  setText(p+"-direction-text", "Aus "+dir.short+" · Adria: "+dir.adria+(bft.desc?" · "+bft.desc:""));
+  setText(p+"-wind-name", t.main);
+  setText(p+"-direction-text", "Aus "+dir.short+(t.sub?" · "+t.sub:" · "+getBeaufort(mean).desc));
   const mEl=$(p+"-mean"); mEl.textContent=mean+" km/h"; mEl.style.color=windColor(mean);
   const gEl=$(p+"-gusts"); gEl.textContent=gust+" km/h"; gEl.style.color=windColor(gust);
   setText(p+"-deg", dir.short+" ("+d360(deg)+"°)");
@@ -776,7 +841,7 @@ function renderWindMini(){
   const el=$("windMini");
   const w=S.windData;
   if(!w){
-    const msg = S.lat==null ? "Kein Standort" : (S.windError ? "Winddaten nicht abrufbar ("+S.windError+")" : "Wind wird geladen…");
+    const msg = S.lat==null ? "Kein Standort" : (S.windError ? "Wind nicht abrufbar ("+S.windError+")" : "Wind wird geladen…");
     el.innerHTML='<div class="wh-hint">'+msg+'</div>';
     el.onclick=null;
     return;
@@ -785,20 +850,14 @@ function renderWindMini(){
   const gust=Math.round(w.daily.wind_gusts_10m_max[0]);
   const deg=Math.round(w.daily.wind_direction_10m_dominant[0]);
   const dir=getDirectionLabel(deg);
-  const mT=Math.round(w.daily.wind_speed_10m_max[1]);
-  const gT=Math.round(w.daily.wind_gusts_10m_max[1]);
-  const dT=getDirectionLabel(Math.round(w.daily.wind_direction_10m_dominant[1]));
+  const t=windTitle(mean,deg);
   el.innerHTML=
-    '<div class="wh-head"><span class="wh-lbl">Wind heute</span>'+
-      '<span class="wh-name" style="color:'+windColor(gust)+'">'+getBeaufort(mean).name+'</span></div>'+
-    '<div class="wh-row">'+
+    '<div class="wm-main">'+
       '<span class="wh-arrow" style="transform:rotate('+d360(deg+180)+'deg)">⬆️</span>'+
-      '<div class="wh-chips">'+
-        '<span class="wh-chip">aus <b>'+dir.short+'</b></span>'+
-        '<span class="wh-chip">Mittel <b>'+mean+' km/h</b></span>'+
-        '<span class="wh-chip">Böen <b style="color:'+windColor(gust)+'">'+gust+' km/h</b></span>'+
-      '</div></div>'+
-    '<div class="wh-tom">Morgen: <b>'+getBeaufort(mT).name+'</b> · aus '+getDirectionLabel(Math.round(w.daily.wind_direction_10m_dominant[1])).short+' · Böen bis '+gT+' km/h <span style="float:right">Details ›</span></div>';
+      '<div class="wm-txt">'+
+        '<div class="wh-name" style="color:'+windColor(gust)+'">'+t.main+'</div>'+
+        '<div class="wh-chips-line">Aus <b>'+dir.short+'</b> · Mittel <b>'+mean+'</b> · Böe <b style="color:'+windColor(gust)+'">'+gust+'</b> km/h'+(t.sub?' · '+t.sub:'')+'</div>'+
+      '</div></div>';
   el.onclick=()=>showTab("wind");
 }
 function loadWindDemo(){
