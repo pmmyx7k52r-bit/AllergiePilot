@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#1a2e1a">
-<title>LuftiBuks 3.7.1</title>
+<title>LuftiBuks 3.7.2</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -202,12 +202,24 @@ main{padding:10px 12px 90px;}
 .pollen-bar{height:5px;flex:1;}
 .pollen-val{font-size:12px;font-weight:600;width:62px;text-align:right;flex-shrink:0;}
 .pollen-item.is-a .pollen-name{color:var(--accent);font-weight:600;}
+
+/* Wind-Karte deutlich hervorheben */
+#windMini{background:linear-gradient(135deg,#1b2f1b 0%,var(--surface) 70%);border:1px solid #3d6b38;border-left:4px solid var(--accent);padding:16px 16px 14px;margin-top:4px;box-shadow:0 6px 18px rgba(0,0,0,.25);}
+#windMini .wm-main{gap:14px;}
+#windMini .wm-main .wh-arrow{width:52px;height:52px;font-size:24px;border-color:var(--accent);background:rgba(108,195,95,.18);}
+#windMini .wm-txt .wh-name{font-size:24px;font-weight:600;line-height:1.15;}
+#windMini .wh-chips-line{font-size:14px;margin-top:4px;}
+#windMini .wh-chips-line b{font-size:15px;}
+#windMini .wh-tom{font-size:13px;}
+#windMini .wh-chips-line + .wh-chips-line{margin-top:10px;}
+#windMini .wh-hint{font-size:14px;}
+.sec-title.wind-title{font-size:12px;color:var(--accent);margin-top:16px;}
 </style>
 </head>
 <body>
 <header>
   <div class="logo">Lufti<span>Buks</span></div>
-  <div class="ver">v3.7.1</div>
+  <div class="ver">v3.7.2</div>
 </header>
 <nav>
   <button type="button" class="active" onclick="showTab('heute')">Heute</button>
@@ -247,7 +259,7 @@ main{padding:10px 12px 90px;}
   <div class="sec-title">Heute am stärksten</div>
   <div id="pollenKombiniert" class="pollen-list"><div class="hint">Warte auf Standort…</div></div>
 
-  <div class="sec-title">Wind</div>
+  <div class="sec-title wind-title">💨 Wind</div>
   <div id="windMini" class="wind-mini"><div class="wh-hint">Wind wird geladen…</div></div>
 </div>
 
@@ -364,7 +376,7 @@ main{padding:10px 12px 90px;}
 
 <script>
 // ===================== KONSTANTEN =====================
-const APP_VERSION = "3.7.1";
+const APP_VERSION = "3.7.2";
 // Standard-Startort: Frechen, Grube Carl (Peter-Pesch-Weg 5, 50226 Frechen)
 // Koordinaten: Marienburger Weg im Ortsteil Grube Carl, ca. 100 m vom Peter-Pesch-Weg entfernt. Für Pollen (Modell-Raster ca. 11 km) unkritisch.
 const DEFAULT_LOC = {lat:50.9105, lon:6.7842, name:"Frechen, Grube Carl"};
