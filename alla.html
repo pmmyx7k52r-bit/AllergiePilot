@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#1a2e1a">
-<title>LuftiBuks 3.6.0</title>
+<title>LuftiBuks 3.6.1</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -207,7 +207,7 @@ main{padding:10px 12px 90px;}
 <body>
 <header>
   <div class="logo">Lufti<span>Buks</span></div>
-  <div class="ver">v3.6.0</div>
+  <div class="ver">v3.6.1</div>
 </header>
 <nav>
   <button type="button" class="active" onclick="showTab('heute')">Heute</button>
@@ -241,13 +241,14 @@ main{padding:10px 12px 90px;}
     <div id="warnSub" class="wb-sub"></div>
   </div>
 
-  <div id="windMini" class="wind-mini"><div class="wh-hint">Wind wird geladen…</div></div>
-
-  <div class="sec-title">5 Tage · Pollen &amp; 💨 Mittel · Böe</div>
+  <div class="sec-title">5 Tage · Pollenbelastung</div>
   <div id="ampelRow" class="ampel-row"><div class="hint">Bitte Standort eingeben</div></div>
 
   <div class="sec-title">Heute am stärksten</div>
   <div id="pollenKombiniert" class="pollen-list"><div class="hint">Warte auf Standort…</div></div>
+
+  <div class="sec-title">Wind</div>
+  <div id="windMini" class="wind-mini"><div class="wh-hint">Wind wird geladen…</div></div>
 </div>
 
 <!-- WIND -->
@@ -361,7 +362,7 @@ main{padding:10px 12px 90px;}
 
 <script>
 // ===================== KONSTANTEN =====================
-const APP_VERSION = "3.6.0";
+const APP_VERSION = "3.6.1";
 // Standard-Startort: Frechen, Grube Carl (Peter-Pesch-Weg 5, 50226 Frechen)
 // Koordinaten: Marienburger Weg im Ortsteil Grube Carl, ca. 100 m vom Peter-Pesch-Weg entfernt. Für Pollen (Modell-Raster ca. 11 km) unkritisch.
 const DEFAULT_LOC = {lat:50.9105, lon:6.7842, name:"Frechen, Grube Carl"};
@@ -753,7 +754,6 @@ function renderAmpel(){
       +'<div class="amp-wday">'+d.toLocaleDateString("de-DE",{weekday:"short"})+'</div>'
       +'<div class="amp-date">'+d.toLocaleDateString("de-DE",{day:"numeric",month:"numeric"})+'</div>'
       +'<div class="amp-lvl" style="color:'+LVL_COLS[l]+'">'+LVL_LBLS[l]+'</div>'
-      +'<div class="amp-wind" style="color:'+(hasWind?windColor(g):'var(--text3)')+'">'+(hasWind?m+' · '+g:'–')+'</div>'
       +'</div>';
   }).join("");
 }
@@ -858,6 +858,10 @@ function renderWindMini(){
         '<div class="wh-name" style="color:'+windColor(gust)+'">'+t.main+'</div>'+
         '<div class="wh-chips-line">Aus <b>'+dir.short+'</b> · Mittel <b>'+mean+'</b> · Böe <b style="color:'+windColor(gust)+'">'+gust+'</b> km/h'+(t.sub?' · '+t.sub:'')+'</div>'+
       '</div></div>';
+  const mT=Math.round(w.daily.wind_speed_10m_max[1]);
+  const gT=Math.round(w.daily.wind_gusts_10m_max[1]);
+  const tT=windTitle(mT, Math.round(w.daily.wind_direction_10m_dominant[1]));
+  el.insertAdjacentHTML('beforeend','<div class="wh-chips-line" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">Morgen: <b>'+tT.main+'</b> · Böe bis <b>'+gT+' km/h</b></div>');
   el.onclick=()=>showTab("wind");
 }
 function loadWindDemo(){
