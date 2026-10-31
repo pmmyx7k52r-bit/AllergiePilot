@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#1a2e1a">
-<title>LuftiBuks 3.6.1</title>
+<title>LuftiBuks 3.7.0</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -207,7 +207,7 @@ main{padding:10px 12px 90px;}
 <body>
 <header>
   <div class="logo">Lufti<span>Buks</span></div>
-  <div class="ver">v3.6.1</div>
+  <div class="ver">v3.7.0</div>
 </header>
 <nav>
   <button type="button" class="active" onclick="showTab('heute')">Heute</button>
@@ -353,8 +353,10 @@ main{padding:10px 12px 90px;}
   <div class="card">
     <div class="card-title">Daten</div>
     <button type="button" class="btn btn-ghost" onclick="exportData()" style="margin-right:8px;margin-bottom:8px">&#128228; Exportieren</button>
+    <button type="button" class="btn btn-ghost" onclick="$('importFile').click()" style="margin-bottom:8px">&#128229; Importieren</button>
+    <input type="file" id="importFile" accept="application/json,.json" style="display:none" onchange="importData(event)">
     <button type="button" class="btn btn-ghost" onclick="clearData()" style="color:#f08080;border-color:#5a2020">&#128465; Alles l&ouml;schen</button>
-    <div class="hint" style="margin-top:10px">Daten liegen nur auf diesem Ger&auml;t (localStorage). Exportieren, bevor du den Browser-Cache leerst.</div>
+    <div class="hint" style="margin-top:10px">Daten liegen nur auf diesem Ger&auml;t. Vor dem Deinstallieren exportieren, danach nach der Neuinstallation wieder importieren. Muster wird aus den Eintr&auml;gen neu berechnet und muss nicht gesichert werden.</div>
   </div>
 </div>
 
@@ -362,7 +364,7 @@ main{padding:10px 12px 90px;}
 
 <script>
 // ===================== KONSTANTEN =====================
-const APP_VERSION = "3.6.1";
+const APP_VERSION = "3.7.0";
 // Standard-Startort: Frechen, Grube Carl (Peter-Pesch-Weg 5, 50226 Frechen)
 // Koordinaten: Marienburger Weg im Ortsteil Grube Carl, ca. 100 m vom Peter-Pesch-Weg entfernt. Für Pollen (Modell-Raster ca. 11 km) unkritisch.
 const DEFAULT_LOC = {lat:50.9105, lon:6.7842, name:"Frechen, Grube Carl"};
@@ -950,6 +952,25 @@ function populateMonths(){
     return '<option value="'+m+'"'+(m===cur?" selected":"")+'>'+lbl+'</option>';
   }).join("");
 }
+// Gleiche Pflanzen unter verschiedenen Namen (englisch, DWD, alte Einträge) zusammenführen
+const CANON_POLLEN = {
+  Ragweed:"Ambrosia", Ambrosia:"Ambrosia",
+  Grasses:"Gräser", Graeser:"Gräser", "Gräser":"Gräser", Timothy:"Lieschgras",
+  Alder:"Erle", Birch:"Birke", Ash:"Esche", Hazel:"Hasel", Oak:"Eiche", Plane:"Platane",
+  Mugwort:"Beifuß", Beifuss:"Beifuß", Olive:"Olive", Pine:"Kiefer", Elm:"Ulme",
+  Cottonwood:"Pappel", Juniper:"Wacholder", Maple:"Ahorn", Walnut:"Walnuss",
+  Cypress:"Zypresse", Mulberry:"Maulbeere", Weegerich:"Wegerich"
+};
+function canonPollenMap(m){
+  const out={};
+  if(!m) return out;
+  Object.keys(m).forEach(k=>{
+    const c=CANON_POLLEN[k]||k;
+    out[c]=Math.max(out[c]||0, m[k]);
+  });
+  return out;
+}
+
 function renderTagebuch(){
   const list=$("tagebuchList");
   if(!list) return;
@@ -966,11 +987,11 @@ function renderTagebuch(){
       +(e.time?" · "+e.time:"")+(e.location?" · "+e.location:"");
     const symPills=Object.keys(e.symptoms||{}).filter(k=>e.symptoms[k]).map(k=>
       '<span class="sym-pill">'+(SYM_LABELS[k]||k)+'</span>').join("");
-    const pollenArr=Object.keys(e.pollenLevel||{}).filter(n=>e.pollenLevel[n]>0)
-      .sort((a,b)=>e.pollenLevel[b]-e.pollenLevel[a]);
+    const pm=canonPollenMap(e.pollenLevel);
+    const pollenArr=Object.keys(pm).filter(n=>pm[n]>0).sort((a,b)=>pm[b]-pm[a]);
     const pollenPills=pollenArr.length
       ? '<div class="pollen-pills">'+pollenArr.map(n=>{
-          const l=e.pollenLevel[n];
+          const l=pm[n];
           return '<span class="pollen-pill" style="color:'+LVL_COLS[l]+'">'+n+' '+LVL_LBLS[l]+'</span>';
         }).join("")+'</div>'
       : "";
@@ -1007,8 +1028,9 @@ function analyseMuster(){
   S.entries.forEach(e=>{
     if(!e.pollenLevel) return;
     const hasSym=!e.beschwerdefrei && Object.values(e.symptoms||{}).some(Boolean);
-    Object.keys(e.pollenLevel).forEach(name=>{
-      if(e.pollenLevel[name]<=0) return;
+    const pm=canonPollenMap(e.pollenLevel);
+    Object.keys(pm).forEach(name=>{
+      if(pm[name]<=0) return;
       pTotal[name]=(pTotal[name]||0)+1;
       if(hasSym) pSym[name]=(pSym[name]||0)+1;
     });
@@ -1088,6 +1110,37 @@ function clearData(){
   saveStorage();
   renderTagebuch(); populateMonths(); renderProfil(); analyseMuster(); renderAll();
   showToast("Gelöscht");
+}
+
+function importData(ev){
+  const file=ev.target.files && ev.target.files[0];
+  ev.target.value="";
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const data=JSON.parse(reader.result);
+      if(!data || !Array.isArray(data.entries)) throw new Error("keine Einträge in der Datei");
+      const valid=data.entries.filter(e=>e && e.id!=null && typeof e.date==="string" && /^\d{4}-\d{2}-\d{2}$/.test(e.date));
+      const ids=new Set(S.entries.map(e=>String(e.id)));
+      let added=0;
+      valid.forEach(e=>{
+        if(!ids.has(String(e.id))){ S.entries.push(e); ids.add(String(e.id)); added++; }
+      });
+      S.entries.sort((a,b)=>Number(b.id)-Number(a.id));
+      if(data.profil){
+        ["pollen","tiere","sonstiges"].forEach(c=>{
+          S.profil[c]=[...new Set([...(S.profil[c]||[]), ...(data.profil[c]||[])])];
+        });
+      }
+      saveStorage();
+      renderAll(); renderTagebuch(); populateMonths(); renderProfil();
+      showToast(added+" Einträge importiert");
+    }catch(err){
+      showToast("Import fehlgeschlagen: "+err.message);
+    }
+  };
+  reader.readAsText(file);
 }
 
 // ===================== INIT =====================
